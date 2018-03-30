@@ -7,9 +7,9 @@ using System.Text;
 
 namespace PCME.Infrastructure.EntityConfigurations
 {
-    public class UnitNatureEntityTypeConfiguration : IEntityTypeConfiguration<UnitNature>
+    public class UnitNatureEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnitNature>
     {
-        public void Configure(EntityTypeBuilder<UnitNature> builder)
+        public void Configure(EntityTypeBuilder<WorkUnitNature> builder)
         {
             builder.ToTable("UnitNature");
 

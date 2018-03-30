@@ -235,7 +235,7 @@ namespace PCME.Infrastructure.Repositories
                         await _mediator.DispatchDomainEventsAsync(uow._context);
                         count += await uow.SaveChangesAsync(ensureAutoHistory);
                     }
-
+                    await _mediator.DispatchDomainEventsAsync(_context);
                     count += await SaveChangesAsync(ensureAutoHistory);
 
                     transaction.Commit();

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace PCME.Domain.AggregatesModel.UnitAggregates
 {
-    public interface IUnitRepository:IRepository<Unit>
+    public interface IWorkUnitRepository:IRepository<WorkUnit>
     {
     }
 }

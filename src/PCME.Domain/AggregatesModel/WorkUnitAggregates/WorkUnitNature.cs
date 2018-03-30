@@ -7,23 +7,23 @@ using System.Linq;
 namespace PCME.Domain.AggregatesModel.UnitAggregates
 {
 
-    public class UnitNature: Enumeration
+    public class WorkUnitNature: Enumeration
     {
-        public static UnitNature JgUnit = new UnitNature(1, nameof(JgUnit));
-        public static UnitNature SyUnit = new UnitNature(2, nameof(SyUnit));
-        public static UnitNature Company = new UnitNature(3, nameof(Company));
-        public static IEnumerable<UnitNature> List() => new[] { JgUnit, SyUnit, Company };
-        public UnitNature()
+        public static WorkUnitNature JgUnit = new WorkUnitNature(1, nameof(JgUnit));
+        public static WorkUnitNature SyUnit = new WorkUnitNature(2, nameof(SyUnit));
+        public static WorkUnitNature Company = new WorkUnitNature(3, nameof(Company));
+        public static IEnumerable<WorkUnitNature> List() => new[] { JgUnit, SyUnit, Company };
+        public WorkUnitNature()
         {
 
         }
-        public UnitNature(int id, string name) :
+        public WorkUnitNature(int id, string name) :
             base(id, name)
         {
 
         }
 
-        public static UnitNature FromName(string name)
+        public static WorkUnitNature FromName(string name)
         {
             var state = List()
                 .SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCulture));
@@ -35,7 +35,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
             return state;
         }
-        public static UnitNature From(int id)
+        public static WorkUnitNature From(int id)
         {
             var state = List().SingleOrDefault(s => s.Id == id);
 

@@ -7,9 +7,9 @@ using System.Text;
 
 namespace PCME.Infrastructure.EntityConfigurations
 {
-    public class UnitEntityTypeConfiguration : IEntityTypeConfiguration<Unit>
+    public class UnitEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnit>
     {
-        public void Configure(EntityTypeBuilder<Unit> builder)
+        public void Configure(EntityTypeBuilder<WorkUnit> builder)
         {
             builder.ToTable("Unit");
 

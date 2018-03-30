@@ -5,7 +5,7 @@ using PCME.Domain.SeedWork;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PCME.Infrastructure.Repositories {
+namespace PCME.Domain.SeedWork {
     /// <summary>
     /// Defines the interface(s) for generic unit of work.
     /// </summary>
