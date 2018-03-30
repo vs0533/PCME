@@ -11,7 +11,7 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
     {
         public static AuditStatus Default = new AuditStatus(1, nameof(Default));
         public static AuditStatus Pass = new AuditStatus(2, nameof(Pass));
-        public static AuditStatus VoteDown = new AuditStatus(1, nameof(VoteDown));
+        public static AuditStatus VoteDown = new AuditStatus(3, nameof(VoteDown));
 
         public static IEnumerable<AuditStatus> List() => new[] { Default, Pass, VoteDown };
         public AuditStatus()

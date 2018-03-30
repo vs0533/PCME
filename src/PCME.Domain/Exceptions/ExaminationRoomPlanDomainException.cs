@@ -14,7 +14,7 @@ namespace PCME.Domain.Exceptions
         {
 
         }
-        public ExaminationRoomPlanDomainException(string message,, Exception exception) :base(message,exception)
+        public ExaminationRoomPlanDomainException(string message, Exception exception) :base(message,exception)
         {
 
         }

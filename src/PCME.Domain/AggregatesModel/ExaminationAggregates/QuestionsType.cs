@@ -9,10 +9,12 @@ namespace PCME.Domain.AggregatesModel.ExaminationAggregates
 {
     public class QuestionsType : Enumeration
     {
-        public static QuestionsType JgUnit = new QuestionsType(1, nameof(JgUnit));
-        public static QuestionsType SyUnit = new QuestionsType(2, nameof(SyUnit));
-        public static QuestionsType Company = new QuestionsType(3, nameof(Company));
-        public static IEnumerable<QuestionsType> List() => new[] { JgUnit, SyUnit, Company };
+        public static QuestionsType SingleChoice = new QuestionsType(1, nameof(SingleChoice));
+        public static QuestionsType MultipleChoice = new QuestionsType(2, nameof(MultipleChoice));
+        public static QuestionsType GapFilling = new QuestionsType(3, nameof(GapFilling));
+        public static QuestionsType Judge = new QuestionsType(4, nameof(Judge));
+        public static QuestionsType EssayQuestions = new QuestionsType(5, nameof(EssayQuestions));
+        public static IEnumerable<QuestionsType> List() => new[] { SingleChoice, MultipleChoice, GapFilling,Judge,EssayQuestions };
         public QuestionsType()
         {
 

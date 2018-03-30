@@ -23,7 +23,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         public int? PID { get; private set; }
 
-        public int UnitNatureId { get; private set; }
+        public UnitNature UnitNature { get; private set; }
 
 
         private readonly List<Unit> _childs;
@@ -34,5 +34,20 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         [Timestamp]
         public byte[] Version { get; set; }
+
+        public Unit(string code, string name, int level, string linkMan, 
+            string linkPhoto, string email, string address, int? pID,
+            UnitNature unitNature)
+        {
+            Code = code ?? throw new ArgumentNullException(nameof(code));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Level = level;
+            LinkMan = linkMan ?? throw new ArgumentNullException(nameof(linkMan));
+            LinkPhoto = linkPhoto ?? throw new ArgumentNullException(nameof(linkPhoto));
+            Email = email ?? throw new ArgumentNullException(nameof(email));
+            Address = address ?? throw new ArgumentNullException(nameof(address));
+            PID = pID;
+            UnitNature = unitNature ?? throw new ArgumentNullException(nameof(unitNature));
+        }
     }
 }

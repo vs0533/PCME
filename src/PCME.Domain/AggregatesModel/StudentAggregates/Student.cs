@@ -42,8 +42,8 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         {
 
         }
-        public Student(string name, string idcard, string password)
-            :this(name, idcard, password, Sex.Unknown,null,string.Empty
+        public Student(string name, string idcard, string password,StudentType studentType)
+            :this(name, idcard, password, Sex.Unknown,studentType,null,string.Empty
                  ,string.Empty,null,string.Empty,string.Empty,false,
                  string.Empty,false,string.Empty,Decimal.Zero)
         {
