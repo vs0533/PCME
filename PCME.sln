@@ -9,9 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCME.Domain", "src\PCME.Dom
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCME.Infrastructure", "src\PCME.Infrastructure\PCME.Infrastructure.csproj", "{258C7E84-54A5-4C42-B159-B01403D47948}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.EntityFrameworkCore.UnitOfWork", "src\Microsoft.EntityFrameworkCore.UnitOfWork\Microsoft.EntityFrameworkCore.UnitOfWork.csproj", "{13D4B5DB-D0DC-4D41-A009-D35D4D847B54}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCME.Api", "src\PCME.Api\PCME.Api.csproj", "{298E258A-AC74-4D3C-BFAE-8C6826215801}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PCME.Api", "src\PCME.Api\PCME.Api.csproj", "{298E258A-AC74-4D3C-BFAE-8C6826215801}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +25,6 @@ Global
 		{258C7E84-54A5-4C42-B159-B01403D47948}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{258C7E84-54A5-4C42-B159-B01403D47948}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{258C7E84-54A5-4C42-B159-B01403D47948}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13D4B5DB-D0DC-4D41-A009-D35D4D847B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13D4B5DB-D0DC-4D41-A009-D35D4D847B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13D4B5DB-D0DC-4D41-A009-D35D4D847B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13D4B5DB-D0DC-4D41-A009-D35D4D847B54}.Release|Any CPU.Build.0 = Release|Any CPU
 		{298E258A-AC74-4D3C-BFAE-8C6826215801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{298E258A-AC74-4D3C-BFAE-8C6826215801}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{298E258A-AC74-4D3C-BFAE-8C6826215801}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,7 +36,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{3D7B2758-9F4D-4DBE-BE39-56E55630B6C5} = {BEFFD360-F6E9-4788-8D1D-62CE265285C9}
 		{258C7E84-54A5-4C42-B159-B01403D47948} = {BEFFD360-F6E9-4788-8D1D-62CE265285C9}
-		{13D4B5DB-D0DC-4D41-A009-D35D4D847B54} = {BEFFD360-F6E9-4788-8D1D-62CE265285C9}
 		{298E258A-AC74-4D3C-BFAE-8C6826215801} = {BEFFD360-F6E9-4788-8D1D-62CE265285C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

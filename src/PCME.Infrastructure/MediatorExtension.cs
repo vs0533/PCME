@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using PCME.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace PCME.Infrastructure
 {
     static class MediatorExtension
     {
-        public static async Task DispatchDomainEventsAsync(this IMediator mediator, ApplicationDbContext ctx)
+        public static async Task DispatchDomainEventsAsync<TContext>(this IMediator mediator, TContext ctx) where TContext:DbContext
         {
             var domainEntities = ctx.ChangeTracker
                 .Entries<Entity>()
