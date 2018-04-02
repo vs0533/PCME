@@ -16,6 +16,7 @@ namespace PCME.Infrastructure
     public class ApplicationDbContext : DbContext
     {
         public DbSet<Student> Students { get; set; }
+        public DbSet<WorkUnitNature> WorkUnitNature { get; set; }
         public DbSet<Domain.AggregatesModel.UnitAggregates.WorkUnit> Unit { get; set; }
 
         //private readonly IMediator _mediator;

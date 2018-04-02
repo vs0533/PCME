@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180329071724_init")]
+    [Migration("20180402065025_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -95,7 +95,7 @@ namespace PCME.Infrastructure.Migrations
                     b.ToTable("StudentType");
                 });
 
-            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.Unit", b =>
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -122,11 +122,13 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int?>("ParentId");
 
-                    b.Property<int?>("UnitNatureId");
+                    b.Property<int>("UnitNatureId");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();
+
+                    b.Property<int>("WorkUnitNatureId");
 
                     b.HasKey("Id");
 
@@ -137,7 +139,7 @@ namespace PCME.Infrastructure.Migrations
                     b.ToTable("Unit");
                 });
 
-            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.UnitNature", b =>
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", b =>
                 {
                     b.Property<int>("Id")
                         .HasDefaultValue(1);
@@ -162,15 +164,16 @@ namespace PCME.Infrastructure.Migrations
                         .HasForeignKey("TypeId");
                 });
 
-            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.Unit", b =>
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", b =>
                 {
-                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.Unit", "Parent")
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "Parent")
                         .WithMany("Childs")
                         .HasForeignKey("ParentId");
 
-                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.UnitNature", "UnitNature")
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
                         .WithMany()
-                        .HasForeignKey("UnitNatureId");
+                        .HasForeignKey("UnitNatureId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

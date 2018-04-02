@@ -54,7 +54,7 @@ namespace XUnitTest
         {
             var unitOfWork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();
             var repository = unitOfWork.GetRepository<WorkUnit>();
-            var workunit = new WorkUnit("370303", "淄博卫盛科技", 1, "唐林", "sdf", "3440", null, null, WorkUnitNature.Company);
+            var workunit = new WorkUnit("370303", "淄博卫盛科技", 1, "唐林", "sdf", "3440", null, null, WorkUnitNature.JgUnit.Id);
             repository.InsertAsync(workunit);
             unitOfWork.SaveEntitiesAsync();
             //IUnitOfWork <ApplicationDbContext> unitofwork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();

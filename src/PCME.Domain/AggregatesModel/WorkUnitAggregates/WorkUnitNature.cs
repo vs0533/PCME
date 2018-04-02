@@ -9,9 +9,9 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
     public class WorkUnitNature: Enumeration
     {
-        public static WorkUnitNature JgUnit = new WorkUnitNature(1, nameof(JgUnit));
-        public static WorkUnitNature SyUnit = new WorkUnitNature(2, nameof(SyUnit));
-        public static WorkUnitNature Company = new WorkUnitNature(3, nameof(Company));
+        public static WorkUnitNature JgUnit = new WorkUnitNature(1, "机关单位");
+        public static WorkUnitNature SyUnit = new WorkUnitNature(2, "事业单位");
+        public static WorkUnitNature Company = new WorkUnitNature(3, "企业");
         public static IEnumerable<WorkUnitNature> List() => new[] { JgUnit, SyUnit, Company };
         public WorkUnitNature()
         {

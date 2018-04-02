@@ -100,8 +100,9 @@ namespace PCME.Infrastructure.Migrations
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     PID = table.Column<int>(nullable: true),
                     ParentId = table.Column<int>(nullable: true),
-                    UnitNatureId = table.Column<int>(nullable: true),
-                    Version = table.Column<byte[]>(rowVersion: true, nullable: true)
+                    UnitNatureId = table.Column<int>(nullable: false),
+                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    WorkUnitNatureId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,7 +118,7 @@ namespace PCME.Infrastructure.Migrations
                         column: x => x.UnitNatureId,
                         principalTable: "UnitNature",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
