@@ -15,7 +15,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         public string LinkMan { get;private set; }
 
-        public string LinkPhoto { get; private set; }
+        public string LinkPhone { get; private set; }
 
         public string Email { get;private set; }
 
@@ -44,7 +44,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Level = level;
             LinkMan = linkMan ?? throw new ArgumentNullException(nameof(linkMan));
-            LinkPhoto = linkPhoto ?? throw new ArgumentNullException(nameof(linkPhoto));
+            LinkPhone = linkPhoto ?? throw new ArgumentNullException(nameof(linkPhoto));
             Email = email ?? throw new ArgumentNullException(nameof(email));
             Address = address;
             PID = pID;
