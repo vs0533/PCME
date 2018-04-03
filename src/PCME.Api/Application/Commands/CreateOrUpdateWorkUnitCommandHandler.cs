@@ -26,8 +26,8 @@ namespace PCME.Api.Application.Commands
         {
             var idIsExisted = await workUnitRepository.FindAsync(request.Id);
 
-            var codeIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(c => c.Code == request.Code && c.Id != request.Id);
-            var nameIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(c => c.Name == request.Name && c.Id != request.Id);
+            var codeIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s=>new { code = s.Code }, c => c.Code == request.Code && c.Id != request.Id);
+            var nameIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s=>new { name = s.Name},c => c.Name == request.Name && c.Id != request.Id);
 
             //单位名称存在
             if (nameIsExisted != null) { return false; }

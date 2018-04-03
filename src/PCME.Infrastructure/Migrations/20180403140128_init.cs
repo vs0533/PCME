@@ -99,7 +99,6 @@ namespace PCME.Infrastructure.Migrations
                     LinkPhone = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     PID = table.Column<int>(nullable: true),
-                    ParentId = table.Column<int>(nullable: true),
                     PassWord = table.Column<string>(nullable: false),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                     WorkUnitNatureId = table.Column<int>(nullable: false)
@@ -108,8 +107,8 @@ namespace PCME.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Unit", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Unit_Unit_ParentId",
-                        column: x => x.ParentId,
+                        name: "FK_Unit_Unit_PID",
+                        column: x => x.PID,
                         principalTable: "Unit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -132,9 +131,9 @@ namespace PCME.Infrastructure.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_ParentId",
+                name: "IX_Unit_PID",
                 table: "Unit",
-                column: "ParentId");
+                column: "PID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Unit_WorkUnitNatureId",

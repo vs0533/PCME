@@ -362,7 +362,7 @@ namespace PCME.Infrastructure.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<TResult> GetFirstOrDefaultAsync_<TResult>(Expression<Func<TEntity, TResult>> selector,
+        public async Task<TResult> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
                                                   Expression<Func<TEntity, bool>> predicate = null,
                                                   Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,

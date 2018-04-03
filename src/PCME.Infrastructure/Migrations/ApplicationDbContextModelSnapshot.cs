@@ -119,8 +119,6 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int?>("PID");
 
-                    b.Property<int?>("ParentId");
-
                     b.Property<string>("PassWord")
                         .IsRequired();
 
@@ -132,7 +130,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("PID");
 
                     b.HasIndex("WorkUnitNatureId");
 
@@ -168,7 +166,7 @@ namespace PCME.Infrastructure.Migrations
                 {
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "Parent")
                         .WithMany("Childs")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("PID");
 
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
                         .WithMany()

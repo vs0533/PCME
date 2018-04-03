@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,15 @@ namespace PCME.Api.Controllers
         {
 
             return new string[] { "value1", "value2" };
+        }
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetUnitTreeByParentId(int pid)
+        {
+            var items = workunitRepository.GetPagedListAsync(
+               predicate: c=>c.PID ==pid
+                );
+            return Ok(items);
         }
 
         // GET: api/WorkUnit/5

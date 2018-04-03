@@ -15,7 +15,8 @@ namespace PCME.Infrastructure.EntityConfigurations
 
             builder
                 .HasOne(o => o.Parent)
-                .WithMany(o => o.Childs);
+                .WithMany(o => o.Childs)
+                .HasForeignKey(d=>d.PID);
 
             builder.Ignore(o => o.DomainEvents);
 

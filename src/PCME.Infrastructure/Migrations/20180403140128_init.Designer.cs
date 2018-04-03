@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180403074809_init")]
+    [Migration("20180403140128_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,8 +120,6 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int?>("PID");
 
-                    b.Property<int?>("ParentId");
-
                     b.Property<string>("PassWord")
                         .IsRequired();
 
@@ -133,7 +131,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
+                    b.HasIndex("PID");
 
                     b.HasIndex("WorkUnitNatureId");
 
@@ -169,7 +167,7 @@ namespace PCME.Infrastructure.Migrations
                 {
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "Parent")
                         .WithMany("Childs")
-                        .HasForeignKey("ParentId");
+                        .HasForeignKey("PID");
 
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
                         .WithMany()
