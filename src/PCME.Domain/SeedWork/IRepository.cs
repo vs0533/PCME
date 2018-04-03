@@ -147,7 +147,7 @@ namespace PCME.Domain.SeedWork
         /// <param name="disableTracking"><c>true</c> to disable changing tracking; otherwise, <c>false</c>. Default to <c>true</c>.</param>
         /// <returns>An <see cref="IPagedList{TEntity}"/> that contains elements that satisfy the condition specified by <paramref name="predicate"/>.</returns>
         /// <remarks>Ex: This method defaults to a read-only, no-tracking query.</remarks>
-        Task<TResult> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
+        Task<TResult> GetFirstOrDefaultAsync_<TResult>(Expression<Func<TEntity, TResult>> selector,
             Expression<Func<TEntity, bool>> predicate = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
@@ -188,7 +188,9 @@ namespace PCME.Domain.SeedWork
         /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
         Task<TEntity> FindAsync(params object[] keyValues);
-
+        
+        Task<TEntity> FindAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            params object[] keyValues);
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
         /// </summary>
@@ -196,6 +198,11 @@ namespace PCME.Domain.SeedWork
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the task to complete.</param>
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
         Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken);
+        Task<TEntity> FindAsync(
+            object[] keyValues,
+            CancellationToken cancellationToken,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null
+            );
 
         /// <summary>
         /// Gets all entities. This method is not recommended

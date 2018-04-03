@@ -100,6 +100,7 @@ namespace PCME.Infrastructure.Migrations
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     PID = table.Column<int>(nullable: true),
                     ParentId = table.Column<int>(nullable: true),
+                    PassWord = table.Column<string>(nullable: false),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                     WorkUnitNatureId = table.Column<int>(nullable: false)
                 },

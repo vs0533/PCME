@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180403044758_init")]
+    [Migration("20180403074809_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -121,6 +121,9 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<int?>("PID");
 
                     b.Property<int?>("ParentId");
+
+                    b.Property<string>("PassWord")
+                        .IsRequired();
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()

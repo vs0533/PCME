@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PCME.Api.Application.Validations
 {
-    public class IdentifiedCommandValidator:AbstractValidator<IdentifiedCommand<CreateWorkUnitCommand,bool>>
+    public class IdentifiedCommandValidator:AbstractValidator<IdentifiedCommand<CreateOrUpdateWorkUnitCommand,bool>>
     {
         public IdentifiedCommandValidator()
     {

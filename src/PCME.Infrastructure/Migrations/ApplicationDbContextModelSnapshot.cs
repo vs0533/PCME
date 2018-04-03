@@ -121,6 +121,9 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int?>("ParentId");
 
+                    b.Property<string>("PassWord")
+                        .IsRequired();
+
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();

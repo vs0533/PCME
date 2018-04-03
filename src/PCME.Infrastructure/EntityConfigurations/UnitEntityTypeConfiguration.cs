@@ -27,11 +27,15 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.Property(o => o.PassWord)
+                .IsRequired();
+
             builder.Property(o => o.Level)
                 .IsRequired();
 
             builder.HasOne(o => o.UnitNature)
                 .WithMany()
+                //.OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey("WorkUnitNatureId");
                 
         }

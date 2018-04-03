@@ -10,7 +10,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
     {
         public string Code { get; private set; }
         public string Name { get; private set; }
-
+        public string PassWord { get; private set; }
         public int Level { get; private set; }
 
         public string LinkMan { get;private set; }
@@ -30,7 +30,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
         private readonly List<WorkUnit> _childs;
         public IReadOnlyCollection<WorkUnit> Childs => _childs;
 
-        public WorkUnit Parent { get; private set; }
+        public virtual WorkUnit Parent { get; private set; }
 
 
         [Timestamp]
@@ -41,11 +41,12 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         }
 
-        public WorkUnit(string code, string name, int level, string linkMan, 
+        public WorkUnit(string code,string passWord, string name, int level, string linkMan, 
             string linkPhoto, string email, string address, int? pID,
             int workUnitNatureId)
         {
             Code = code ?? throw new ArgumentNullException(nameof(code));
+            PassWord = passWord ?? throw new ArgumentNullException(nameof(PassWord));
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Level = level;
             LinkMan = linkMan ?? throw new ArgumentNullException(nameof(linkMan));
@@ -54,6 +55,19 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             Address = address;
             PID = pID;
             WorkUnitNatureId = workUnitNatureId;
+        }
+
+        public void Update(string name,string linkman,string email,string linkphone,string address)
+        {
+            Name = name;
+            LinkMan = linkman;
+            Email = email;
+            LinkPhone = linkphone;
+            Address = address;
+        }
+
+        public void ChangePassWord(string passWord) {
+            PassWord = passWord ?? throw new ArgumentNullException(nameof(PassWord));
         }
     }
 }

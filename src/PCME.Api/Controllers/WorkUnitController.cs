@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PCME.Api.Application.Commands;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.SeedWork;
@@ -20,7 +19,7 @@ namespace PCME.Api.Controllers
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<WorkUnit> workunitRepository;
 
-        public WorkUnitController(IMediator mediator,IUnitOfWork<ApplicationDbContext> unitOfWork)
+        public WorkUnitController(IMediator mediator, IUnitOfWork<ApplicationDbContext> unitOfWork)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -31,7 +30,7 @@ namespace PCME.Api.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            
+
             return new string[] { "value1", "value2" };
         }
 
@@ -39,12 +38,12 @@ namespace PCME.Api.Controllers
         [HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> Get(int id)
         {
-            var result = await workunitRepository.FindAsync(id);
+            var result = await workunitRepository.FindAsync(c => c.Include(d => d.UnitNature), id);
             if (id <= 0)
             {
                 return BadRequest();
             }
-            
+
             if (result != null)
             {
                 return Ok(result);
@@ -52,29 +51,36 @@ namespace PCME.Api.Controllers
 
             return NotFound();
         }
-        
+
         // POST: api/WorkUnit
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]CreateWorkUnitCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command)
         {
             bool commandResult = false;
-            if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
-            {
-                //var requestCancelOrder = new IdentifiedCommand<CreateWorkUnitCommand, bool>(command, guid);
-                //var command = new CreateWorkUnitCommand(command);
-                commandResult = await _mediator.Send(command);
-            }
-
+            commandResult = await _mediator.Send(command);
             return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
 
         }
 
         // PUT: api/WorkUnit/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<IActionResult> ChangePassword(int id, string password)
         {
+            if (id < 0)
+            {
+                return NotFound();
+            }
+            var workUnitItem = await workunitRepository.FindAsync(id);
+            if (workUnitItem == null)
+            {
+                return NotFound();
+            }
+            workUnitItem.ChangePassWord(password);
+            workunitRepository.Update(workUnitItem);
+            await unitOfWork.SaveEntitiesAsync();
+            return (IActionResult)Ok();
         }
-        
+
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -84,13 +90,13 @@ namespace PCME.Api.Controllers
                 return BadRequest();
             }
 
-            var campaignToDelete = await workunitRepository.FindAsync(id);
-            if (campaignToDelete is null)
+            var workUnitToDelete = await workunitRepository.FindAsync(id);
+            if (workUnitToDelete is null)
             {
                 return NotFound();
             }
 
-            workunitRepository.Delete(id);
+            workunitRepository.Delete(workUnitToDelete);
             await unitOfWork.SaveEntitiesAsync();
             return NoContent();
         }

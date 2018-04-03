@@ -11,11 +11,8 @@ namespace PCME.Api.Infrastructure.AutoMapperMapping
     public static class MappingConfiguration
     {
         public static void Configure(IMapperConfigurationExpression cfg)
-
         {
-
-            cfg.CreateMap<CreateWorkUnitCommand, WorkUnit>();
-
+            cfg.CreateMap<CreateOrUpdateWorkUnitCommand, WorkUnit>();
         }
     }
 
@@ -23,7 +20,7 @@ namespace PCME.Api.Infrastructure.AutoMapperMapping
     {
         public MappingProfile()
         {
-            CreateMap<CreateWorkUnitCommand, WorkUnit>();
+            CreateMap<CreateOrUpdateWorkUnitCommand, WorkUnit>();
         }
     }
 }

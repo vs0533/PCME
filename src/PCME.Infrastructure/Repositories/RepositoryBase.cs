@@ -362,7 +362,7 @@ namespace PCME.Infrastructure.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<TResult> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
+        public async Task<TResult> GetFirstOrDefaultAsync_<TResult>(Expression<Func<TEntity, TResult>> selector,
                                                   Expression<Func<TEntity, bool>> predicate = null,
                                                   Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                                   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
@@ -415,6 +415,18 @@ namespace PCME.Infrastructure.Repositories
         /// <param name="keyValues">The values of the primary key for the entity to be found.</param>
         /// <returns>A <see cref="Task{TEntity}" /> that represents the asynchronous insert operation.</returns>
         public Task<TEntity> FindAsync(params object[] keyValues) => _dbSet.FindAsync(keyValues);
+        
+
+        public async Task<TEntity> FindAsync(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+            params object[] keyValues)
+        {
+            IQueryable<TEntity> query = _dbSet;
+            if (include != null)
+            {
+                query = include(query);
+            }
+            return await query.FirstOrDefaultAsync();
+        }
 
         /// <summary>
         /// Finds an entity with the given primary key values. If found, is attached to the context and returned. If no entity is found, then null is returned.
@@ -424,6 +436,17 @@ namespace PCME.Infrastructure.Repositories
         /// <returns>A <see cref="Task{TEntity}"/> that represents the asynchronous find operation. The task result contains the found entity or null.</returns>
         public Task<TEntity> FindAsync(object[] keyValues, CancellationToken cancellationToken) => _dbSet.FindAsync(keyValues, cancellationToken);
 
+        public async Task<TEntity> FindAsync(
+            object[] keyValues, CancellationToken cancellationToken,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+            if (include != null)
+            {
+                query = include(query);
+            }
+            return await query.FirstOrDefaultAsync(cancellationToken);
+        }
         /// <summary>
         /// Gets the count based on a predicate.
         /// </summary>
@@ -568,5 +591,7 @@ namespace PCME.Infrastructure.Repositories
         /// </summary>
         /// <param name="entities">The entities.</param>
         public void Delete(IEnumerable<TEntity> entities) => _dbSet.RemoveRange(entities);
+
+        
     }
 }
