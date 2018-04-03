@@ -23,15 +23,27 @@ namespace PCME.Api.Application.Commands
         }
         public async Task<bool> Handle(CreateWorkUnitCommand request, CancellationToken cancellationToken)
         {
-            var workUnitToUpdate = await workUnitRepository.FindAsync(request.Id);
-            var workUnit = Mapper.Map<CreateWorkUnitCommand, WorkUnit>(request);
-            if (workUnitToUpdate == null)
+
+            try
             {
-                await workUnitRepository.InsertAsync(workUnit);
+                var workUnitToUpdate = await workUnitRepository.FindAsync(request.Id);
+                //Mapper.Initialize(cfg =>
+                //  cfg.CreateMap<CreateWorkUnitCommand, WorkUnit>()
+                //);
+                var workUnit = Mapper.Map<CreateWorkUnitCommand, WorkUnit>(request);
+                if (workUnitToUpdate == null)
+                {
+                    await workUnitRepository.InsertAsync(workUnit);
+                }
+                else
+                {
+                    workUnitRepository.Update(workUnit);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                workUnitRepository.Update(workUnit);
+
+                throw;
             }
 
             return await unitOfWork.SaveEntitiesAsync();

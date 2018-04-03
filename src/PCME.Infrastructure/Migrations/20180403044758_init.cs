@@ -96,11 +96,10 @@ namespace PCME.Infrastructure.Migrations
                     Email = table.Column<string>(nullable: true),
                     Level = table.Column<int>(nullable: false),
                     LinkMan = table.Column<string>(nullable: true),
-                    LinkPhoto = table.Column<string>(nullable: true),
+                    LinkPhone = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     PID = table.Column<int>(nullable: true),
                     ParentId = table.Column<int>(nullable: true),
-                    UnitNatureId = table.Column<int>(nullable: false),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                     WorkUnitNatureId = table.Column<int>(nullable: false)
                 },
@@ -114,8 +113,8 @@ namespace PCME.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Unit_UnitNature_UnitNatureId",
-                        column: x => x.UnitNatureId,
+                        name: "FK_Unit_UnitNature_WorkUnitNatureId",
+                        column: x => x.WorkUnitNatureId,
                         principalTable: "UnitNature",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -137,9 +136,9 @@ namespace PCME.Infrastructure.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_UnitNatureId",
+                name: "IX_Unit_WorkUnitNatureId",
                 table: "Unit",
-                column: "UnitNatureId");
+                column: "WorkUnitNatureId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

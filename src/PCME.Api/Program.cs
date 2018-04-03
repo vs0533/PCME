@@ -12,6 +12,7 @@ using PCME.Api.Infrastructure;
 using PCME.Infrastructure;
 using PCME.CustomWebHost;
 using Microsoft.Extensions.Options;
+using PCME.Api.Infrastructure.AutoMapperMapping;
 
 namespace PCME.Api
 {
@@ -28,7 +29,7 @@ namespace PCME.Api
                     //var logger = services.GetService<ILogger<OrderingContextSeed>>();
 
                     new ApplicationContextSeed()
-                        .SeedAsync(context, env,settings)
+                        .SeedAsync(context, env, settings)
                         .Wait();
                 })
                 //.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })

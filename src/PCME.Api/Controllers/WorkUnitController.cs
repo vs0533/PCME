@@ -20,11 +20,11 @@ namespace PCME.Api.Controllers
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<WorkUnit> workunitRepository;
 
-        public WorkUnitController(IMediator mediator, IUnitOfWork<ApplicationDbContext> unitOfWork, IRepository<WorkUnit> workunitRepository)
+        public WorkUnitController(IMediator mediator,IUnitOfWork<ApplicationDbContext> unitOfWork)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
             this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            this.workunitRepository = unitOfWork.GetRepository<WorkUnit>();
+            workunitRepository = unitOfWork.GetRepository<WorkUnit>();
         }
 
         // GET: api/WorkUnit
@@ -60,8 +60,9 @@ namespace PCME.Api.Controllers
             bool commandResult = false;
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestCancelOrder = new IdentifiedCommand<CreateWorkUnitCommand, bool>(command, guid);
-                commandResult = await _mediator.Send(requestCancelOrder);
+                //var requestCancelOrder = new IdentifiedCommand<CreateWorkUnitCommand, bool>(command, guid);
+                //var command = new CreateWorkUnitCommand(command);
+                commandResult = await _mediator.Send(command);
             }
 
             return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();

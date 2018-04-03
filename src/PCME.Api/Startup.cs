@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PCME.Api.Infrastructure.AutofacModules;
+using PCME.Api.Infrastructure.AutoMapperMapping;
 using PCME.Infrastructure;
 
 namespace PCME.Api
@@ -36,19 +38,21 @@ namespace PCME.Api
                         options.UseSqlServer(Configuration["ConnectionString"],
                             sqlServerOptionsAction: sqlOptions =>
                             {
-                                sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                                sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                                //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                                //sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                             });
                     },
                         ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
                     ).AddUnitOfWork<ApplicationDbContext>();
 
             services.Configure<ApplicationSettings>(Configuration);
+
+            //services.AddSingleton(new Mapper(new MapperConfiguration(MappingConfiguration.Configure)));
+            services.AddAutoMapper();
+
             var container = new ContainerBuilder();
             container.Populate(services);
-
             container.RegisterModule(new MeditorModule());
-
             return new AutofacServiceProvider(container.Build());
         }
 

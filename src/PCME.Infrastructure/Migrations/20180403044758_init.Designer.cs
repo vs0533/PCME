@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180402065025_init")]
+    [Migration("20180403044758_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,7 +112,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<string>("LinkMan");
 
-                    b.Property<string>("LinkPhoto");
+                    b.Property<string>("LinkPhone");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -121,8 +121,6 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<int?>("PID");
 
                     b.Property<int?>("ParentId");
-
-                    b.Property<int>("UnitNatureId");
 
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
@@ -134,7 +132,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasIndex("ParentId");
 
-                    b.HasIndex("UnitNatureId");
+                    b.HasIndex("WorkUnitNatureId");
 
                     b.ToTable("Unit");
                 });
@@ -172,7 +170,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
                         .WithMany()
-                        .HasForeignKey("UnitNatureId")
+                        .HasForeignKey("WorkUnitNatureId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

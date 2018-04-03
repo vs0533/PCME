@@ -32,7 +32,7 @@ namespace PCME.Infrastructure.EntityConfigurations
 
             builder.HasOne(o => o.UnitNature)
                 .WithMany()
-                .HasForeignKey("UnitNatureId");
+                .HasForeignKey("WorkUnitNatureId");
                 
         }
     }

@@ -36,6 +36,11 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
         [Timestamp]
         public byte[] Version { get; set; }
 
+        public WorkUnit()
+        {
+
+        }
+
         public WorkUnit(string code, string name, int level, string linkMan, 
             string linkPhoto, string email, string address, int? pID,
             int workUnitNatureId)
@@ -48,7 +53,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             Email = email ?? throw new ArgumentNullException(nameof(email));
             Address = address;
             PID = pID;
-            WorkUnitNatureId = WorkUnitNatureId;
+            WorkUnitNatureId = workUnitNatureId;
         }
     }
 }
