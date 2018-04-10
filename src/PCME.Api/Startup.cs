@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using IdentityServer4.AccessTokenValidation;
+using IdentityServer4.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using PCME.Api.Infrastructure.AutofacModules;
-using PCME.Api.Infrastructure.AutoMapperMapping;
 using PCME.Infrastructure;
+using System;
+using System.Collections.Generic;
 
 namespace PCME.Api
 {
@@ -31,7 +27,44 @@ namespace PCME.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            #region 跨域设置
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder.WithOrigins("http://localhost:1841", "http://192.168.4.102:5000").AllowAnyMethod().AllowAnyHeader());
+            });
+            #endregion
             services.AddMvc();
+
+            #region api密码token身份认证设置
+
+            services.AddIdentityServer()
+                .AddDeveloperSigningCredential()
+                .AddInMemoryApiResources(new List<ApiResource>{
+                    new ApiResource("api1","myapi")
+                })
+                .AddInMemoryClients(new List<Client> {
+                    new Client{
+                        ClientId = "client",
+                        AllowedGrantTypes = GrantTypes.ResourceOwnerPassword,
+                        ClientSecrets = {
+                            new Secret("secret".Sha256())
+                        },
+                        AllowedScopes = { "api1"}
+                    }
+                });
+
+            services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
+                .AddIdentityServerAuthentication(options =>
+                {
+                    options.Authority = "http://localhost:6000";
+                    options.RequireHttpsMetadata = false;
+                    options.ApiName = "api1";
+                    options.ApiSecret = "secret";
+                });
+
+            #endregion
+
             services.AddEntityFrameworkSqlServer()
                     .AddDbContext<ApplicationDbContext>(options =>
                     {
@@ -59,10 +92,14 @@ namespace PCME.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors("AllowSpecificOrigin"); //跨域必须设置在这里 一开始这里 切记
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseIdentityServer();
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }

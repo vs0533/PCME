@@ -38,8 +38,8 @@ namespace PCME.Api.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetUnitTreeByParentId(int pid)
         {
-            var items = workunitRepository.GetPagedListAsync(
-               predicate: c=>c.PID ==pid
+            var items = await workunitRepository.GetPagedListAsync(
+               predicate: c=>c.PID ==pid,pageIndex:0,pageSize:int.MaxValue
                 );
             return Ok(items);
         }

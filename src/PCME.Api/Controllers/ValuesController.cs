@@ -11,9 +11,24 @@ namespace PCME.Api.Controllers
     {
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get()
         {
-            return new string[] { "value1", "value2" };
+            //return new string[] { "value1", "value2" };
+            IEnumerable<Dictionary<string, dynamic>> d = new List<Dictionary<string, dynamic>>{
+                new Dictionary<string, dynamic>{
+                    { "id","1"},
+                    { "text","水水"},
+                    { "leaf",true},
+                    { "route","/"}
+                },
+                new Dictionary<string, dynamic>{
+                    { "id","2"},
+                    { "text","得到"},
+                    { "leaf",true},
+                    { "route","/"}
+                }
+            };
+            return Ok(d);
         }
 
         // GET api/values/5
