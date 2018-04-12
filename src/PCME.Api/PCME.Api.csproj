@@ -6,8 +6,8 @@
 
   <ItemGroup>
     <Folder Include="Application\DomainEventHandlers\" />
-    <Folder Include="wwwroot\" />
     <Folder Include="Setup\" />
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>

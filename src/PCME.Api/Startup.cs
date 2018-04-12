@@ -1,14 +1,19 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
+using IdentityServer4;
 using IdentityServer4.AccessTokenValidation;
 using IdentityServer4.Models;
+using IdentityServer4.Services;
+using IdentityServer4.Test;
+using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PCME.Api.Infrastructure.AutofacModules;
+using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -31,7 +36,10 @@ namespace PCME.Api
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:1841", "http://192.168.4.102:5000").AllowAnyMethod().AllowAnyHeader());
+                    builder => builder.WithOrigins("http://localhost:1841", "http://loclahost:5003")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    );
             });
             #endregion
             services.AddMvc();
@@ -62,7 +70,6 @@ namespace PCME.Api
                     options.ApiName = "api1";
                     options.ApiSecret = "secret";
                 });
-
             #endregion
 
             services.AddEntityFrameworkSqlServer()
@@ -83,6 +90,8 @@ namespace PCME.Api
             //services.AddSingleton(new Mapper(new MapperConfiguration(MappingConfiguration.Configure)));
             services.AddAutoMapper();
 
+            services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+
             var container = new ContainerBuilder();
             container.Populate(services);
             container.RegisterModule(new MeditorModule());
@@ -100,7 +109,8 @@ namespace PCME.Api
             app.UseIdentityServer();
 
             app.UseAuthentication();
-
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
             app.UseMvc();
         }
     }
