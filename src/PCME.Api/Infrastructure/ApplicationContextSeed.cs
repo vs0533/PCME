@@ -40,6 +40,7 @@ namespace PCME.Api.Infrastructure
                 WorkUnitNature.Company
             };
         }
+        
         public async Task SeedAsync(ApplicationDbContext context, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
         {
             var policy = CreatePolicy(nameof(ApplicationContextSeed));
@@ -55,7 +56,16 @@ namespace PCME.Api.Infrastructure
                     {
                         context.WorkUnitNature.AddRange(GetPredefinedWorkUnitNature());
 
+                        
                         await context.SaveChangesAsync();
+                    }
+                    if (!context.WorkUnits.Any())
+                    {
+                        IEnumerable<WorkUnit> workunits = new List<WorkUnit>()
+                        {
+                            new WorkUnit("370303","111111","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id)
+                        };
+                        context.WorkUnits.AddRange(workunits);
                     }
 
                     //if (!context.OrderStatus.Any())
@@ -68,6 +78,8 @@ namespace PCME.Api.Infrastructure
                     await context.SaveChangesAsync();
                 }
             });
+
+
             Console.Write("seed");
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,10 +10,12 @@ namespace PCME.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/Login")]
+    [Authorize]
     public class LoginController : Controller
     {
         //[HttpGet]
         [Route("[action]")]
+        [AllowAnonymous]
         public IActionResult GetSystemInfo()
         {
             Dictionary<string, object> cfg = new Dictionary<string, object>();
@@ -47,6 +50,10 @@ namespace PCME.Api.Controllers
             cfg.Add("systeminfo", systeminfo);
             cfg.Add("company", company);
             return Ok(cfg);
+        }
+        [Route("[action]")]
+        public IActionResult GetUserInfo() {
+            return Ok(from c in User.Claims select new { c.Type, c.Value });
         }
     }
 }

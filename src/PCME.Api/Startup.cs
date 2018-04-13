@@ -65,7 +65,7 @@ namespace PCME.Api
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = "http://localhost:6000";
+                    options.Authority = "http://localhost:8888";
                     options.RequireHttpsMetadata = false;
                     options.ApiName = "api1";
                     options.ApiSecret = "secret";
@@ -91,6 +91,7 @@ namespace PCME.Api
             services.AddAutoMapper();
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
+            services.AddTransient<IProfileService, ProfileService>();
 
             var container = new ContainerBuilder();
             container.Populate(services);
