@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -44,7 +45,7 @@ namespace PCME.Api.Controllers
             systeminfo.Add("allowsavepassword", "");
             systeminfo.Add("savepassworddays", "");
             systeminfo.Add("needidentifingcode", "");
-            systeminfo.Add("alwaysneedidentifingcode","");
+            systeminfo.Add("alwaysneedidentifingcode", "");
             systeminfo.Add("forgetpassword", "忘记密码找管理员");
 
             cfg.Add("systeminfo", systeminfo);
@@ -53,7 +54,22 @@ namespace PCME.Api.Controllers
         }
         [Route("[action]")]
         public IActionResult GetUserInfo() {
-            return Ok(from c in User.Claims select new { c.Type, c.Value });
+            var result = GetDict(User.Claims);
+            //return Ok(from c in User.Claims select new { c.Type, c.Value });
+            return Ok(result);
+        }
+        private Dictionary<string, string> GetDict(IEnumerable<Claim> claims)
+        {
+            var d = new Dictionary<string, string>();
+            foreach (var item in claims)
+            {
+                if (!d.Any(c=>c.Key == item.Type))
+                {
+                    d.Add(item.Type, item.Value);
+                }
+                
+            }
+            return d;
         }
     }
 }

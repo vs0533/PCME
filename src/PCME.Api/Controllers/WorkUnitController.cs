@@ -35,18 +35,22 @@ namespace PCME.Api.Controllers
             return new string[] { "value1", "value2" };
         }
         [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> GetUnitTreeByParentId(int pid)
+        [Route("child")]
+        public async Task<IActionResult> GetUnitTreeByParentId(int? pid)
         {
-            var items = await workunitRepository.GetPagedListAsync(
-               predicate: c=>c.PID ==pid,pageIndex:0,pageSize:int.MaxValue
-                );
-            return Ok(items);
+            //var items = await workunitRepository.GetPagedListAsync(
+            //   predicate: c=>c.PID ==pid,pageIndex:0,pageSize:int.MaxValue
+            //    );
+            pid = pid == 0 ? null : pid;
+            var query = from c in workunitRepository.Query(c => c.PID == pid)
+                         select new { c.Id, text= c.Name ,leaf = !c.Childs.Any()};
+            var item = await query.ToListAsync();
+            return Ok(item);
         }
 
         // GET: api/WorkUnit/5
         [HttpGet("{id}", Name = "Get")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             var result = await workunitRepository.FindAsync(c => c.Include(d => d.UnitNature), id);
             if (id <= 0)
