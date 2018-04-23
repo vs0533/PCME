@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PCME.Api.Infrastructure.AutofacModules;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
+using PCME.Infrastructure.Repositories;
 using System;
 using System.Collections.Generic;
 

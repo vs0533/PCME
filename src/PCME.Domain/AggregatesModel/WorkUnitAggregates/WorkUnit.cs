@@ -38,7 +38,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         public WorkUnit()
         {
-
+            this._childs = new List<WorkUnit>();
         }
 
         public WorkUnit(string code,string passWord, string name, int level, string linkMan, 
