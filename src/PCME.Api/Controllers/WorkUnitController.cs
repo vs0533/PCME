@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PCME.Api.Application.Commands;
+using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.SeedWork;
@@ -32,18 +33,13 @@ namespace PCME.Api.Controllers
             this._dbContext = _dbContext;
             workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
         }
+        
 
-        // GET: api/WorkUnit
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-
-            return new string[] { "value1", "value2" };
-        }
-        [HttpGet]
+        [HttpPost]
         //[Authorize(Roles = "Unit")]
         [Route("getpagedlist")]
-        public IActionResult GetPagedList(string unitname,int id, int start,int limit) {
+        public IActionResult GetPagedList(string unitname,int id, int start,int limit, string filter) {
+            
 
             var sqlparameId = new SqlParameter("id", id);
 
@@ -57,7 +53,7 @@ namespace PCME.Api.Controllers
                             )  
                             SELECT * FROM temp";
 
-            var query = workUnitRepository.FromSql(sql, sqlparameId);
+            var query = workUnitRepository.FromSql(sql, sqlparameId).Filter(filter.ToFilter());
 
             if (!string.IsNullOrEmpty(unitname))
             {
@@ -65,7 +61,15 @@ namespace PCME.Api.Controllers
             }
 
             var item = query.Skip(start).Take(limit);
-            var result = item.Select(c=>new { c.Id,c.Name, parentname = c.Parent.Name,c.Level,workunitnature=WorkUnitNature.From(c.WorkUnitNatureId).Name});
+            var result = item.Select(c=>new {
+                c.Id,
+                c.Name,
+                parentname = c.Parent.Name,
+                c.Level,
+                linkman = c.LinkMan,
+                linkphone = c.LinkPhone,
+                workunitnature =WorkUnitNature.From(c.WorkUnitNatureId).Name
+            });
             var total = query.Count();
             return Ok(new { total, data=result });
         }
