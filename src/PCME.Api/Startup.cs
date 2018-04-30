@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PCME.Api.Infrastructure.AutofacModules;
+using PCME.Api.Infrastructure.Filters;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
 using PCME.Infrastructure.Repositories;
@@ -43,7 +44,9 @@ namespace PCME.Api
                     );
             });
             #endregion
-            services.AddMvc();
+            services.AddMvc(options=> {
+                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+            });
 
             #region api密码token身份认证设置
 
