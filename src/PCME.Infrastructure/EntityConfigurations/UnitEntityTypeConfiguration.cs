@@ -34,7 +34,7 @@ namespace PCME.Infrastructure.EntityConfigurations
             builder.Property(o => o.Level)
                 .IsRequired();
 
-            builder.HasOne(o => o.UnitNature)
+            builder.HasOne(o => o.WorkUnitNature)
                 .WithMany()
                 //.OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey("WorkUnitNatureId");

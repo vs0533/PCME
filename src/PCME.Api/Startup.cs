@@ -45,6 +45,7 @@ namespace PCME.Api
             });
             #endregion
             services.AddMvc(options=> {
+                options.Filters.Add(typeof(CheckPostParametersFilter));
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
             });
 

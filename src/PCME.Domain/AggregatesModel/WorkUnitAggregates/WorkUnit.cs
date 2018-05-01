@@ -23,7 +23,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         public int? PID { get; private set; }
 
-        public WorkUnitNature UnitNature { get; private set; }
+        public WorkUnitNature WorkUnitNature { get; private set; }
         public int WorkUnitNatureId { get; private set; }
 
 

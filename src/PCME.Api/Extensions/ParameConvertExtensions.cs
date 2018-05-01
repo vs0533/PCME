@@ -7,22 +7,22 @@ using Newtonsoft.Json;
 
 namespace PCME.Api.Extensions
 {
-    public static class FilterExtensions
+    public static class ParameConvertExtensions
     {
-        public static IEnumerable<Filter> ToFilter(this string filter) {
-            IEnumerable<Filter> filterItems = new List<Filter>();
-            if (!string.IsNullOrEmpty(filter))
+        public static IEnumerable<T> ToObject<T>(this string json) {
+            IEnumerable<T> Items = new List<T>();
+            if (!string.IsNullOrEmpty(json))
             {
                 try
                 {
-                    filterItems = JsonConvert.DeserializeObject<IEnumerable<Filter>>(filter);
+                    Items = JsonConvert.DeserializeObject<IEnumerable<T>>(json);
                 }
                 catch (Exception)
                 {
                     
                 }
             }
-            return filterItems;
+            return Items;
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +8,13 @@ using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Dynamic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace PCME.Api.Controllers
 {
@@ -34,33 +35,76 @@ namespace PCME.Api.Controllers
             this._dbContext = _dbContext;
             workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
         }
-        private class temp
+
+        [HttpPost]
+        [Route("fetchinfo")]
+        public async Task<IActionResult> FindById(int id)
         {
-            public int Id { get; set; }
+            var query = await workUnitRepository.FindAsync(c => c.Include(d => d.WorkUnitNature), id);
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (query != null)
+            {
+                //var result = new
+                //{
+                //    query.Id,
+                //    query.Name,
+                //    parentname = query.Parent?.Name,
+                //    parentid = query.PID,
+                //    query.Level,
+                //    linkman = query.LinkMan,
+                //    linkphone = query.LinkPhone,
+                //    workunitnaturename = WorkUnitNature.From(query.WorkUnitNatureId).Name,
+                //    workunitnatureid = query.WorkUnitNatureId
+                //};
+                var result = new Dictionary<string, object>{
+                    { "id",query.Id},
+                    { "name",query.Name},
+                    { "Parent.Name",query.Parent?.Name},
+                    { "Parent.Id",query.PID},
+                    { "level",query.Level},
+                    { "linkman",query.LinkMan},
+                    { "linkphone",query.LinkPhone},
+                    { "WorkUnitNature.Name",WorkUnitNature.From(query.WorkUnitNatureId).Name},
+                    { "WorkUnitNature.Id",query.WorkUnitNatureId}
+                };
+                return Ok(new { data = result });
+            }
+
+            return NotFound();
         }
         [HttpGet]
         [Route("navigatedata")]
-        public IActionResult NavigateData(int? id)
+        public IActionResult NavigateData(int? id, int? node)
         {
-            var _id = id ?? int.Parse(User.FindFirstValue("id"));
+            node = node == 1 ? null : node;
+            var _id = node ?? id ?? int.Parse(User.FindFirstValue("id"));
             var query = workUnitRepository.Query(c => c.PID == _id, include: s => s.Include(d => d.Childs));
-            
+            if (node == null)
+            {
+                query = workUnitRepository.Query(c => c.Id == _id, include: s => s.Include(d => d.Childs));
+            }
             var item = query.Select(d => new
             {
                 d.Id,
                 text = d.Name,
                 d.PID,
-                leaf = d.Childs.Any()
+                leaf = !d.Childs.Any(),
+                fieldvalue = d.Id
             });
             return Ok(item);
         }
         [HttpPost]
         [Route("read")]
-        public IActionResult StoreRead(int start, int limit, string filter)
+        public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
+            var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
             var id = User.FindFirstValue("id");
-            var sqlparameId = new SqlParameter("id", id);
-
+            var sqlparameId = new SqlParameter("id", navigate == null ? id : navigate.FieldValue.ToString());
+            //var search = workUnitRepository.Query(c => c.Id != 0).Include(s=>s.Parent);
             string sql = @"WITH temp  
                             AS  
                             (  
@@ -70,30 +114,31 @@ namespace PCME.Api.Controllers
                             INNER JOIN temp AS child ON m.PID = child.Id  
                             )  
                             SELECT * FROM temp";
+            var search = workUnitRepository.FromSql(sql, sqlparameId)
+                .Filter(filter.ToObject<Filter>())
+                .Filter(query.ToObject<Filter>());
+            var item = search.Skip(start).Take(limit);
 
-            var query = workUnitRepository.FromSql(sql, sqlparameId).Filter(filter.ToFilter());
-            var item = query.Skip(start).Take(limit);
-
-            temp t = new temp();
-
-            var result = item.Select(c => new
+            var result = item.ToList().Select(c => new Dictionary<string, object>
             {
-                c.Id,
-                c.Name,
-                parentname = c.Parent.Name,
-                c.Level,
-                linkman = c.LinkMan,
-                linkphone = c.LinkPhone,
-                workunitnaturename = WorkUnitNature.From(c.WorkUnitNatureId).Name,
-                workunitnatureid = c.WorkUnitNatureId
+                { "id",c.Id},
+                { "name",c.Name},
+                { "Parent.Name",c.Parent?.Name},
+                { "Parent.Id",c.PID},
+                { "level",c.Level},
+                { "linkman",c.LinkMan},
+                { "linkphone",c.LinkPhone},
+                { "WorkUnitNature.Name",WorkUnitNature.From(c.WorkUnitNatureId).Name},
+                { "WorkUnitNature.Id",c.WorkUnitNatureId}
             });
-            var total = query.Count();
+            var total = search.Count();
             return Ok(new { total, data = result });
         }
+
         [HttpPost]
         //[Authorize(Roles = "Unit")]
         [Route("getpagedlist")]
-        public IActionResult GetPagedList(string unitname, int id, int start, int limit, string filter)
+        public IActionResult GetPagedList(string unitname, int id, int start, int limit, string filter, string navigates)
         {
             var sqlparameId = new SqlParameter("id", id);
             string sql = @"WITH temp  
@@ -106,7 +151,7 @@ namespace PCME.Api.Controllers
                             )  
                             SELECT * FROM temp";
 
-            var query = workUnitRepository.FromSql(sql, sqlparameId).Filter(filter.ToFilter());
+            var query = workUnitRepository.FromSql(sql, sqlparameId).Filter(filter.ToObject<Filter>());
 
             if (!string.IsNullOrEmpty(unitname))
             {
@@ -127,7 +172,7 @@ namespace PCME.Api.Controllers
             var total = query.Count();
             return Ok(new { total, data = result });
         }
-        
+
 
         [HttpGet]
         [Route("child")]
@@ -169,7 +214,7 @@ namespace PCME.Api.Controllers
         [HttpGet("{id}", Name = "Get")]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await workUnitRepository.FindAsync(c => c.Include(d => d.UnitNature), id);
+            var result = await workUnitRepository.FindAsync(c => c.Include(d => d.WorkUnitNature), id);
             if (id <= 0)
             {
                 return BadRequest();
@@ -188,9 +233,27 @@ namespace PCME.Api.Controllers
         [Route("saveorupdate")]
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command)
         {
-            //var command = new CreateOrUpdateWorkUnitCommand(command.);
+            var loginid = int.Parse(User.FindFirstValue("id"));
             bool commandResult = false;
-            commandResult = await _mediator.Send(command);
+            var nameExisted = workUnitRepository.GetFirstOrDefault(predicate: c =>
+                 c.Name == command.Name && c.Id != loginid
+            );
+            var codeExistend = workUnitRepository.GetFirstOrDefault(predicate: c =>
+                c.Code == command.Code && c.Id != loginid
+            );
+            if (nameExisted != null)
+            {
+                ModelState.AddModelError("name", "单位名称存在");
+            }
+            if (codeExistend != null)
+            {
+                ModelState.AddModelError("code", "单位代码存在");
+            }
+
+            if (ModelState.IsValid)
+            {
+                commandResult = await _mediator.Send(command);
+            }
             return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
 
         }
