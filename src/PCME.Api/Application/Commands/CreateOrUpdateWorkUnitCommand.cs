@@ -1,4 +1,7 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using PCME.Api.Infrastructure.ModelBinder;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,7 +12,7 @@ namespace PCME.Api.Application.Commands
 {
     public class CreateOrUpdateWorkUnitCommand:IRequest<bool>
     {
-        public int Id { get; private set; }
+        public int Id { get;  set; }
         [Required(ErrorMessage ="单位编码必须填写")]
         public string Code { get; private set; }
         [Required(ErrorMessage = "单位密码必须填写")]
@@ -25,8 +28,9 @@ namespace PCME.Api.Application.Commands
         public string Email { get; private set; }
 
         public string Address { get; private set; }
-        public int? PID { get; private set; }
+        public int? PID { get; set; }
         [Required(ErrorMessage = "单位类型必须选择")]
+        [JsonProperty("WorkUnitNature.Id")]
         public int WorkUnitNatureId { get; private set; }
 
 

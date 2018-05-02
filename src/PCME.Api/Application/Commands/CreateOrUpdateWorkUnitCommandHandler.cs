@@ -26,13 +26,13 @@ namespace PCME.Api.Application.Commands
         {
             var idIsExisted = await workUnitRepository.FindAsync(request.Id);
 
-            var codeIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s=>new { code = s.Code }, c => c.Code == request.Code && c.Id != request.Id);
-            var nameIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s=>new { name = s.Name},c => c.Name == request.Name && c.Id != request.Id);
+            //var codeIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s => new { code = s.Code }, c => c.Code == request.Code && c.Id != request.Id);
+            //var nameIsExisted = await workUnitRepository.GetFirstOrDefaultAsync(s => new { name = s.Name }, c => c.Name == request.Name && c.Id != request.Id);
 
-            //单位名称存在
-            if (nameIsExisted != null) { return false; }
-            //单位代码存在
-            if (codeIsExisted != null) { return false; }
+            ////单位名称存在
+            //if (nameIsExisted != null) { return false; }
+            ////单位代码存在
+            //if (codeIsExisted != null) { return false; }
 
             var workUnit = Mapper.Map<CreateOrUpdateWorkUnitCommand, WorkUnit>(request);
 
@@ -42,7 +42,7 @@ namespace PCME.Api.Application.Commands
             }
             else//更新单位
             {
-                idIsExisted.Update(request.Name, request.LinkMan, request.Email, request.LinkPhone, request.Address);
+                idIsExisted.Update(request.Name, request.LinkMan, request.Email, request.LinkPhone, request.Address,request.PassWord,request.WorkUnitNatureId);
                 workUnitRepository.Update(idIsExisted);
 
             }

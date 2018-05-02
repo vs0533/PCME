@@ -43,7 +43,7 @@ namespace PCME.Api.Infrastructure.Filters
 
                 var json = new { message = "输入错误", success = false, data = error };
                 context.Result = new BadRequestObjectResult(json);
-                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             
         }

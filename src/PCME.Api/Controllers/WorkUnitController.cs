@@ -97,6 +97,28 @@ namespace PCME.Api.Controllers
             });
             return Ok(item);
         }
+        [HttpGet]
+        [Route("test")]
+        public IActionResult test(int pid) {
+            var s = from c in findallchildren(pid)
+                    select c;
+            return Ok(s);
+        }
+        public List<WorkUnit> findallchildren(int PID)
+        {
+            var list = workUnitRepository.Query(c=>c.PID == PID,include:s=>s.Include(d=>d.Parent)).ToList();
+
+            List<WorkUnit> tmpList = new List<WorkUnit>(list);
+            foreach (WorkUnit single in tmpList)
+            {
+                List<WorkUnit> tmpChildren = findallchildren(single.Id);
+                if (tmpChildren.Count != 0)
+                {
+                    list.AddRange(tmpChildren);
+                }
+            }
+            return list;
+        }
         [HttpPost]
         [Route("read")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
@@ -123,11 +145,13 @@ namespace PCME.Api.Controllers
             {
                 { "id",c.Id},
                 { "name",c.Name},
+                { "code",c.Code},
                 { "Parent.Name",c.Parent?.Name},
                 { "Parent.Id",c.PID},
                 { "level",c.Level},
                 { "linkman",c.LinkMan},
                 { "linkphone",c.LinkPhone},
+                { "password",c.PassWord},
                 { "WorkUnitNature.Name",WorkUnitNature.From(c.WorkUnitNatureId).Name},
                 { "WorkUnitNature.Id",c.WorkUnitNatureId}
             });
@@ -231,15 +255,17 @@ namespace PCME.Api.Controllers
         // POST: api/WorkUnit
         [HttpPost]
         [Route("saveorupdate")]
-        public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command)
+        public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
+            command.Id = opertype == "new" ? 0 : command.Id;
             var loginid = int.Parse(User.FindFirstValue("id"));
+            command.PID = opertype == "new" ? loginid : command.PID;
             bool commandResult = false;
             var nameExisted = workUnitRepository.GetFirstOrDefault(predicate: c =>
-                 c.Name == command.Name && c.Id != loginid
+                 c.Name == command.Name && c.Id != command.Id
             );
             var codeExistend = workUnitRepository.GetFirstOrDefault(predicate: c =>
-                c.Code == command.Code && c.Id != loginid
+                c.Code == command.Code && c.Id != command.Id
             );
             if (nameExisted != null)
             {
@@ -249,12 +275,27 @@ namespace PCME.Api.Controllers
             {
                 ModelState.AddModelError("code", "单位代码存在");
             }
-
+            ModelState.Remove("opertype");
             if (ModelState.IsValid)
             {
                 commandResult = await _mediator.Send(command);
             }
-            return commandResult ? (IActionResult)Ok() : (IActionResult)BadRequest();
+
+            var data = new Dictionary<string, object>
+            {
+                { "id", command.Id },
+                { "name",command.Name},
+                { "code",command.Code},
+                { "Parent.Id",command.PID},
+                { "level",command.Level},
+                { "linkman",command.LinkMan},
+                { "linkphone",command.LinkPhone},
+                { "password",command.PassWord},
+                { "WorkUnitNature.Name",WorkUnitNature.From(command.WorkUnitNatureId).Name},
+                { "WorkUnitNature.Id",command.WorkUnitNatureId}
+            };
+
+            return commandResult ? (IActionResult)Ok(new { success=true,data= data }) : (IActionResult)BadRequest();
 
         }
 

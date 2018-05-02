@@ -136,7 +136,17 @@ namespace PCME.Infrastructure.Repositories
                 _context.EnsureAutoHistory();
             }
 
-            return await _context.SaveChangesAsync();
+
+            try
+            {
+                return await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
         }
 
         /// <summary>

@@ -30,7 +30,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
         private readonly List<WorkUnit> _childs;
         public IReadOnlyCollection<WorkUnit> Childs => _childs;
 
-        public virtual WorkUnit Parent { get; private set; }
+        public WorkUnit Parent { get; private set; }
 
 
         [Timestamp]
@@ -57,13 +57,15 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             WorkUnitNatureId = workUnitNatureId;
         }
 
-        public void Update(string name,string linkman,string email,string linkphone,string address)
+        public void Update(string name,string linkman,string email,string linkphone,string address,string password,int workunitnatureid)
         {
             Name = name;
             LinkMan = linkman;
             Email = email;
             LinkPhone = linkphone;
             Address = address;
+            WorkUnitNatureId = workunitnatureid;
+            PassWord = password;
         }
 
         public void ChangePassWord(string passWord) {
