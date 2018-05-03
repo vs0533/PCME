@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PCME.Api.Infrastructure.ModelBinder;
+using PCME.Domain.AggregatesModel.UnitAggregates;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace PCME.Api.Application.Commands
 {
-    public class CreateOrUpdateWorkUnitCommand:IRequest<bool>
+    public class CreateOrUpdateWorkUnitCommand:IRequest<WorkUnit>
     {
         public int Id { get;  set; }
         [Required(ErrorMessage ="单位编码必须填写")]
@@ -55,6 +56,13 @@ namespace PCME.Api.Application.Commands
             WorkUnitNatureId = workUnitNatureId;
 
             //_childs = new List<CreateWorkUnitCommand>();
+        }
+
+        public void NewInitData(int pid,int curLevel)
+        {
+            Id = 0;
+            PID = pid;
+            Level = curLevel+1;
         }
     }
 }

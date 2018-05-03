@@ -63,7 +63,7 @@ namespace PCME.Api.Infrastructure
                     {
                         IEnumerable<WorkUnit> workunits = new List<WorkUnit>()
                         {
-                            new WorkUnit("370303","111111","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id)
+                            new WorkUnit("3703","111111","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id)
                         };
                         context.WorkUnits.AddRange(workunits);
                     }

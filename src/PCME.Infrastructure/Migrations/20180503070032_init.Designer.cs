@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180403140128_init")]
+    [Migration("20180503070032_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -131,6 +131,12 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("PID");
 
                     b.HasIndex("WorkUnitNatureId");
@@ -169,7 +175,7 @@ namespace PCME.Infrastructure.Migrations
                         .WithMany("Childs")
                         .HasForeignKey("PID");
 
-                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "WorkUnitNature")
                         .WithMany()
                         .HasForeignKey("WorkUnitNatureId")
                         .OnDelete(DeleteBehavior.Cascade);

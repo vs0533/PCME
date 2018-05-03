@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
@@ -97,12 +98,11 @@ namespace PCME.Api.Controllers
             });
             return Ok(item);
         }
-        [HttpGet]
+        [HttpPost]
         [Route("test")]
-        public IActionResult test(int pid) {
-            var s = from c in findallchildren(pid)
-                    select c;
-            return Ok(s);
+        public IActionResult test([FromBody]JObject pid) {
+            var id = pid["pid"].ToObject<string>();
+            return Ok(pid);
         }
         public List<WorkUnit> findallchildren(int PID)
         {
@@ -137,8 +137,8 @@ namespace PCME.Api.Controllers
                             )  
                             SELECT * FROM temp";
             var search = workUnitRepository.FromSql(sql, sqlparameId)
-                .Filter(filter.ToObject<Filter>())
-                .Filter(query.ToObject<Filter>());
+                .FilterAnd(filter.ToObject<Filter>())
+                .FilterOr(query.ToObject<Filter>());
             var item = search.Skip(start).Take(limit);
 
             var result = item.ToList().Select(c => new Dictionary<string, object>
@@ -175,7 +175,7 @@ namespace PCME.Api.Controllers
                             )  
                             SELECT * FROM temp";
 
-            var query = workUnitRepository.FromSql(sql, sqlparameId).Filter(filter.ToObject<Filter>());
+            var query = workUnitRepository.FromSql(sql, sqlparameId).FilterOr(filter.ToObject<Filter>());
 
             if (!string.IsNullOrEmpty(unitname))
             {
@@ -234,33 +234,20 @@ namespace PCME.Api.Controllers
             return Ok(item);
         }
 
-        // GET: api/WorkUnit/5
-        [HttpGet("{id}", Name = "Get")]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var result = await workUnitRepository.FindAsync(c => c.Include(d => d.WorkUnitNature), id);
-            if (id <= 0)
-            {
-                return BadRequest();
-            }
-
-            if (result != null)
-            {
-                return Ok(result);
-            }
-
-            return NotFound();
-        }
-
         // POST: api/WorkUnit
         [HttpPost]
         [Route("saveorupdate")]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
-            command.Id = opertype == "new" ? 0 : command.Id;
+            WorkUnit result = null;
             var loginid = int.Parse(User.FindFirstValue("id"));
-            command.PID = opertype == "new" ? loginid : command.PID;
-            bool commandResult = false;
+            var loginobj = await workUnitRepository.FindAsync(loginid);
+            if (opertype == "new")
+            {
+                command.NewInitData(loginid,loginobj.Level);
+            }
+            
             var nameExisted = workUnitRepository.GetFirstOrDefault(predicate: c =>
                  c.Name == command.Name && c.Id != command.Id
             );
@@ -278,27 +265,48 @@ namespace PCME.Api.Controllers
             ModelState.Remove("opertype");
             if (ModelState.IsValid)
             {
-                commandResult = await _mediator.Send(command);
+                result = await _mediator.Send(command);
+                var data = new Dictionary<string, object>
+                {
+                    { "id", result.Id },
+                    { "name",result.Name},
+                    { "code",result.Code},
+                    { "Parent.Id",result.PID},
+                    { "level",result.Level},
+                    { "linkman",result.LinkMan},
+                    { "linkphone",result.LinkPhone},
+                    { "password",result.PassWord},
+                    { "WorkUnitNature.Name",WorkUnitNature.From(result.WorkUnitNatureId).Name},
+                    { "WorkUnitNature.Id",result.WorkUnitNatureId}
+                };
+                return Ok(new { success = true, data });
             }
-
-            var data = new Dictionary<string, object>
-            {
-                { "id", command.Id },
-                { "name",command.Name},
-                { "code",command.Code},
-                { "Parent.Id",command.PID},
-                { "level",command.Level},
-                { "linkman",command.LinkMan},
-                { "linkphone",command.LinkPhone},
-                { "password",command.PassWord},
-                { "WorkUnitNature.Name",WorkUnitNature.From(command.WorkUnitNatureId).Name},
-                { "WorkUnitNature.Id",command.WorkUnitNatureId}
-            };
-
-            return commandResult ? (IActionResult)Ok(new { success=true,data= data }) : (IActionResult)BadRequest();
+            return BadRequest();
 
         }
+        [HttpPost]
+        [Route("remove")]
+        [Authorize(Roles ="Unit")]
+        public async Task<IActionResult> Remove([FromBody]JObject data)
+        {
+            var id = data["id"].ToObject<int>();
+            //var loginid = int.Parse(User.FindFirstValue("id"));
+            var delUnit = await workUnitRepository.FindAsync(id);
+            if (delUnit is null)
+            {
+                return Ok(new { message = "该条记录已经被删除" });
+            }
+            var delUnit_IsChild = await workUnitRepository.GetFirstOrDefaultAsync(predicate: c => c.PID == delUnit.Id);
+            if (delUnit_IsChild != null)
+            {
+                return Ok(new { message = "存在下级单位不允许删除" });
+            }
 
+
+            workUnitRepository.Delete(delUnit);
+            await unitOfWork.SaveEntitiesAsync();
+            return NoContent();
+        }
         // PUT: api/WorkUnit/5
         [HttpPut("{id}")]
         public async Task<IActionResult> ChangePassword(int id, string password)
@@ -308,7 +316,7 @@ namespace PCME.Api.Controllers
                 return NotFound();
             }
             var workUnitItem = await workUnitRepository.FindAsync(id);
-            if (workUnitItem == null)
+            if (workUnitItem is null)
             {
                 return NotFound();
             }

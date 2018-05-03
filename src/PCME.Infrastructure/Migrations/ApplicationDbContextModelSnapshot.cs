@@ -130,6 +130,12 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.HasIndex("PID");
 
                     b.HasIndex("WorkUnitNatureId");
@@ -168,7 +174,7 @@ namespace PCME.Infrastructure.Migrations
                         .WithMany("Childs")
                         .HasForeignKey("PID");
 
-                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "UnitNature")
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "WorkUnitNature")
                         .WithMany()
                         .HasForeignKey("WorkUnitNatureId")
                         .OnDelete(DeleteBehavior.Cascade);

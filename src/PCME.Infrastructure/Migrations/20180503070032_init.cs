@@ -131,6 +131,18 @@ namespace PCME.Infrastructure.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Unit_Code",
+                table: "Unit",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Unit_Name",
+                table: "Unit",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Unit_PID",
                 table: "Unit",
                 column: "PID");

@@ -25,9 +25,10 @@ namespace PCME.Api.Infrastructure.Filters
         {
             if (context.Exception.GetType() == typeof(ArgumentNullException))
             {
-                var json = new JsonErrorResponse
+                var json = new 
                 {
-                    Messages = new[] { context.Exception.Message }
+                    success=false,
+                    message = new[] { context.Exception.Message }
                 };
 
                 // Result asigned to a result object but in destiny the response is empty. This is a known bug of .net core 1.1
@@ -37,14 +38,15 @@ namespace PCME.Api.Infrastructure.Filters
             }
             else
             {
-                var json = new JsonErrorResponse
+                var json = new
                 {
-                    Messages = new[] { "An error occur.Try it again." }
+                    success = false,
+                    message = new[] { context.Exception.Message }
                 };
 
                 if (env.IsDevelopment())
                 {
-                    json.DeveloperMessage = context.Exception;
+                    //json.DeveloperMessage = context.Exception;
                 }
 
                 // Result asigned to a result object but in destiny the response is empty. This is a known bug of .net core 1.1

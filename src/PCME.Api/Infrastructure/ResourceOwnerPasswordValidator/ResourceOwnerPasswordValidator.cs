@@ -20,14 +20,13 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
         {
             this.unitOfWork = unitOfWork;
         }
-        public static Claim[] GetUserClaims(int userid, string displayname, string username, string email, string valtype)
+        public static Claim[] GetUserClaims(int userid, string displayname, string username, string valtype)
         {
             return new Claim[]
             {
                 new Claim(JwtClaimTypes.Id, userid.ToString()),
                 new Claim("DisplayName",displayname),
                 new Claim(JwtClaimTypes.Name, username),
-                new Claim(JwtClaimTypes.Email, email),
                 new Claim(JwtClaimTypes.Role, valtype)
             };
         }
@@ -74,7 +73,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                     context.Result = new GrantValidationResult(
                                                 subject: student.Name,
                                                 authenticationMethod: "custom",
-                                                claims: GetUserClaims(student.Id, student.Name, student.IDCard, student.Email, valtype)
+                                                claims: GetUserClaims(student.Id, student.Name, student.IDCard, valtype)
                                             );
                                 }
                                 catch (Exception ex)
@@ -103,7 +102,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                     context.Result = new GrantValidationResult(
                                                 subject: unit.Code,
                                                 authenticationMethod: "custom",
-                                                claims: GetUserClaims(unit.Id,unit.Name,unit.Code, unit.Email, valtype)
+                                                claims: GetUserClaims(unit.Id,unit.Name,unit.Code, valtype)
                                             );
                                 }
                                 catch (Exception ex)

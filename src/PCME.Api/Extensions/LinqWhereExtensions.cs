@@ -38,7 +38,7 @@ namespace PCME.Api.Extensions
             }
             return query;
         }
-        public static IQueryable<TSource> Filter<TSource>(
+        public static IQueryable<TSource> FilterAnd<TSource>(
         this IQueryable<TSource> query, IEnumerable<Filter> filter)
         where TSource : class
         {
@@ -55,6 +55,38 @@ namespace PCME.Api.Extensions
                     //Expression value = Expression.Constant(item.Value);
                     //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
                     exp = exp == null ? contains : Expression.And(exp, contains);
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+            if (exp != null)
+            {
+                Expression<Func<TSource, bool>> pre = Expression.Lambda<Func<TSource, bool>>(exp, parameter);
+                return query.Where(pre);
+            }
+            return query;
+
+        }
+
+
+        public static IQueryable<TSource> FilterOr<TSource>(
+        this IQueryable<TSource> query, IEnumerable<Filter> filter)
+        where TSource : class
+        {
+
+            ParameterExpression parameter = Expression.Parameter(typeof(TSource), "s");
+            Expression exp = null;
+            //var plist = parameter.Type.GetRuntimeProperties().ToDictionary(z => z.Name);
+            foreach (var item in filter)
+            {
+                try
+                {
+                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
+                    //Expression property = Expression.Property(parameter, item.Property);
+                    //Expression value = Expression.Constant(item.Value);
+                    //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
+                    exp = exp == null ? contains : Expression.Or(exp, contains);
                 }
                 catch (Exception ex)
                 {

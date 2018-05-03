@@ -24,6 +24,9 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .HasMaxLength(50)
                 .IsRequired();
 
+            builder.HasIndex(o => o.Name).IsUnique();
+            builder.HasIndex(o => o.Code).IsUnique();
+
             builder.Property(o => o.Code)
                 .HasMaxLength(50)
                 .IsRequired();

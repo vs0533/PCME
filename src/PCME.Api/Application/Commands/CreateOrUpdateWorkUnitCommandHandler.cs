@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace PCME.Api.Application.Commands
 {
-    public class CreateOrUpdateWorkUnitCommandHandler : IRequestHandler<CreateOrUpdateWorkUnitCommand, bool>
+    public class CreateOrUpdateWorkUnitCommandHandler : IRequestHandler<CreateOrUpdateWorkUnitCommand, WorkUnit>
     {
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<WorkUnit> workUnitRepository;
@@ -22,7 +22,7 @@ namespace PCME.Api.Application.Commands
             this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             this.workUnitRepository = unitOfWork.GetRepository<WorkUnit>() ?? throw new ArgumentNullException(nameof(workUnitRepository));
         }
-        public async Task<bool> Handle(CreateOrUpdateWorkUnitCommand request, CancellationToken cancellationToken)
+        public async Task<WorkUnit> Handle(CreateOrUpdateWorkUnitCommand request, CancellationToken cancellationToken)
         {
             var idIsExisted = await workUnitRepository.FindAsync(request.Id);
 
@@ -46,7 +46,8 @@ namespace PCME.Api.Application.Commands
                 workUnitRepository.Update(idIsExisted);
 
             }
-            return await unitOfWork.SaveEntitiesAsync();
+            await unitOfWork.SaveEntitiesAsync();
+            return workUnit;
         }
     }
 }
