@@ -36,29 +36,30 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 
         public decimal Balance { get; private set; }
 
-        
+        public int ProfessionalTitleId { get; private set; }
+
 
         public Student()
         {
 
         }
-        public Student(string name, string idcard, string password,StudentType studentType)
+        public Student(string name, string idcard, string password,StudentType studentType,int professionaltitleid)
             :this(name, idcard, password, Sex.Unknown,studentType,null,string.Empty
                  ,string.Empty,null,string.Empty,string.Empty,false,
-                 string.Empty,false,string.Empty,Decimal.Zero)
+                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid)
         {
 
         }
-        public Student(string name, string idcard, string password, Sex sex,StudentType type)
+        public Student(string name, string idcard, string password, Sex sex,StudentType type,int professionaltitleid)
             :this(name, idcard, password, sex,type,null,string.Empty
                  ,string.Empty,null,string.Empty,string.Empty,false,
-                 string.Empty,false,string.Empty,Decimal.Zero)
+                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid)
         {
         }
         public Student(string name,string idcard,string password,Sex sex,StudentType type,
             DateTime? birthDay,string graduationSchool,string specialty,
             DateTime? workdate,string officeName,string photo,bool photoIsValid,
-            string email,bool emailIsValid,string address,decimal balance
+            string email,bool emailIsValid,string address,decimal balance,int professionaltitleid
             )
         {
             Type = type;
@@ -77,6 +78,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             EmailIsValid = EmailIsValid;
             Address = address;
             Balance = balance;
+            ProfessionalTitleId = professionaltitleid;
         }
         
     }

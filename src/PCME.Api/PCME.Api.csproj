@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PCME.MOPDB\PCME.MOPDB.csproj" />
     <ProjectReference Include="..\PCME.Infrastructure\PCME.Infrastructure.csproj" />
     <ProjectReference Include="..\PCME.WebHost\PCME.CustomWebHost.csproj" />
   </ItemGroup>

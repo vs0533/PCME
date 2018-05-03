@@ -8,6 +8,10 @@ namespace PCME.Domain.AggregatesModel.ProfessionalTitleAggregates
     public class Specialty:Entity
     {
         public string Name { get; private set; }
+        public Specialty()
+        {
+
+        }
 
         public Specialty(string name)
         {

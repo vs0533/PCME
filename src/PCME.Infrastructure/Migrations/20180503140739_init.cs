@@ -10,6 +10,32 @@ namespace PCME.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Levels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Levels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Seriess",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Seriess", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Sex",
                 columns: table => new
                 {
@@ -19,6 +45,19 @@ namespace PCME.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Sex", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Specialtys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Specialtys", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -46,6 +85,40 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProfessionalTitle",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    LevelId = table.Column<int>(nullable: true),
+                    Name = table.Column<string>(maxLength: 100, nullable: false),
+                    SeriesId = table.Column<int>(nullable: true),
+                    SpecialtyId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfessionalTitle", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfessionalTitle_Levels_LevelId",
+                        column: x => x.LevelId,
+                        principalTable: "Levels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProfessionalTitle_Seriess_SeriesId",
+                        column: x => x.SeriesId,
+                        principalTable: "Seriess",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ProfessionalTitle_Specialtys_SpecialtyId",
+                        column: x => x.SpecialtyId,
+                        principalTable: "Specialtys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -63,6 +136,7 @@ namespace PCME.Infrastructure.Migrations
                     Password = table.Column<string>(nullable: true),
                     Photo = table.Column<string>(nullable: true),
                     PhotoIsValid = table.Column<bool>(nullable: false),
+                    ProfessionalTitleId = table.Column<int>(nullable: false),
                     SexId = table.Column<int>(nullable: true),
                     Specialty = table.Column<string>(nullable: true),
                     TypeId = table.Column<int>(nullable: true),
@@ -121,6 +195,21 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProfessionalTitle_LevelId",
+                table: "ProfessionalTitle",
+                column: "LevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfessionalTitle_SeriesId",
+                table: "ProfessionalTitle",
+                column: "SeriesId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfessionalTitle_SpecialtyId",
+                table: "ProfessionalTitle",
+                column: "SpecialtyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_SexId",
                 table: "Students",
                 column: "SexId");
@@ -156,10 +245,22 @@ namespace PCME.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ProfessionalTitle");
+
+            migrationBuilder.DropTable(
                 name: "Students");
 
             migrationBuilder.DropTable(
                 name: "Unit");
+
+            migrationBuilder.DropTable(
+                name: "Levels");
+
+            migrationBuilder.DropTable(
+                name: "Seriess");
+
+            migrationBuilder.DropTable(
+                name: "Specialtys");
 
             migrationBuilder.DropTable(
                 name: "Sex");

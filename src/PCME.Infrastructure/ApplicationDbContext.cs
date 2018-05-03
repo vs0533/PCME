@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel;
+using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Infrastructure.EntityConfigurations;
@@ -19,7 +20,10 @@ namespace PCME.Infrastructure
         public DbSet<WorkUnitNature> WorkUnitNature { get; set; }
 
         public DbSet<WorkUnit> WorkUnits { get; set; }
-        public DbSet<Domain.AggregatesModel.UnitAggregates.WorkUnit> Unit { get; set; }
+        public DbSet<Level> Levels { get; set; }
+        public DbSet<ProfessionalTitle> ProfessionalTitles { get; set; }
+        public DbSet<Series> Seriess { get; set; }
+        public DbSet<Specialty> Specialtys { get; set; }
 
         //private readonly IMediator _mediator;
 
@@ -41,6 +45,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new UnitNatureEntityTypeConfiguration());
             builder.ApplyConfiguration(new SexEntityTypeConfiguration());
             builder.ApplyConfiguration(new StudentTypeEntityTypeConfiguration());
+            builder.ApplyConfiguration(new ProfessionalTitleEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 

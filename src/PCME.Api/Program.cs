@@ -13,6 +13,7 @@ using PCME.Infrastructure;
 using PCME.CustomWebHost;
 using Microsoft.Extensions.Options;
 using PCME.Api.Infrastructure.AutoMapperMapping;
+using PCME.MOPDB;
 
 namespace PCME.Api
 {
@@ -26,10 +27,11 @@ namespace PCME.Api
                 {
                     var env = services.GetService<IHostingEnvironment>();
                     var settings = services.GetService<IOptions<ApplicationSettings>>();
+                    var mopdbcontext = services.GetService<MOPDBContext>();
                     //var logger = services.GetService<ILogger<OrderingContextSeed>>();
 
                     new ApplicationContextSeed()
-                        .SeedAsync(context, env, settings)
+                        .SeedAsync(context,mopdbcontext, env, settings)
                         .Wait();
                 })
                 //.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })

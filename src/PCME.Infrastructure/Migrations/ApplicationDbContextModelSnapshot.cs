@@ -20,6 +20,68 @@ namespace PCME.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Level", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int?>("LevelId");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100);
+
+                    b.Property<int?>("SeriesId");
+
+                    b.Property<int?>("SpecialtyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LevelId");
+
+                    b.HasIndex("SeriesId");
+
+                    b.HasIndex("SpecialtyId");
+
+                    b.ToTable("ProfessionalTitle");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Series", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Seriess");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Specialty", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Specialtys");
+                });
+
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Sex", b =>
                 {
                     b.Property<int>("Id")
@@ -62,6 +124,8 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<string>("Photo");
 
                     b.Property<bool>("PhotoIsValid");
+
+                    b.Property<int>("ProfessionalTitleId");
 
                     b.Property<int?>("SexId");
 
@@ -155,6 +219,21 @@ namespace PCME.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UnitNature");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Level", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId");
+
+                    b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Series", "Series")
+                        .WithMany()
+                        .HasForeignKey("SeriesId");
+
+                    b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Specialty", "Specialty")
+                        .WithMany()
+                        .HasForeignKey("SpecialtyId");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Student", b =>

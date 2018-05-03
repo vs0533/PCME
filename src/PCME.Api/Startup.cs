@@ -17,6 +17,7 @@ using PCME.Api.Infrastructure.Filters;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
 using PCME.Infrastructure.Repositories;
+using PCME.MOPDB;
 using System;
 using System.Collections.Generic;
 
@@ -88,7 +89,9 @@ namespace PCME.Api
                             });
                     },
                         ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
-                    ).AddUnitOfWork<ApplicationDbContext>();
+                    )
+                    .AddDbContext<MOPDBContext>()
+                    .AddUnitOfWork<ApplicationDbContext>().AddUnitOfWork<MOPDBContext>();
 
             services.Configure<ApplicationSettings>(Configuration);
 
