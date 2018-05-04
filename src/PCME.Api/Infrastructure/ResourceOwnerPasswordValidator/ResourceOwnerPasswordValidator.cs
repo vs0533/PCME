@@ -1,12 +1,12 @@
 ﻿using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
+using Microsoft.EntityFrameworkCore;
 using PCME.Domain.AggregatesModel.StudentAggregates;
-using PCME.Domain.AggregatesModel.UnitAggregates;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -16,18 +16,29 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
     public class ResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork = null;
-        public ResourceOwnerPasswordValidator(IUnitOfWork<ApplicationDbContext> unitOfWork)
+        private readonly ApplicationDbContext dbContext = null;
+        public ResourceOwnerPasswordValidator(IUnitOfWork<ApplicationDbContext> unitOfWork, ApplicationDbContext dbContext)
         {
             this.unitOfWork = unitOfWork;
+            this.dbContext = dbContext;
         }
-        public static Claim[] GetUserClaims(int userid, string displayname, string username, string valtype)
+        public static Claim[] GetUserClaims(
+            string accountId,
+            string accountName,
+            string workUnitId,
+            string workUnitName,
+            string displayName,
+            string valtype, string accountType)
         {
             return new Claim[]
             {
-                new Claim(JwtClaimTypes.Id, userid.ToString()),
-                new Claim("DisplayName",displayname),
-                new Claim(JwtClaimTypes.Name, username),
-                new Claim(JwtClaimTypes.Role, valtype)
+                new Claim("AccountId", accountId),
+                new Claim("AccountName",accountName),
+                new Claim("WorkUnitId",workUnitId),
+                new Claim("WorkUnitName",workUnitName),
+                new Claim("DisplayName",displayName),
+                new Claim(JwtClaimTypes.Role, valtype),
+                new Claim("AccountType",accountType)
             };
         }
 
@@ -37,11 +48,12 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
             var student = await studentRepository.GetFirstOrDefaultAsync(predicate: c => c.IDCard == username);
             return student;
         }
-        private async Task<WorkUnit> GetUnitByName(string username)
+        private async Task<WorkUnitAccount> GetUnitAccountByAccountName(string username)
         {
-            var reporitory = unitOfWork.GetRepository<WorkUnit>();
-            var result = await reporitory.GetFirstOrDefaultAsync(predicate: c => c.Code == username);
-            return result;
+            var workUnitAccount = await dbContext.WorkUnitAccounts
+                .Include(s=>s.WorkUnit)
+                .FirstOrDefaultAsync(c => c.AccountName == username);
+            return workUnitAccount;
         }
         public async Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
@@ -56,6 +68,9 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                 {
                     case "Student":
                         var student = await GetStudentByName(context.UserName);
+                        var studentUnit = await (from c in dbContext.WorkUnits
+                                                 where c.Id == student.WorkUnitId
+                                                 select c).FirstOrDefaultAsync();
                         if (student == null)
                         {
                             context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
@@ -73,7 +88,13 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                     context.Result = new GrantValidationResult(
                                                 subject: student.Name,
                                                 authenticationMethod: "custom",
-                                                claims: GetUserClaims(student.Id, student.Name, student.IDCard, valtype)
+                                                claims: GetUserClaims(
+                                                    student.Id.ToString(),
+                                                    student.IDCard,
+                                                    student.WorkUnitId.ToString(),
+                                                    studentUnit.Name,
+                                                    student.Name, valtype, StudentType.Professional.Id.ToString()
+                                                    )
                                             );
                                 }
                                 catch (Exception ex)
@@ -84,14 +105,14 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                         }
                         break;
                     case "Unit":
-                        var unit = await GetUnitByName(context.UserName);
-                        if (unit == null)
+                        var account = await GetUnitAccountByAccountName(context.UserName);
+                        if (account == null)
                         {
                             context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
                         }
                         else
                         {
-                            if (!(unit.PassWord == context.Password))
+                            if (!(account.PassWord == context.Password))
                             {
                                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "密码不正确");
                             }
@@ -100,9 +121,16 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                 try
                                 {
                                     context.Result = new GrantValidationResult(
-                                                subject: unit.Code,
+                                                subject: account.WorkUnit.Code,
                                                 authenticationMethod: "custom",
-                                                claims: GetUserClaims(unit.Id,unit.Name,unit.Code, valtype)
+                                                claims: GetUserClaims(
+                                                    account.Id.ToString(),
+                                                    account.AccountName,
+                                                    account.WorkUnit.Id.ToString(),
+                                                    account.WorkUnit.Name,
+                                                    account.WorkUnit.Name,
+                                                    valtype, account.WorkUnitAccountTypeId.ToString()
+                                                    )
                                             );
                                 }
                                 catch (Exception ex)

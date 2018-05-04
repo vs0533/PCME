@@ -22,6 +22,14 @@
     <Compile Remove="Migrations\20180403140128_init.cs" />
     <Compile Remove="Migrations\20180503070032_init.cs" />
     <Compile Remove="Migrations\20180503092722_init.cs" />
+    <Compile Remove="Migrations\20180503140739_init.cs" />
+    <Compile Remove="Migrations\20180504112409_init.cs" />
+    <Compile Remove="Migrations\20180504112651_init.cs" />
+    <Compile Remove="Migrations\20180504112834_init.cs" />
+    <Compile Remove="Migrations\20180504115945_init.cs" />
+    <Compile Remove="Migrations\20180504121528_init.cs" />
+    <Compile Remove="Migrations\20180504143509_init.cs" />
+    <Compile Remove="Migrations\20180504144620_init.cs" />
   </ItemGroup>
 
   <ItemGroup>

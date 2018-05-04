@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PCME.Domain.AggregatesModel.UnitAggregates;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 using System;
@@ -53,7 +54,7 @@ namespace XUnitTest
         {
             var unitOfWork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();
             var repository = unitOfWork.GetRepository<WorkUnit>();
-            var workunit = new WorkUnit("370303","123456", "淄博卫盛科技", 1, "唐林", "sdf", "3440", null, null, WorkUnitNature.JgUnit.Id);
+            var workunit = new WorkUnit("370303", "淄博卫盛科技", 1, "唐林", "18653311771", "3440", null, null, WorkUnitNature.JgUnit.Id,WorkUnitAccountType.Manager.Id);
             repository.InsertAsync(workunit);
             unitOfWork.SaveEntitiesAsync();
             //IUnitOfWork <ApplicationDbContext> unitofwork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();

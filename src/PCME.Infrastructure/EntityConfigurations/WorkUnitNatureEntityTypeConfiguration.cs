@@ -7,11 +7,11 @@ using System.Text;
 
 namespace PCME.Infrastructure.EntityConfigurations
 {
-    public class UnitNatureEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnitNature>
+    public class WorkUnitNatureEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnitNature>
     {
         public void Configure(EntityTypeBuilder<WorkUnitNature> builder)
         {
-            builder.ToTable("UnitNature");
+            builder.ToTable("WorkUnitNature");
 
             builder.HasKey(o => o.Id);
 

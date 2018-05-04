@@ -73,7 +73,7 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UnitNature",
+                name: "WorkUnitAccountType",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false, defaultValue: 1),
@@ -81,7 +81,19 @@ namespace PCME.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UnitNature", x => x.Id);
+                    table.PrimaryKey("PK_WorkUnitAccountType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkUnitNature",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkUnitNature", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -140,7 +152,8 @@ namespace PCME.Infrastructure.Migrations
                     SexId = table.Column<int>(nullable: true),
                     Specialty = table.Column<string>(nullable: true),
                     TypeId = table.Column<int>(nullable: true),
-                    WorkDate = table.Column<DateTime>(nullable: true)
+                    WorkDate = table.Column<DateTime>(nullable: true),
+                    WorkUnitId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -160,7 +173,7 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Unit",
+                name: "WorkUnit",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
@@ -173,23 +186,51 @@ namespace PCME.Infrastructure.Migrations
                     LinkPhone = table.Column<string>(nullable: true),
                     Name = table.Column<string>(maxLength: 50, nullable: false),
                     PID = table.Column<int>(nullable: true),
-                    PassWord = table.Column<string>(nullable: false),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                     WorkUnitNatureId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Unit", x => x.Id);
+                    table.PrimaryKey("PK_WorkUnit", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Unit_Unit_PID",
+                        name: "FK_WorkUnit_WorkUnit_PID",
                         column: x => x.PID,
-                        principalTable: "Unit",
+                        principalTable: "WorkUnit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Unit_UnitNature_WorkUnitNatureId",
+                        name: "FK_WorkUnit_WorkUnitNature_WorkUnitNatureId",
                         column: x => x.WorkUnitNatureId,
-                        principalTable: "UnitNature",
+                        principalTable: "WorkUnitNature",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkUnitAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    AccountName = table.Column<string>(nullable: true),
+                    HolderName = table.Column<string>(nullable: true),
+                    PassWord = table.Column<string>(nullable: true),
+                    WorkUnitAccountTypeId = table.Column<int>(nullable: false),
+                    WorkUnitId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkUnitAccounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkUnitAccounts_WorkUnitAccountType_WorkUnitAccountTypeId",
+                        column: x => x.WorkUnitAccountTypeId,
+                        principalTable: "WorkUnitAccountType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WorkUnitAccounts_WorkUnit_WorkUnitId",
+                        column: x => x.WorkUnitId,
+                        principalTable: "WorkUnit",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -220,26 +261,36 @@ namespace PCME.Infrastructure.Migrations
                 column: "TypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_Code",
-                table: "Unit",
+                name: "IX_WorkUnit_Code",
+                table: "WorkUnit",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_Name",
-                table: "Unit",
+                name: "IX_WorkUnit_Name",
+                table: "WorkUnit",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_PID",
-                table: "Unit",
+                name: "IX_WorkUnit_PID",
+                table: "WorkUnit",
                 column: "PID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Unit_WorkUnitNatureId",
-                table: "Unit",
+                name: "IX_WorkUnit_WorkUnitNatureId",
+                table: "WorkUnit",
                 column: "WorkUnitNatureId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkUnitAccounts_WorkUnitAccountTypeId",
+                table: "WorkUnitAccounts",
+                column: "WorkUnitAccountTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkUnitAccounts_WorkUnitId",
+                table: "WorkUnitAccounts",
+                column: "WorkUnitId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -251,7 +302,7 @@ namespace PCME.Infrastructure.Migrations
                 name: "Students");
 
             migrationBuilder.DropTable(
-                name: "Unit");
+                name: "WorkUnitAccounts");
 
             migrationBuilder.DropTable(
                 name: "Levels");
@@ -269,7 +320,13 @@ namespace PCME.Infrastructure.Migrations
                 name: "StudentType");
 
             migrationBuilder.DropTable(
-                name: "UnitNature");
+                name: "WorkUnitAccountType");
+
+            migrationBuilder.DropTable(
+                name: "WorkUnit");
+
+            migrationBuilder.DropTable(
+                name: "WorkUnitNature");
         }
     }
 }

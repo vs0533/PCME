@@ -34,6 +34,8 @@ namespace PCME.Api.Application.Commands
         [JsonProperty("WorkUnitNature.Id")]
         public int WorkUnitNatureId { get; private set; }
 
+        public int WorkUnitAccountTypeId { get; private set; }
+
 
         //private readonly List<CreateWorkUnitCommand> _childs;
         //public IReadOnlyCollection<CreateWorkUnitCommand> Childs => _childs;

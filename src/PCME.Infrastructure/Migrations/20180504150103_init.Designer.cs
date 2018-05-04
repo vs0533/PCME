@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180503140739_init")]
+    [Migration("20180504150103_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -136,6 +136,8 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<DateTime?>("WorkDate");
 
+                    b.Property<int>("WorkUnitId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SexId");
@@ -184,9 +186,6 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int?>("PID");
 
-                    b.Property<string>("PassWord")
-                        .IsRequired();
-
                     b.Property<byte[]>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate();
@@ -205,7 +204,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasIndex("WorkUnitNatureId");
 
-                    b.ToTable("Unit");
+                    b.ToTable("WorkUnit");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", b =>
@@ -219,7 +218,45 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UnitNature");
+                    b.ToTable("WorkUnitNature");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.WorkUnitAccountAggregates.WorkUnitAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AccountName");
+
+                    b.Property<string>("HolderName");
+
+                    b.Property<string>("PassWord");
+
+                    b.Property<int>("WorkUnitAccountTypeId");
+
+                    b.Property<int>("WorkUnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WorkUnitAccountTypeId");
+
+                    b.HasIndex("WorkUnitId");
+
+                    b.ToTable("WorkUnitAccounts");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.WorkUnitAccountAggregates.WorkUnitAccountType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkUnitAccountType");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", b =>
@@ -257,6 +294,19 @@ namespace PCME.Infrastructure.Migrations
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnitNature", "WorkUnitNature")
                         .WithMany()
                         .HasForeignKey("WorkUnitNatureId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.WorkUnitAccountAggregates.WorkUnitAccount", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.WorkUnitAccountAggregates.WorkUnitAccountType", "WorkUnitAccountType")
+                        .WithMany()
+                        .HasForeignKey("WorkUnitAccountTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "WorkUnit")
+                        .WithMany("Accounts")
+                        .HasForeignKey("WorkUnitId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

@@ -7,16 +7,17 @@ using System.Text;
 
 namespace PCME.Infrastructure.EntityConfigurations
 {
-    public class UnitEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnit>
+    public class WorkUnitEntityTypeConfiguration : IEntityTypeConfiguration<WorkUnit>
     {
         public void Configure(EntityTypeBuilder<WorkUnit> builder)
         {
-            builder.ToTable("Unit");
+            builder.ToTable("WorkUnit");
 
             builder
                 .HasOne(o => o.Parent)
                 .WithMany(o => o.Childs)
                 .HasForeignKey(d=>d.PID);
+            
 
             builder.Ignore(o => o.DomainEvents);
 
@@ -30,9 +31,8 @@ namespace PCME.Infrastructure.EntityConfigurations
             builder.Property(o => o.Code)
                 .HasMaxLength(50)
                 .IsRequired();
-
-            builder.Property(o => o.PassWord)
-                .IsRequired();
+            
+            
 
             builder.Property(o => o.Level)
                 .IsRequired();

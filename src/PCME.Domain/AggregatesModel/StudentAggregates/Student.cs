@@ -38,28 +38,31 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 
         public int ProfessionalTitleId { get; private set; }
 
+        public int WorkUnitId { get; private set; }
+
 
         public Student()
         {
 
         }
-        public Student(string name, string idcard, string password,StudentType studentType,int professionaltitleid)
+        public Student(string name, string idcard, string password,StudentType studentType,int professionaltitleid,int workUnitId)
             :this(name, idcard, password, Sex.Unknown,studentType,null,string.Empty
                  ,string.Empty,null,string.Empty,string.Empty,false,
-                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid)
+                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid, workUnitId)
         {
 
         }
-        public Student(string name, string idcard, string password, Sex sex,StudentType type,int professionaltitleid)
+        public Student(string name, string idcard, string password, Sex sex,StudentType type,int professionaltitleid,int workUnitId)
             :this(name, idcard, password, sex,type,null,string.Empty
                  ,string.Empty,null,string.Empty,string.Empty,false,
-                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid)
+                 string.Empty,false,string.Empty,Decimal.Zero, professionaltitleid,workUnitId)
         {
         }
         public Student(string name,string idcard,string password,Sex sex,StudentType type,
             DateTime? birthDay,string graduationSchool,string specialty,
             DateTime? workdate,string officeName,string photo,bool photoIsValid,
-            string email,bool emailIsValid,string address,decimal balance,int professionaltitleid
+            string email,bool emailIsValid,string address,decimal balance,int professionaltitleid,
+            int workUnitId
             )
         {
             Type = type;
@@ -79,6 +82,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             Address = address;
             Balance = balance;
             ProfessionalTitleId = professionaltitleid;
+            WorkUnitId = workUnitId;
         }
         
     }

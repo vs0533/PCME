@@ -7,6 +7,7 @@ using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.UnitAggregates;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 using System;
@@ -82,7 +83,7 @@ namespace PCME.Api.Controllers
         public IActionResult NavigateData(int? id, int? node)
         {
             node = node == 1 ? null : node;
-            var _id = node ?? id ?? int.Parse(User.FindFirstValue("id"));
+            var _id = node ?? id ?? int.Parse(User.FindFirstValue("AccountId"));
             var query = workUnitRepository.Query(c => c.PID == _id, include: s => s.Include(d => d.Childs));
             if (node == null)
             {
@@ -124,15 +125,15 @@ namespace PCME.Api.Controllers
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
-            var id = User.FindFirstValue("id");
+            var id = User.FindFirstValue("AccountId");
             var sqlparameId = new SqlParameter("id", navigate == null ? id : navigate.FieldValue.ToString());
             //var search = workUnitRepository.Query(c => c.Id != 0).Include(s=>s.Parent);
             string sql = @"WITH temp  
                             AS  
                             (  
-                            SELECT * FROM Unit WHERE id = @id 
+                            SELECT * FROM WorkUnit WHERE id = @id 
                             UNION ALL  
-                            SELECT m.* FROM Unit  AS m  
+                            SELECT m.* FROM WorkUnit  AS m  
                             INNER JOIN temp AS child ON m.PID = child.Id  
                             )  
                             SELECT * FROM temp";
@@ -151,7 +152,6 @@ namespace PCME.Api.Controllers
                 { "level",c.Level},
                 { "linkman",c.LinkMan},
                 { "linkphone",c.LinkPhone},
-                { "password",c.PassWord},
                 { "WorkUnitNature.Name",WorkUnitNature.From(c.WorkUnitNatureId).Name},
                 { "WorkUnitNature.Id",c.WorkUnitNatureId}
             });
@@ -241,7 +241,12 @@ namespace PCME.Api.Controllers
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
             WorkUnit result = null;
-            var loginid = int.Parse(User.FindFirstValue("id"));
+            var loginid = int.Parse(User.FindFirstValue("WorkUnitId"));
+            int workUnitAccountTypeId = int.Parse(User.FindFirstValue("AccountType"));
+            if (workUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
+            {
+                return new UnauthorizedResult();
+            }
             var loginobj = await workUnitRepository.FindAsync(loginid);
             if (opertype == "new")
             {
@@ -263,6 +268,10 @@ namespace PCME.Api.Controllers
                 ModelState.AddModelError("code", "单位代码存在");
             }
             ModelState.Remove("opertype");
+            if (opertype != "new")
+            {
+                ModelState.Remove("PassWord");
+            }
             if (ModelState.IsValid)
             {
                 result = await _mediator.Send(command);
@@ -275,7 +284,6 @@ namespace PCME.Api.Controllers
                     { "level",result.Level},
                     { "linkman",result.LinkMan},
                     { "linkphone",result.LinkPhone},
-                    { "password",result.PassWord},
                     { "WorkUnitNature.Name",WorkUnitNature.From(result.WorkUnitNatureId).Name},
                     { "WorkUnitNature.Id",result.WorkUnitNatureId}
                 };
@@ -306,24 +314,6 @@ namespace PCME.Api.Controllers
             workUnitRepository.Delete(delUnit);
             await unitOfWork.SaveEntitiesAsync();
             return NoContent();
-        }
-        // PUT: api/WorkUnit/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> ChangePassword(int id, string password)
-        {
-            if (id < 0)
-            {
-                return NotFound();
-            }
-            var workUnitItem = await workUnitRepository.FindAsync(id);
-            if (workUnitItem is null)
-            {
-                return NotFound();
-            }
-            workUnitItem.ChangePassWord(password);
-            workUnitRepository.Update(workUnitItem);
-            await unitOfWork.SaveEntitiesAsync();
-            return (IActionResult)Ok();
         }
 
         // DELETE: api/ApiWithActions/5

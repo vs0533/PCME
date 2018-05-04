@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure;
 using PCME.MOPDB;
 using Polly;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -33,6 +31,7 @@ namespace PCME.Api.Infrastructure
                 );
         }
 
+        #region 枚举字典表初实例化
         private IEnumerable<WorkUnitNature> GetPredefinedWorkUnitNature()
         {
             return new List<WorkUnitNature>()
@@ -42,6 +41,16 @@ namespace PCME.Api.Infrastructure
                 WorkUnitNature.Company
             };
         }
+        private IEnumerable<WorkUnitAccountType> GetPredefinedWorkUnitAccountType()
+        {
+            return new List<WorkUnitAccountType>()
+            {
+                WorkUnitAccountType.Manager,
+                WorkUnitAccountType.CE,
+                WorkUnitAccountType.CS
+            };
+        }
+        #endregion
 
 
         public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
@@ -54,19 +63,23 @@ namespace PCME.Api.Infrastructure
                 using (context)
                 {
                     context.Database.Migrate();
-
+                    #region 美剧字典表初始化数据
                     if (!context.WorkUnitNature.Any())
                     {
                         context.WorkUnitNature.AddRange(GetPredefinedWorkUnitNature());
-
-
                         await context.SaveChangesAsync();
                     }
+                    if (!context.WorkUnitAccountType.Any())
+                    {
+                        context.WorkUnitAccountType.AddRange(GetPredefinedWorkUnitAccountType());
+                        await context.SaveChangesAsync();
+                    }
+                    #endregion
                     if (!context.WorkUnits.Any())
                     {
                         IEnumerable<WorkUnit> workunits = new List<WorkUnit>()
                         {
-                            new WorkUnit("3703","111111","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id)
+                            new WorkUnit("3703","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id,WorkUnitAccountType.Manager.Id)
                         };
                         context.WorkUnits.AddRange(workunits);
                     }
@@ -224,6 +237,21 @@ namespace PCME.Api.Infrastructure
                         context.ProfessionalTitles.AddRange(ptitles);
                         await context.SaveChangesAsync();
                     }
+                    //if (!(context.WorkUnits.Count() == 1))
+                    //{
+                    //    var u_all = mopcontext.Unit.Include(s=>s.Account).ToList();
+                    //    var u_1 = u_all.Where(c => c.UnitId.Length == 6).ToList();
+                    //    var u_2 = u_all.Where(c => c.UnitId.Length == 8).ToList();
+                    //    List<WorkUnit> workUnits = new List<WorkUnit>();
+                        
+                    //    foreach (var item in collection)
+                    //    {
+
+                    //        WorkUnit workUnit = new WorkUnit(
+                                
+                    //            );
+                    //    }
+                    //}
                 }
             });
 

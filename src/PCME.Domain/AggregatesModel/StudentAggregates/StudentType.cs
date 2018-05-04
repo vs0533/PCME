@@ -9,8 +9,8 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 {
     public class StudentType:Enumeration
     {
-        public static StudentType Professional = new StudentType(1,nameof(Professional));
-        public static StudentType CivilServant = new StudentType(2,nameof(CivilServant));
+        public static StudentType Professional = new StudentType(1,"专业技术人员");
+        public static StudentType CivilServant = new StudentType(2,"公务员");
         public static IEnumerable<StudentType> List() => new[] { Professional, CivilServant };
         public StudentType()
         {
