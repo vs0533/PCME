@@ -27,6 +27,8 @@ namespace PCME.Infrastructure
         public DbSet<Specialty> Specialtys { get; set; }
         public DbSet<WorkUnitAccount> WorkUnitAccounts { get; set; }
         public DbSet<WorkUnitAccountType> WorkUnitAccountType { get; set; }
+        public DbSet<StudentType> StudentTypes { get; set; }
+        public DbSet<Sex> Sex { get; set; }
 
         //private readonly IMediator _mediator;
 

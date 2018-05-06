@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
+using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure;
@@ -52,6 +53,23 @@ namespace PCME.Api.Infrastructure
                 WorkUnitAccountType.CS
             };
         }
+        private IEnumerable<StudentType> GetPredefinedStudentType()
+        {
+            return new List<StudentType>()
+            {
+                StudentType.Professional,
+                StudentType.CivilServant
+            };
+        }
+        private IEnumerable<Sex> GetPredefinedSex()
+        {
+            return new List<Sex>()
+            {
+                Sex.Man,
+                Sex.Woman,
+                Sex.Unknown
+            };
+        }
         #endregion
 
 
@@ -74,6 +92,16 @@ namespace PCME.Api.Infrastructure
                     if (!context.WorkUnitAccountType.Any())
                     {
                         context.WorkUnitAccountType.AddRange(GetPredefinedWorkUnitAccountType());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.StudentTypes.Any())
+                    {
+                        context.StudentTypes.AddRange(GetPredefinedStudentType());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.Sex.Any())
+                    {
+                        context.Sex.AddRange(GetPredefinedSex());
                         await context.SaveChangesAsync();
                     }
                     #endregion
@@ -240,6 +268,7 @@ namespace PCME.Api.Infrastructure
                         await context.SaveChangesAsync();
                     }
                     #endregion
+                    #region 导入单位和账号
                     if ((context.WorkUnits.Count() == 1))
                     {
                         var u_all = mopcontext.Unit.Include(s => s.Account).ToList();
@@ -430,8 +459,91 @@ namespace PCME.Api.Infrastructure
 
                             workUnits4.Add(workUnit);
                         }
-                        
+
                         context.WorkUnits.AddRange(workUnits4);
+                        await context.SaveChangesAsync();
+                    }
+                    #endregion
+
+                    if (!context.Students.Any())
+                    {
+                        var photo = mopcontext.PersonPhoto.ToList();
+                        var office = mopcontext.UnitDept.ToList();
+                        var money = mopcontext.Money.ToList();
+                        var oldPerson = mopcontext.Person
+                            .Include(s=>s.PersonIdentity)
+                            .ToList();
+                        var curWorkUnits = context.WorkUnits.ToList();
+                        var curProfessionTitles = context.ProfessionalTitles.ToList();
+                        
+
+                        List<Student> studentContent = new List<Student>();
+                        //foreach (var item in oldPerson)
+                        Parallel.ForEach(oldPerson, item => {
+                            try
+                            {
+                                int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
+                                //int professionalTitleId = 1;//curProfessionTitles.SingleOrDefault(c => c.Name == "待定").Id;
+
+                                var m = money.FirstOrDefault(c => c.PersonId == item.PersonId);
+                                decimal mV = m == null ? 0 : m.MoneyVirtual;
+                                decimal mA = m == null ? 0 : m.MoneyActual;
+
+                                var of = office.FirstOrDefault(c => c.DeptId == item.DeptId);
+
+                                string officestr = of == null ? "待定" : of.DeptName;
+                                var pho = photo.FirstOrDefault(c => c.PersonId == item.PersonId);
+
+
+                                int sex = Sex.Man.Id;
+                                switch (item.Sex)
+                                {
+                                    case "男":
+                                        sex = Sex.Man.Id;
+                                        break;
+                                    case "女":
+                                        sex = Sex.Woman.Id;
+                                        break;
+                                    default:
+                                        sex = Sex.Unknown.Id;
+                                        break;
+                                }
+
+                                int typeId = 1;
+                                switch (item.PersonIdentityId)
+                                {
+                                    case "01":
+                                        typeId = StudentType.CivilServant.Id;
+                                        break;
+                                    default:
+                                        typeId = StudentType.Professional.Id;
+                                        break;
+                                }
+
+                                Student student = new Student(
+                                    item.Idcard
+                                    , item.PersonName
+                                    , item.Password
+                                    , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
+                                    , officestr, pho == null ? string.Empty : pho.PhotoUrl, pho == null ? false : pho.IsOk
+                                    , item.Email, false, item.Address, mA, mV, pid
+                                    );
+                                studentContent.Add(student);
+                            }
+                            catch (Exception ex)
+                            {
+
+                                throw;
+                            }
+                        });
+                        //foreach (var item in oldPerson)
+                        //{
+                            
+                            
+                        //}
+                        //var studenttypeNull = studentContent.Where(c => c.StudentType is null).ToList();
+                        //var studenttypeNull1 = studentContent.Where(c => c.StudentType != null).ToList();
+                        context.Students.AddRange(studentContent);
                         await context.SaveChangesAsync();
                     }
                 }

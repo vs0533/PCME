@@ -101,9 +101,12 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Address");
+                    b.Property<string>("Address")
+                        .HasMaxLength(60);
 
-                    b.Property<decimal>("Balance");
+                    b.Property<decimal>("BalanceActual");
+
+                    b.Property<decimal>("BalanceVirtual");
 
                     b.Property<DateTime?>("BirthDay");
 
@@ -111,7 +114,8 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<bool>("EmailIsValid");
 
-                    b.Property<string>("GraduationSchool");
+                    b.Property<string>("GraduationSchool")
+                        .HasMaxLength(60);
 
                     b.Property<string>("IDCard");
 
@@ -125,13 +129,11 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<bool>("PhotoIsValid");
 
-                    b.Property<int>("ProfessionalTitleId");
-
-                    b.Property<int?>("SexId");
+                    b.Property<int>("SexId");
 
                     b.Property<string>("Specialty");
 
-                    b.Property<int?>("TypeId");
+                    b.Property<int>("StudentTypeId");
 
                     b.Property<DateTime?>("WorkDate");
 
@@ -141,7 +143,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasIndex("SexId");
 
-                    b.HasIndex("TypeId");
+                    b.HasIndex("StudentTypeId");
 
                     b.ToTable("Students");
                 });
@@ -276,11 +278,13 @@ namespace PCME.Infrastructure.Migrations
                 {
                     b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Sex", "Sex")
                         .WithMany()
-                        .HasForeignKey("SexId");
+                        .HasForeignKey("SexId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.StudentType", "Type")
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.StudentType", "StudentType")
                         .WithMany()
-                        .HasForeignKey("TypeId");
+                        .HasForeignKey("StudentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", b =>

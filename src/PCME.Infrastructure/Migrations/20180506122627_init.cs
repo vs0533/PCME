@@ -136,22 +136,22 @@ namespace PCME.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Address = table.Column<string>(nullable: true),
-                    Balance = table.Column<decimal>(nullable: false),
+                    Address = table.Column<string>(maxLength: 60, nullable: true),
+                    BalanceActual = table.Column<decimal>(nullable: false),
+                    BalanceVirtual = table.Column<decimal>(nullable: false),
                     BirthDay = table.Column<DateTime>(nullable: true),
                     Email = table.Column<string>(nullable: true),
                     EmailIsValid = table.Column<bool>(nullable: false),
-                    GraduationSchool = table.Column<string>(nullable: true),
+                    GraduationSchool = table.Column<string>(maxLength: 60, nullable: true),
                     IDCard = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     OfficeName = table.Column<string>(nullable: true),
                     Password = table.Column<string>(nullable: true),
                     Photo = table.Column<string>(nullable: true),
                     PhotoIsValid = table.Column<bool>(nullable: false),
-                    ProfessionalTitleId = table.Column<int>(nullable: false),
-                    SexId = table.Column<int>(nullable: true),
+                    SexId = table.Column<int>(nullable: false),
                     Specialty = table.Column<string>(nullable: true),
-                    TypeId = table.Column<int>(nullable: true),
+                    StudentTypeId = table.Column<int>(nullable: false),
                     WorkDate = table.Column<DateTime>(nullable: true),
                     WorkUnitId = table.Column<int>(nullable: false)
                 },
@@ -163,13 +163,13 @@ namespace PCME.Infrastructure.Migrations
                         column: x => x.SexId,
                         principalTable: "Sex",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Students_StudentType_TypeId",
-                        column: x => x.TypeId,
+                        name: "FK_Students_StudentType_StudentTypeId",
+                        column: x => x.StudentTypeId,
                         principalTable: "StudentType",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -256,9 +256,9 @@ namespace PCME.Infrastructure.Migrations
                 column: "SexId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_TypeId",
+                name: "IX_Students_StudentTypeId",
                 table: "Students",
-                column: "TypeId");
+                column: "StudentTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkUnit_Code",

@@ -3,11 +3,13 @@
     using System;
     using MediatR;
     using System.Collections.Generic;
+    using System.ComponentModel.DataAnnotations;
 
     public abstract class Entity
     {
         int? _requestedHashCode;
-        int _Id;        
+        int _Id; 
+        [Key]
         public virtual  int Id 
         {
             get

@@ -12,7 +12,10 @@ namespace PCME.Domain.AggregatesModel.ProfessionalTitleAggregates
         public Specialty Specialty { get; private set; }
         public Series Series { get; private set; }
         public Level Level { get; private set; }
+        public ProfessionalTitle()
+        {
 
+        }
         public ProfessionalTitle(string name, Specialty specialty, Series series, Level level)
         {
             Name = name;
