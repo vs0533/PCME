@@ -13,15 +13,16 @@ namespace PCME.Domain.AggregatesModel.WorkUnitAccountAggregates
         /// Continuing Education
         /// </summary>
         public static WorkUnitAccountType Manager = new WorkUnitAccountType(1, "单位管理员");
+        public static WorkUnitAccountType Approve = new WorkUnitAccountType(2, "单位审核");
         /// <summary>
         /// Continuing Education
         /// </summary>
-        public static WorkUnitAccountType CE = new WorkUnitAccountType(2, "继续教育培训");
+        public static WorkUnitAccountType CE = new WorkUnitAccountType(3, "继续教育培训");
         /// <summary>
         /// CivilServant
         /// </summary>
-        public static WorkUnitAccountType CS = new WorkUnitAccountType(3, "公务员培训");
-        public static IEnumerable<WorkUnitAccountType> List() => new[] { Manager, CE, CS };
+        public static WorkUnitAccountType CS = new WorkUnitAccountType(4, "公务员培训");
+        public static IEnumerable<WorkUnitAccountType> List() => new[] { Manager,Approve, CE, CS };
         public WorkUnitAccountType()
         {
 

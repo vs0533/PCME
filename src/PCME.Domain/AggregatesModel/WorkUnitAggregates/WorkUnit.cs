@@ -45,15 +45,16 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             _accounts = new List<WorkUnitAccount>();
         }
 
-        public void AddAccount(string password,string accountname,int accountType,string holderName) {
+        public void AddAccount(string password,int accountType,string holderName, string accountname = null) {
             
             var existed = _accounts.FirstOrDefault(c => c.AccountName == accountname);
             if (existed != null)
             {
                 throw new Exception("单位账号已经存在");
             }
+            string accountName_ = accountname ?? GenerateAccountName();
             _accounts.Add(new WorkUnitAccount(
-                accountname, 
+                accountName_, 
                 accountType,
                 password,
                 holderName
@@ -62,11 +63,7 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
 
         public WorkUnit(string code, string name, int level, string linkMan, 
             string linkPhoto, string email, string address, int? pID,
-            int workUnitNatureId,
-            int accountType,
-            string accountName = null,
-            string password = "111111",
-            string holderName = null
+            int workUnitNatureId
             )
         {
             _childs = new List<WorkUnit>();
@@ -75,16 +72,12 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
             Code = code ?? throw new ArgumentNullException(nameof(code));
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Level = level;
-            LinkMan = linkMan ?? throw new ArgumentNullException(nameof(linkMan));
-            LinkPhone = linkPhoto ?? throw new ArgumentNullException(nameof(linkPhoto));
-            Email = email;// ?? throw new ArgumentNullException(nameof(email));
+            LinkMan = linkMan;
+            LinkPhone = linkPhoto;
+            Email = email;;
             Address = address;
             PID = pID;
             WorkUnitNatureId = workUnitNatureId;
-
-            string accountName_ = accountName ?? GenerateAccountName();
-            string holdername = holderName ?? linkMan;
-            AddAccount(password, accountName_, accountType, holdername);
         }
 
         private string GenerateAccountName()

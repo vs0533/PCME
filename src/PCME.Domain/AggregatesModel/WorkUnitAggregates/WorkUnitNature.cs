@@ -12,7 +12,8 @@ namespace PCME.Domain.AggregatesModel.UnitAggregates
         public static WorkUnitNature JgUnit = new WorkUnitNature(1, "机关单位");
         public static WorkUnitNature SyUnit = new WorkUnitNature(2, "事业单位");
         public static WorkUnitNature Company = new WorkUnitNature(3, "企业");
-        public static IEnumerable<WorkUnitNature> List() => new[] { JgUnit, SyUnit, Company };
+        public static WorkUnitNature Unknown = new WorkUnitNature(4, "未知");
+        public static IEnumerable<WorkUnitNature> List() => new[] { JgUnit, SyUnit, Company, Unknown };
         public WorkUnitNature()
         {
 

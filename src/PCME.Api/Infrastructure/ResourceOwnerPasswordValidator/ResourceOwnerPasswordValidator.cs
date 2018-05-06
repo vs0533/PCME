@@ -7,6 +7,7 @@ using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -28,18 +29,22 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
             string workUnitId,
             string workUnitName,
             string displayName,
-            string valtype, string accountType)
+            string[] valtype, string accountType)
         {
-            return new Claim[]
+            var claims = new List<Claim>()
             {
                 new Claim("AccountId", accountId),
                 new Claim("AccountName",accountName),
                 new Claim("WorkUnitId",workUnitId),
                 new Claim("WorkUnitName",workUnitName),
                 new Claim("DisplayName",displayName),
-                new Claim(JwtClaimTypes.Role, valtype),
                 new Claim("AccountType",accountType)
             };
+            foreach (var item in valtype)
+            {
+                claims.Add(new Claim(JwtClaimTypes.Role, item));
+            }
+            return claims.ToArray();
         }
 
         private async Task<Student> GetStudentByName(string username)
@@ -93,7 +98,9 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                                     student.IDCard,
                                                     student.WorkUnitId.ToString(),
                                                     studentUnit.Name,
-                                                    student.Name, valtype, StudentType.Professional.Id.ToString()
+                                                    student.Name, 
+                                                    new string[] { valtype,StudentType.Professional.Name},
+                                                    StudentType.Professional.Id.ToString()
                                                     )
                                             );
                                 }
@@ -129,7 +136,8 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                                     account.WorkUnit.Id.ToString(),
                                                     account.WorkUnit.Name,
                                                     account.WorkUnit.Name,
-                                                    valtype, account.WorkUnitAccountTypeId.ToString()
+                                                    new string[] { valtype,WorkUnitAccountType.From(account.WorkUnitAccountTypeId).Name}, 
+                                                    account.WorkUnitAccountTypeId.ToString()
                                                     )
                                             );
                                 }

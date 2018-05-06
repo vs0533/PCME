@@ -30,6 +30,12 @@
     <Compile Remove="Migrations\20180504121528_init.cs" />
     <Compile Remove="Migrations\20180504143509_init.cs" />
     <Compile Remove="Migrations\20180504144620_init.cs" />
+    <Compile Remove="Migrations\20180504150103_init.cs" />
+    <Compile Remove="Migrations\20180506033715_init.cs" />
+    <Compile Remove="Migrations\20180506034614_init.cs" />
+    <Compile Remove="Migrations\20180506035055_init.cs" />
+    <Compile Remove="Migrations\20180506040855_init.cs" />
+    <Compile Remove="Migrations\20180506072358_init.cs" />
   </ItemGroup>
 
   <ItemGroup>

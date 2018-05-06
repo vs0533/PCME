@@ -184,7 +184,7 @@ namespace PCME.Infrastructure.Migrations
                     Level = table.Column<int>(nullable: false),
                     LinkMan = table.Column<string>(nullable: true),
                     LinkPhone = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(maxLength: 50, nullable: false),
+                    Name = table.Column<string>(maxLength: 60, nullable: false),
                     PID = table.Column<int>(nullable: true),
                     Version = table.Column<byte[]>(rowVersion: true, nullable: true),
                     WorkUnitNatureId = table.Column<int>(nullable: false)
@@ -212,9 +212,9 @@ namespace PCME.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    AccountName = table.Column<string>(nullable: true),
+                    AccountName = table.Column<string>(nullable: false),
                     HolderName = table.Column<string>(nullable: true),
-                    PassWord = table.Column<string>(nullable: true),
+                    PassWord = table.Column<string>(nullable: false),
                     WorkUnitAccountTypeId = table.Column<int>(nullable: false),
                     WorkUnitId = table.Column<int>(nullable: false)
                 },
@@ -264,12 +264,6 @@ namespace PCME.Infrastructure.Migrations
                 name: "IX_WorkUnit_Code",
                 table: "WorkUnit",
                 column: "Code",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkUnit_Name",
-                table: "WorkUnit",
-                column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(

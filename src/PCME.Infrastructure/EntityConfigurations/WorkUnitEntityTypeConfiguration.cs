@@ -22,10 +22,10 @@ namespace PCME.Infrastructure.EntityConfigurations
             builder.Ignore(o => o.DomainEvents);
 
             builder.Property(o => o.Name)
-                .HasMaxLength(50)
+                .HasMaxLength(60)
                 .IsRequired();
 
-            builder.HasIndex(o => o.Name).IsUnique();
+            //builder.HasIndex(o => o.Name).IsUnique();
             builder.HasIndex(o => o.Code).IsUnique();
 
             builder.Property(o => o.Code)

@@ -80,10 +80,12 @@ namespace PCME.Api.Controllers
         }
         [HttpGet]
         [Route("navigatedata")]
+        [Authorize(Roles ="Unit")]
         public IActionResult NavigateData(int? id, int? node)
         {
-            node = node == 1 ? null : node;
-            var _id = node ?? id ?? int.Parse(User.FindFirstValue("AccountId"));
+            node = node == 0 ? null : node;
+            var _id = node ?? id ?? int.Parse(User.FindFirstValue("WorkUnitId"));
+            
             var query = workUnitRepository.Query(c => c.PID == _id, include: s => s.Include(d => d.Childs));
             if (node == null)
             {
@@ -98,12 +100,6 @@ namespace PCME.Api.Controllers
                 fieldvalue = d.Id
             });
             return Ok(item);
-        }
-        [HttpPost]
-        [Route("test")]
-        public IActionResult test([FromBody]JObject pid) {
-            var id = pid["pid"].ToObject<string>();
-            return Ok(pid);
         }
         public List<WorkUnit> findallchildren(int PID)
         {
@@ -122,6 +118,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("read")]
+        [Authorize(Roles = "单位管理员")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
@@ -158,95 +155,14 @@ namespace PCME.Api.Controllers
             var total = search.Count();
             return Ok(new { total, data = result });
         }
-
-        [HttpPost]
-        //[Authorize(Roles = "Unit")]
-        [Route("getpagedlist")]
-        public IActionResult GetPagedList(string unitname, int id, int start, int limit, string filter, string navigates)
-        {
-            var sqlparameId = new SqlParameter("id", id);
-            string sql = @"WITH temp  
-                            AS  
-                            (  
-                            SELECT * FROM Unit WHERE id = @id 
-                            UNION ALL  
-                            SELECT m.* FROM Unit  AS m  
-                            INNER JOIN temp AS child ON m.PID = child.Id  
-                            )  
-                            SELECT * FROM temp";
-
-            var query = workUnitRepository.FromSql(sql, sqlparameId).FilterOr(filter.ToObject<Filter>());
-
-            if (!string.IsNullOrEmpty(unitname))
-            {
-                query = query.Where(c => c.Name.Contains(unitname));
-            }
-
-            var item = query.Skip(start).Take(limit);
-            var result = item.Select(c => new
-            {
-                c.Id,
-                c.Name,
-                parentname = c.Parent.Name,
-                c.Level,
-                linkman = c.LinkMan,
-                linkphone = c.LinkPhone,
-                workunitnature = WorkUnitNature.From(c.WorkUnitNatureId).Name
-            });
-            var total = query.Count();
-            return Ok(new { total, data = result });
-        }
-
-
-        [HttpGet]
-        [Route("child")]
-        [Authorize(Roles = "Unit")]
-        public IActionResult GetUnitTreeByParentId(int id, string unitname)
-        {
-            //var items = await workunitRepository.GetPagedListAsync(
-            //   predicate: c=>c.PID ==pid,pageIndex:0,pageSize:int.MaxValue
-            //    );
-
-            var query = workUnitRepository.Query(c => c.PID == id, include: s => s.Include(d => d.Childs));
-            if (!string.IsNullOrEmpty(unitname))
-            {
-                var sqlparameId = new SqlParameter("id", id);
-                var sqlparameName = new SqlParameter("name", string.Format("%{0}%", unitname));
-
-                string sql = @"WITH temp  
-                            AS  
-                            (  
-                            SELECT * FROM Unit WHERE id = @id 
-                            UNION ALL  
-                            SELECT m.* FROM Unit  AS m  
-                            INNER JOIN temp AS child ON m.PID = child.Id  
-                            )  
-                            SELECT * FROM temp where temp.name like @name";
-                query = workUnitRepository.FromSql(sql, sqlparameId, sqlparameName);
-            }
-            var item = query.Select(d => new
-            {
-                id = d.Id,
-                text = d.Name,
-                parentId = d.PID,
-                leaf = !d.Childs.Any()
-            });
-            return Ok(item);
-        }
-
-        // POST: api/WorkUnit
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "Unit")]
+        [Authorize(Roles = "单位管理员")]
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
             WorkUnit result = null;
             var loginid = int.Parse(User.FindFirstValue("WorkUnitId"));
-            int workUnitAccountTypeId = int.Parse(User.FindFirstValue("AccountType"));
-            if (workUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
-            {
-                return new UnauthorizedResult();
-            }
+            
             var loginobj = await workUnitRepository.FindAsync(loginid);
             if (opertype == "new")
             {
@@ -304,6 +220,10 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "该条记录已经被删除" });
             }
+            if (delUnit.Level == 0)
+            {
+                return Ok(new { message = "系统单位不允许删除" });
+            }
             var delUnit_IsChild = await workUnitRepository.GetFirstOrDefaultAsync(predicate: c => c.PID == delUnit.Id);
             if (delUnit_IsChild != null)
             {
@@ -312,26 +232,6 @@ namespace PCME.Api.Controllers
 
 
             workUnitRepository.Delete(delUnit);
-            await unitOfWork.SaveEntitiesAsync();
-            return NoContent();
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (id < 1)
-            {
-                return BadRequest();
-            }
-
-            var workUnitToDelete = await workUnitRepository.FindAsync(id);
-            if (workUnitToDelete is null)
-            {
-                return NotFound();
-            }
-
-            workUnitRepository.Delete(workUnitToDelete);
             await unitOfWork.SaveEntitiesAsync();
             return NoContent();
         }

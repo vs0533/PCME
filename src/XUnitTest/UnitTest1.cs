@@ -52,11 +52,11 @@ namespace XUnitTest
         [Fact]
         public void Test1()
         {
-            var unitOfWork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();
-            var repository = unitOfWork.GetRepository<WorkUnit>();
-            var workunit = new WorkUnit("370303", "淄博卫盛科技", 1, "唐林", "18653311771", "3440", null, null, WorkUnitNature.JgUnit.Id,WorkUnitAccountType.Manager.Id);
-            repository.InsertAsync(workunit);
-            unitOfWork.SaveEntitiesAsync();
+            //var unitOfWork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();
+            //var repository = unitOfWork.GetRepository<WorkUnit>();
+            //var workunit = new WorkUnit("370303", "淄博卫盛科技", 1, "唐林", "18653311771", "3440", null, null, WorkUnitNature.JgUnit.Id,WorkUnitAccountType.Manager.Id);
+            //repository.InsertAsync(workunit);
+            //unitOfWork.SaveEntitiesAsync();
             //IUnitOfWork <ApplicationDbContext> unitofwork = provider.GetService<IUnitOfWork<ApplicationDbContext>>();
         }
     }

@@ -38,7 +38,8 @@ namespace PCME.Api.Infrastructure
             {
                 WorkUnitNature.JgUnit,
                 WorkUnitNature.SyUnit,
-                WorkUnitNature.Company
+                WorkUnitNature.Company,
+                WorkUnitNature.Unknown
             };
         }
         private IEnumerable<WorkUnitAccountType> GetPredefinedWorkUnitAccountType()
@@ -46,6 +47,7 @@ namespace PCME.Api.Infrastructure
             return new List<WorkUnitAccountType>()
             {
                 WorkUnitAccountType.Manager,
+                WorkUnitAccountType.Approve,
                 WorkUnitAccountType.CE,
                 WorkUnitAccountType.CS
             };
@@ -63,7 +65,7 @@ namespace PCME.Api.Infrastructure
                 using (context)
                 {
                     context.Database.Migrate();
-                    #region 美剧字典表初始化数据
+                    #region 枚举字典表初始化数据
                     if (!context.WorkUnitNature.Any())
                     {
                         context.WorkUnitNature.AddRange(GetPredefinedWorkUnitNature());
@@ -75,12 +77,14 @@ namespace PCME.Api.Infrastructure
                         await context.SaveChangesAsync();
                     }
                     #endregion
+                    #region 字典表初始化数据
                     if (!context.WorkUnits.Any())
                     {
-                        IEnumerable<WorkUnit> workunits = new List<WorkUnit>()
-                        {
-                            new WorkUnit("3703","淄博市人力资源和社会保障局",1,"卢瑞生","","","",null,WorkUnitNature.JgUnit.Id,WorkUnitAccountType.Manager.Id)
-                        };
+                        List<WorkUnit> workunits = new List<WorkUnit>();
+                        var workUnit = new WorkUnit("3703", "淄博市人力资源和社会保障局", 0, "卢瑞生", "", "", "", null, WorkUnitNature.JgUnit.Id);
+                        workUnit.AddAccount("111111", WorkUnitAccountType.Manager.Id, "堂堂");
+                        workunits.Add(workUnit);
+
                         context.WorkUnits.AddRange(workunits);
                     }
                     if (!context.Levels.Any())
@@ -212,12 +216,10 @@ namespace PCME.Api.Infrastructure
                         };
                         context.Specialtys.AddRange(specialty);
                     }
-
                     await context.SaveChangesAsync();
-
                     if (!context.ProfessionalTitles.Any())
                     {
-                        var p = mopcontext.DirectoryZwName.Include(s=>s.ClassNameNavigation).ToList();
+                        var p = mopcontext.DirectoryZwName.Include(s => s.ClassNameNavigation).ToList();
                         var levels = context.Levels.ToList();
                         var serieses = context.Seriess.ToList();
                         var specialtys = context.Specialtys.ToList();
@@ -227,31 +229,211 @@ namespace PCME.Api.Infrastructure
                         foreach (var item in p)
                         {
                             string name = item.ZwName;
-                            Specialty specialty = specialtys.FirstOrDefault(c => c.Name == item.Zy.Trim()) ?? specialtys.FirstOrDefault(c=>c.Name == "其他");
-                            Level level = levels.FirstOrDefault(c => c.Name == item.ZcJb.Trim()) ?? levels.FirstOrDefault(c=>c.Name == "未定");
-                            Series series = serieses.FirstOrDefault(c => c.Name == item.ClassNameNavigation?.ClassName.Trim()) ?? serieses.FirstOrDefault(c=>c.Name == "其他");
+                            Specialty specialty = specialtys.FirstOrDefault(c => c.Name == item.Zy.Trim()) ?? specialtys.FirstOrDefault(c => c.Name == "其他");
+                            Level level = levels.FirstOrDefault(c => c.Name == item.ZcJb.Trim()) ?? levels.FirstOrDefault(c => c.Name == "未定");
+                            Series series = serieses.FirstOrDefault(c => c.Name == item.ClassNameNavigation?.ClassName.Trim()) ?? serieses.FirstOrDefault(c => c.Name == "其他");
 
-                            ProfessionalTitle ptitle = new ProfessionalTitle(name,specialty, series,level);
+                            ProfessionalTitle ptitle = new ProfessionalTitle(name, specialty, series, level);
                             ptitles.Add(ptitle);
                         }
                         context.ProfessionalTitles.AddRange(ptitles);
                         await context.SaveChangesAsync();
                     }
-                    //if (!(context.WorkUnits.Count() == 1))
-                    //{
-                    //    var u_all = mopcontext.Unit.Include(s=>s.Account).ToList();
-                    //    var u_1 = u_all.Where(c => c.UnitId.Length == 6).ToList();
-                    //    var u_2 = u_all.Where(c => c.UnitId.Length == 8).ToList();
-                    //    List<WorkUnit> workUnits = new List<WorkUnit>();
-                        
-                    //    foreach (var item in collection)
-                    //    {
+                    #endregion
+                    if ((context.WorkUnits.Count() == 1))
+                    {
+                        var u_all = mopcontext.Unit.Include(s => s.Account).ToList();
+                        var u_1 = u_all.Where(c => c.UnitId.Length == 6).ToList();
+                        var u_2 = u_all.Where(c => c.UnitId.Length == 9).ToList();
+                        var u_3 = u_all.Where(c => c.UnitId.Length == 12).ToList();
+                        var u_4 = u_all.Where(c => c.UnitId.Length == 15).ToList();
 
-                    //        WorkUnit workUnit = new WorkUnit(
-                                
-                    //            );
-                    //    }
-                    //}
+
+                        List<WorkUnit> workUnits = new List<WorkUnit>();
+                        var rootUnit = await context.WorkUnits.FirstOrDefaultAsync(c => c.Level == 0);
+                        foreach (var item in u_1)
+                        {
+
+                            WorkUnit workUnit = new WorkUnit(
+                                item.UnitId,
+                                item.UnitName,
+                                1,
+                                item.Linkman,
+                                item.Mobile,
+                                item.Email,
+                                item.Address,
+                                rootUnit.Id,
+                                WorkUnitNature.Unknown.Id
+                                );
+                            foreach (var account in item.Account)
+                            {
+                                int accounttypeid = 0;
+                                switch (account.TypeId)
+                                {
+                                    case 11:
+                                        accounttypeid = 1;
+                                        break;
+                                    case 12:
+                                        accounttypeid = 2;
+                                        break;
+                                    case 21:
+                                        accounttypeid = 4;
+                                        break;
+                                    default:
+                                        accounttypeid = 3;
+                                        break;
+                                }
+                                workUnit.AddAccount(account.Password, accounttypeid, workUnit.LinkMan, account.AccountName);
+                            }
+
+                            workUnits.Add(workUnit);
+                        }
+                        context.WorkUnits.AddRange(workUnits);
+                        await context.SaveChangesAsync();
+
+
+                        List<WorkUnit> workUnits2 = new List<WorkUnit>();
+                        List<WorkUnit> curAddedWorkUnit2 = context.WorkUnits.ToList();
+                        foreach (var item in u_2)
+                        {
+                            var parentUnitId = u_1.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit2.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            if (parentUnit == null)
+                            {
+                                break;
+                            }
+                            WorkUnit workUnit = new WorkUnit(
+                                item.UnitId,
+                                item.UnitName,
+                                2,
+                                item.Linkman,
+                                item.Mobile,
+                                item.Email,
+                                item.Address,
+                                parentUnit.Id,
+                                WorkUnitNature.Unknown.Id
+                                );
+                            foreach (var account in item.Account)
+                            {
+                                int accounttypeid = 0;
+                                switch (account.TypeId)
+                                {
+                                    case 11:
+                                        accounttypeid = 1;
+                                        break;
+                                    case 12:
+                                        accounttypeid = 2;
+                                        break;
+                                    case 21:
+                                        accounttypeid = 4;
+                                        break;
+                                    default:
+                                        accounttypeid = 3;
+                                        break;
+                                }
+                                workUnit.AddAccount(account.Password, accounttypeid, workUnit.LinkMan, account.AccountName);
+                            }
+
+                            workUnits2.Add(workUnit);
+                        }
+                        context.WorkUnits.AddRange(workUnits2);
+                        await context.SaveChangesAsync();
+
+                        List<WorkUnit> workUnits3 = new List<WorkUnit>();
+                        List<WorkUnit> curAddedWorkUnit3 = context.WorkUnits.ToList();
+                        foreach (var item in u_3)
+                        {
+                            var parentUnitId = u_2.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit3.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            if (parentUnit == null)
+                            {
+                                break;
+                            }
+                            WorkUnit workUnit = new WorkUnit(
+                                item.UnitId,
+                                item.UnitName,
+                                3,
+                                item.Linkman,
+                                item.Mobile,
+                                item.Email,
+                                item.Address,
+                                parentUnit.Id,
+                                WorkUnitNature.Unknown.Id
+                                );
+                            foreach (var account in item.Account)
+                            {
+                                int accounttypeid = 0;
+                                switch (account.TypeId)
+                                {
+                                    case 11:
+                                        accounttypeid = 1;
+                                        break;
+                                    case 12:
+                                        accounttypeid = 2;
+                                        break;
+                                    case 21:
+                                        accounttypeid = 4;
+                                        break;
+                                    default:
+                                        accounttypeid = 3;
+                                        break;
+                                }
+                                workUnit.AddAccount(account.Password, accounttypeid, workUnit.LinkMan, account.AccountName);
+                            }
+
+                            workUnits3.Add(workUnit);
+                        }
+                        context.WorkUnits.AddRange(workUnits3);
+                        await context.SaveChangesAsync();
+
+                        List<WorkUnit> workUnits4 = new List<WorkUnit>();
+                        List<WorkUnit> curAddedWorkUnit4 = context.WorkUnits.ToList();
+                        foreach (var item in u_4)
+                        {
+                            var parentUnitId = u_3.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit4.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            if (parentUnit == null)
+                            {
+                                break;
+                            }
+                            WorkUnit workUnit = new WorkUnit(
+                                item.UnitId,
+                                item.UnitName,
+                                4,
+                                item.Linkman,
+                                item.Mobile,
+                                item.Email,
+                                item.Address,
+                                parentUnit.Id,
+                                WorkUnitNature.Unknown.Id
+                                );
+                            foreach (var account in item.Account)
+                            {
+                                int accounttypeid = 0;
+                                switch (account.TypeId)
+                                {
+                                    case 11:
+                                        accounttypeid = 1;
+                                        break;
+                                    case 12:
+                                        accounttypeid = 2;
+                                        break;
+                                    case 21:
+                                        accounttypeid = 4;
+                                        break;
+                                    default:
+                                        accounttypeid = 3;
+                                        break;
+                                }
+                                workUnit.AddAccount(account.Password, accounttypeid, workUnit.LinkMan, account.AccountName);
+                            }
+
+                            workUnits4.Add(workUnit);
+                        }
+                        
+                        context.WorkUnits.AddRange(workUnits4);
+                        await context.SaveChangesAsync();
+                    }
                 }
             });
 

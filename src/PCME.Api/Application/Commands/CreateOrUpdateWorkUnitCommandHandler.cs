@@ -41,9 +41,9 @@ namespace PCME.Api.Application.Commands
                        request.Email,
                        request.Address,
                        request.PID,
-                       request.WorkUnitNatureId,
-                       WorkUnitAccountType.Manager.Id, null, request.PassWord
+                       request.WorkUnitNatureId
                    );
+                workUnit.AddAccount(request.PassWord, WorkUnitAccountType.Manager.Id, request.LinkMan);
                 try
                 {
                     await workUnitRepository.InsertAsync(workUnit);

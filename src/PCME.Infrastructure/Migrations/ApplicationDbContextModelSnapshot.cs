@@ -181,7 +181,7 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50);
+                        .HasMaxLength(60);
 
                     b.Property<int?>("PID");
 
@@ -194,9 +194,6 @@ namespace PCME.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.HasIndex("PID");
@@ -225,11 +222,13 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AccountName");
+                    b.Property<string>("AccountName")
+                        .IsRequired();
 
                     b.Property<string>("HolderName");
 
-                    b.Property<string>("PassWord");
+                    b.Property<string>("PassWord")
+                        .IsRequired();
 
                     b.Property<int>("WorkUnitAccountTypeId");
 
