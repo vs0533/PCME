@@ -467,84 +467,98 @@ namespace PCME.Api.Infrastructure
 
                     if (!context.Students.Any())
                     {
-                        var photo = mopcontext.PersonPhoto.ToList();
-                        var office = mopcontext.UnitDept.ToList();
-                        var money = mopcontext.Money.ToList();
-                        var oldPerson = mopcontext.Person
-                            .Include(s=>s.PersonIdentity)
+                        IReadOnlyCollection<PersonPhoto> photo = mopcontext.PersonPhoto.ToList();
+                        IReadOnlyCollection<UnitDept> office = mopcontext.UnitDept.ToList();
+                        IReadOnlyCollection<Money> money = mopcontext.Money.ToList();
+                        IReadOnlyCollection<Person> oldPerson = mopcontext.Person
+                            .Include(s => s.PersonIdentity)//.Skip(0).Take(1753)
                             .ToList();
-                        var curWorkUnits = context.WorkUnits.ToList();
-                        var curProfessionTitles = context.ProfessionalTitles.ToList();
-                        
+                        IReadOnlyCollection<WorkUnit> curWorkUnits = context.WorkUnits.ToList();
+                        IReadOnlyCollection<ProfessionalTitle> curProfessionTitles = context.ProfessionalTitles.ToList();
+
 
                         List<Student> studentContent = new List<Student>();
                         //foreach (var item in oldPerson)
-                        Parallel.ForEach(oldPerson, item => {
-                            try
+                        int ctr = 0;
+                        int insertCtr = 0;
+                        int insertCount = 0;
+                        const int SAVECTR = 8;
+                        Object thisLock = new Object();
+                        Parallel.ForEach(oldPerson, item =>
+                        {
+                            int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
+
+                            var m = money.FirstOrDefault(c => c.PersonId == item.PersonId);
+                            decimal mV = m is null ? 0 : m.MoneyVirtual;
+                            decimal mA = m is null ? 0 : m.MoneyActual;
+
+                            var of = office.FirstOrDefault(c => c.DeptId == item.DeptId);
+
+                            string officestr = of is null ? "待定" : of.DeptName;
+                            var pho = photo.FirstOrDefault(c => c.PersonId == item.PersonId);
+
+
+                            int sex = Sex.Man.Id;
+                            switch (item.Sex)
                             {
-                                int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
-                                //int professionalTitleId = 1;//curProfessionTitles.SingleOrDefault(c => c.Name == "待定").Id;
-
-                                var m = money.FirstOrDefault(c => c.PersonId == item.PersonId);
-                                decimal mV = m == null ? 0 : m.MoneyVirtual;
-                                decimal mA = m == null ? 0 : m.MoneyActual;
-
-                                var of = office.FirstOrDefault(c => c.DeptId == item.DeptId);
-
-                                string officestr = of == null ? "待定" : of.DeptName;
-                                var pho = photo.FirstOrDefault(c => c.PersonId == item.PersonId);
-
-
-                                int sex = Sex.Man.Id;
-                                switch (item.Sex)
-                                {
-                                    case "男":
-                                        sex = Sex.Man.Id;
-                                        break;
-                                    case "女":
-                                        sex = Sex.Woman.Id;
-                                        break;
-                                    default:
-                                        sex = Sex.Unknown.Id;
-                                        break;
-                                }
-
-                                int typeId = 1;
-                                switch (item.PersonIdentityId)
-                                {
-                                    case "01":
-                                        typeId = StudentType.CivilServant.Id;
-                                        break;
-                                    default:
-                                        typeId = StudentType.Professional.Id;
-                                        break;
-                                }
-
-                                Student student = new Student(
-                                    item.Idcard
-                                    , item.PersonName
-                                    , item.Password
-                                    , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
-                                    , officestr, pho == null ? string.Empty : pho.PhotoUrl, pho == null ? false : pho.IsOk
-                                    , item.Email, false, item.Address, mA, mV, pid
-                                    );
-                                studentContent.Add(student);
+                                case "男":
+                                    sex = Sex.Man.Id;
+                                    break;
+                                case "女":
+                                    sex = Sex.Woman.Id;
+                                    break;
+                                default:
+                                    sex = Sex.Unknown.Id;
+                                    break;
                             }
-                            catch (Exception ex)
-                            {
 
-                                throw;
+                            int typeId = 1;
+                            switch (item.PersonIdentityId)
+                            {
+                                case "01":
+                                    typeId = StudentType.CivilServant.Id;
+                                    break;
+                                default:
+                                    typeId = StudentType.Professional.Id;
+                                    break;
+                            }
+                            bool photoisVal = true;
+                            if (photo is null)
+                            {
+                                photoisVal = false;
+
+                            }
+
+                            Student student = new Student(
+                                item.PersonName
+                                , item.Idcard
+                                , item.Password
+                                , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
+                                , officestr, pho?.PhotoUrl, photoisVal
+                                , item.Email, false, item.Address, mA, mV, pid
+                                );
+                            
+                            lock (thisLock)
+                            {
+                                studentContent.Add(student);
+                                ctr++;
+                                if ((ctr >= oldPerson.Count() / SAVECTR) || 
+                                    ((ctr == (oldPerson.Count % SAVECTR)) && insertCtr == SAVECTR)
+                                    )
+                                {
+                                    Console.Write("开始提交数据库");
+                                    context.Students.AddRange(studentContent);
+                                    context.SaveChanges();
+                                    insertCount += studentContent.Count();
+                                    insertCtr++;
+                                    Console.WriteLine(string.Format("已经提交...{0}次；本次提交{1}条;共提交{2}条",insertCtr.ToString(),studentContent.Count(),insertCount.ToString()));
+                                    studentContent.Clear();
+                                    ctr = 0;
+                                }
                             }
                         });
-                        //foreach (var item in oldPerson)
-                        //{
-                            
-                            
-                        //}
-                        //var studenttypeNull = studentContent.Where(c => c.StudentType is null).ToList();
-                        //var studenttypeNull1 = studentContent.Where(c => c.StudentType != null).ToList();
-                        context.Students.AddRange(studentContent);
-                        await context.SaveChangesAsync();
+                        //context.Students.AddRange(studentContent);
+                        //await context.SaveChangesAsync();
                     }
                 }
             });

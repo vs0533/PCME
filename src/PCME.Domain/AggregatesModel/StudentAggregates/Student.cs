@@ -79,7 +79,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             WorkDate = workdate;
             OfficeName = officeName;
             Photo = photo;
-            PhotoIsValid = PhotoIsValid;
+            PhotoIsValid = photoIsValid;
             Email = email;
             EmailIsValid = EmailIsValid;
             Address = address;
