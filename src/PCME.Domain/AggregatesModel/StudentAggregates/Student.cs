@@ -42,7 +42,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public decimal BalanceActual { get; private set; }
         public decimal BalanceVirtual { get; private set; }
         public int WorkUnitId { get; private set; }
-
+        public int StudentStatusId { get; private set; }
 
         public Student()
         {
@@ -51,21 +51,21 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public Student(string name, string idcard, string password, int studentTypeId, int professionaltitleid, int workUnitId)
             : this(name, idcard, password, Sex.Unknown.Id, studentTypeId, null, string.Empty
                  , string.Empty, null, string.Empty, string.Empty, false,
-                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId)
+                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id)
         {
 
         }
         public Student(string name, string idcard, string password, int sex, int studentTypeId, int professionaltitleid, int workUnitId)
             : this(name, idcard, password, sex, studentTypeId, null, string.Empty
                  , string.Empty, null, string.Empty, string.Empty, false,
-                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId)
+                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id)
         {
         }
         public Student(string name, string idcard, string password, int sex, int studentTypeId,
             DateTime? birthDay, string graduationSchool, string specialty,
             DateTime? workdate, string officeName, string photo, bool photoIsValid,
             string email, bool emailIsValid, string address, decimal balanceActual,decimal balanceVirtual,
-            int workUnitId
+            int workUnitId,int studentStatus
             )
         {
             StudentTypeId = StudentType.From(studentTypeId).Id;
@@ -86,6 +86,31 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             BalanceActual = balanceActual;
             BalanceVirtual = balanceVirtual;
             WorkUnitId = workUnitId;
+            StudentStatusId = studentStatus;
+        }
+
+        public void Update(string name, string password, int sex, int studentTypeId,
+            DateTime? birthDay, string graduationSchool, string specialty,
+            DateTime? workdate, string officeName,
+            string address, int studentStatus
+            )
+        {
+            StudentTypeId = StudentType.From(studentTypeId).Id;
+            Name = name;
+            Password = password;
+            SexId = Sex.From(sex).Id;
+            BirthDay = birthDay;
+            GraduationSchool = graduationSchool;
+            Specialty = specialty;
+            WorkDate = workdate;
+            OfficeName = officeName;
+            EmailIsValid = EmailIsValid;
+            Address = address;
+            StudentStatusId = studentStatus;
+        }
+
+        public void UpdateWorkUnit(int workUnitId) {
+            WorkUnitId = WorkUnitId;
         }
 
     }

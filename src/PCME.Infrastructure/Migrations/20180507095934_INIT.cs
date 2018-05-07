@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace PCME.Infrastructure.Migrations
 {
-    public partial class init : Migration
+    public partial class INIT : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -58,6 +58,18 @@ namespace PCME.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Specialtys", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StudentStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StudentStatus", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -151,6 +163,7 @@ namespace PCME.Infrastructure.Migrations
                     PhotoIsValid = table.Column<bool>(nullable: false),
                     SexId = table.Column<int>(nullable: false),
                     Specialty = table.Column<string>(nullable: true),
+                    StudentStatusId = table.Column<int>(nullable: false),
                     StudentTypeId = table.Column<int>(nullable: false),
                     WorkDate = table.Column<DateTime>(nullable: true),
                     WorkUnitId = table.Column<int>(nullable: false)
@@ -294,6 +307,9 @@ namespace PCME.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "StudentStatus");
 
             migrationBuilder.DropTable(
                 name: "WorkUnitAccounts");

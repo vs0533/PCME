@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PCME.Api.Infrastructure.ModelBinder;
+using PCME.Api.Infrastructure.Validation;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,14 @@ namespace PCME.Api.Application.Commands
     {
         public int Id { get;  set; }
         [Required(ErrorMessage ="单位编码必须填写")]
+        //[RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "单位编码只能是数字和字母组合")]
+        [String(ErrorMessage = "单位编码只能是数字和字母组合")]
         public string Code { get; private set; }
         [Required(ErrorMessage = "单位密码必须填写")]
         public string PassWord { get; private set; }
         [Required(ErrorMessage = "单位名称必须填写")]
+        //[RegularExpression(@"^[A-Za-z0-9|_\u4e00-\u9fa5]+$", ErrorMessage = "单位名称不允许非法字符")]
+        [StringAndCharacter(ErrorMessage = "单位名称不允许非法字符")]
         public string Name { get; private set; }
         [Required(ErrorMessage = "单位级别必须填写")]
         public int Level { get; private set; }

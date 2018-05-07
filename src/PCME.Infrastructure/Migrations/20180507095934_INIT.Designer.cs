@@ -11,8 +11,8 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180507035858_init")]
-    partial class init
+    [Migration("20180507095934_INIT")]
+    partial class INIT
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -134,6 +134,8 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<string>("Specialty");
 
+                    b.Property<int>("StudentStatusId");
+
                     b.Property<int>("StudentTypeId");
 
                     b.Property<DateTime?>("WorkDate");
@@ -147,6 +149,20 @@ namespace PCME.Infrastructure.Migrations
                     b.HasIndex("StudentTypeId");
 
                     b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.StudentStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentStatus");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.StudentType", b =>

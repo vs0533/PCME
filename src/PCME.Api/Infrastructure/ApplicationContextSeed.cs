@@ -70,6 +70,16 @@ namespace PCME.Api.Infrastructure
                 Sex.Unknown
             };
         }
+        private IEnumerable<StudentStatus> GetPredefinedStudentStatus()
+        {
+            return new List<StudentStatus>()
+            {
+                StudentStatus.Normal,
+                StudentStatus.Resign,
+                StudentStatus.Retire,
+                StudentStatus.BeNotIn
+            };
+        }
         #endregion
 
 
@@ -102,6 +112,11 @@ namespace PCME.Api.Infrastructure
                     if (!context.Sex.Any())
                     {
                         context.Sex.AddRange(GetPredefinedSex());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.StudentStatus.Any())
+                    {
+                        context.StudentStatus.AddRange(GetPredefinedStudentStatus());
                         await context.SaveChangesAsync();
                     }
                     #endregion
@@ -535,7 +550,7 @@ namespace PCME.Api.Infrastructure
                                 , item.Password
                                 , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
                                 , officestr, pho?.PhotoUrl, photoisVal
-                                , item.Email, false, item.Address, mA, mV, pid
+                                , item.Email, false, item.Address, mA, mV, pid,StudentStatus.Normal.Id
                                 );
                             
                             lock (thisLock)
@@ -557,8 +572,6 @@ namespace PCME.Api.Infrastructure
                                 }
                             }
                         });
-                        //context.Students.AddRange(studentContent);
-                        //await context.SaveChangesAsync();
                     }
                 }
             });

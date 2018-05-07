@@ -29,6 +29,7 @@ namespace PCME.Infrastructure
         public DbSet<WorkUnitAccountType> WorkUnitAccountType { get; set; }
         public DbSet<StudentType> StudentTypes { get; set; }
         public DbSet<Sex> Sex { get; set; }
+        public DbSet<StudentStatus> StudentStatus { get; set; }
 
         //private readonly IMediator _mediator;
 
@@ -52,6 +53,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new StudentTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new ProfessionalTitleEntityTypeConfiguration());
             builder.ApplyConfiguration(new WorkUnitAccountTypeEntityTypeConfiguration());
+            builder.ApplyConfiguration(new StudentStatusEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 

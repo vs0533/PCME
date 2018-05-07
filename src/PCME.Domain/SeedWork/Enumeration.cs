@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 
@@ -8,7 +9,6 @@ namespace PCME.Domain.SeedWork
     public abstract class Enumeration : IComparable
     {
         public string Name { get; private set; }
-
         public int Id { get; private set; }
 
         protected Enumeration(){}
