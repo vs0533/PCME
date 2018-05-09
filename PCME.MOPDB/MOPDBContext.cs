@@ -74,6 +74,7 @@ namespace PCME.MOPDB
         public virtual DbSet<UnitApply> UnitApply { get; set; }
         public virtual DbSet<UnitDept> UnitDept { get; set; }
         public virtual DbSet<UnitType> UnitType { get; set; }
+        public virtual DbSet<PxdAccount> PxdAccount { get; set; }
 
         // Unable to generate entity type for table 'dbo.cc_history'. Please see the warning messages.
         // Unable to generate entity type for table 'dbo.personksresult_up_history'. Please see the warning messages.
@@ -95,6 +96,9 @@ namespace PCME.MOPDB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PxdAccount>(entity => {
+                entity.ToTable("pxdAccount");
+            });
             modelBuilder.Entity<Account>(entity =>
             {
                 entity.Property(e => e.AccountId).HasColumnName("accountID");

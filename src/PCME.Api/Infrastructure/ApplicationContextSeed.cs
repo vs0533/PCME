@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
+using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure;
@@ -572,6 +573,24 @@ namespace PCME.Api.Infrastructure
                                 }
                             }
                         });
+                    }
+                    #endregion
+
+                    #region 导入培训点和培训点账号
+                    if (!context.TrainingCenter.Any())
+                    {
+                        IReadOnlyCollection<PxdUnitInfo> pxdUnitInfo = mopcontext.PxdUnitInfo.ToList();
+                        IReadOnlyCollection<PxdAccount> pxdAccount = mopcontext.PxdAccount.ToList();
+
+                        List<TrainingCenter> trainingCenters = new List<TrainingCenter>();
+                        foreach (var item in pxdUnitInfo)
+                        {
+                            var account = pxdAccount.FirstOrDefault(c => c.UnitID == item.Id);
+                            TrainingCenter tc = new TrainingCenter(account?.LogName, account?.LogPassWord, item.PxdName, item.PxdAddress);
+                            trainingCenters.Add(tc);
+                        }
+                        context.AddRange(trainingCenters);
+                        await context.SaveChangesAsync();
                     }
                     #endregion
                 }

@@ -131,7 +131,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("remove")]
-        [Authorize(Roles = "继续教育培训")]
+        [Authorize(Roles = "单位管理员,继续教育培训")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();

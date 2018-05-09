@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
+using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure.EntityConfigurations;
@@ -30,6 +31,7 @@ namespace PCME.Infrastructure
         public DbSet<StudentType> StudentTypes { get; set; }
         public DbSet<Sex> Sex { get; set; }
         public DbSet<StudentStatus> StudentStatus { get; set; }
+        public DbSet<TrainingCenter> TrainingCenter { get; set; }
 
         //private readonly IMediator _mediator;
 

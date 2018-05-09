@@ -69,7 +69,7 @@ namespace PCME.Api.Controllers
         }
         [HttpGet]
         [Route("navigatedata")]
-        [Authorize(Roles ="Unit")]
+        [Authorize(Roles = "单位管理员,继续教育培训")]
         public IActionResult NavigateData(int? id, int? node)
         {
             node = node == 0 ? null : node;
@@ -107,7 +107,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles = "单位管理员")]
+        [Authorize(Roles = "单位管理员,继续教育培训")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
@@ -146,7 +146,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "单位管理员")]
+        [Authorize(Roles = "单位管理员,继续教育培训")]
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
             WorkUnit result = null;
@@ -199,7 +199,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("remove")]
-        [Authorize(Roles ="Unit")]
+        [Authorize(Roles = "单位管理员,继续教育培训")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();
