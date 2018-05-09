@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PCME.Domain.AggregatesModel.StudentAggregates;
+using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCME.Domain.AggregatesModel.StudentAggregates
 {
@@ -41,7 +43,10 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 
         public decimal BalanceActual { get; private set; }
         public decimal BalanceVirtual { get; private set; }
+        [ForeignKey("WorkUnitId")]
+        public WorkUnit WorkUnit { get; private set; }
         public int WorkUnitId { get; private set; }
+        public StudentStatus StudentStatus{get;private set;}
         public int StudentStatusId { get; private set; }
 
         public Student()
@@ -111,6 +116,10 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 
         public void UpdateWorkUnit(int workUnitId) {
             WorkUnitId = WorkUnitId;
+        }
+
+        public void ChangeStudentStatus(int statusId) {
+            StudentStatusId = StudentStatus.From(statusId).Id;
         }
 
     }

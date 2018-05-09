@@ -479,7 +479,7 @@ namespace PCME.Api.Infrastructure
                         await context.SaveChangesAsync();
                     }
                     #endregion
-
+                    #region 导入人员
                     if (!context.Students.Any())
                     {
                         IReadOnlyCollection<PersonPhoto> photo = mopcontext.PersonPhoto.ToList();
@@ -545,9 +545,9 @@ namespace PCME.Api.Infrastructure
                             }
 
                             Student student = new Student(
-                                item.PersonName
-                                , item.Idcard
-                                , item.Password
+                                item.PersonName.Trim()
+                                , item.Idcard.Trim()
+                                , item.Password.Trim()
                                 , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
                                 , officestr, pho?.PhotoUrl, photoisVal
                                 , item.Email, false, item.Address, mA, mV, pid,StudentStatus.Normal.Id
@@ -573,6 +573,7 @@ namespace PCME.Api.Infrastructure
                             }
                         });
                     }
+                    #endregion
                 }
             });
 

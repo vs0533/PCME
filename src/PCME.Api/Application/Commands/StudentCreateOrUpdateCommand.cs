@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Newtonsoft.Json;
+using PCME.Api.Infrastructure.Validation;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using System;
 using System.Collections.Generic;
@@ -11,15 +13,20 @@ namespace PCME.Api.Application.Commands
     public class StudentCreateOrUpdateCommand:IRequest<Student>
     {
         public int Id { get; private set; }
+        
         [Required(ErrorMessage ="人员姓名必须填写")]
-        [RegularExpression(@"^[A-Za-z0-9|_\u4e00-\u9fa5]+$", ErrorMessage = "人员姓名不允许非法字符")]
+        [StringAndCharacter(ErrorMessage ="不能包含非法字符")]
         public string Name { get; private set; }
         [Required(ErrorMessage ="身份证号必须填写")]
         [RegularExpression(@"\d{17}[\d|x]|\d{15}", ErrorMessage = "身份证号码格式错误")]
         public string IDCard { get; private set; }
         public Sex Sex { get; private set; }
+        [Required(ErrorMessage = "性别必须选择")]
+        [JsonProperty("Sex.Id")]
         public int SexId { get; private set; }
         public StudentType StudentType { get; private set; }
+        [Required(ErrorMessage = "学员类型必须选择")]
+        [JsonProperty("StudentType.Id")]
         public int StudentTypeId { get; private set; }
         public string Password { get; private set; }
 
@@ -48,6 +55,36 @@ namespace PCME.Api.Application.Commands
         public decimal BalanceActual { get; private set; }
         public decimal BalanceVirtual { get; private set; }
         public int WorkUnitId { get; private set; }
+        [Required(ErrorMessage = "学员状态必须选择")]
+        [JsonProperty("StudentStatus.Id")]
         public int StudentStatusId { get; private set; }
+
+        public StudentCreateOrUpdateCommand(int id, string name, string iDCard, int sexId, int studentTypeId,
+            string password, DateTime? birthDay, string graduationSchool, string specialty,
+            DateTime? workDate, string officeName,  string email, string address, int workUnitId, int studentStatusId)
+        {
+            Id = id;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            IDCard = iDCard ?? throw new ArgumentNullException(nameof(iDCard));
+            SexId = sexId;
+            StudentTypeId = studentTypeId;
+            Password = password ?? throw new ArgumentNullException(nameof(password));
+            BirthDay = birthDay ?? throw new ArgumentNullException(nameof(birthDay));
+            GraduationSchool = graduationSchool;
+            Specialty = specialty;
+            WorkDate = workDate;
+            OfficeName = officeName ?? throw new ArgumentNullException(nameof(officeName));
+            Email = email;
+            Address = address;
+            WorkUnitId = workUnitId;
+            StudentStatusId = studentStatusId;
+        }
+
+        public void SetWorkUnitId(int workUnitId) {
+            WorkUnitId = workUnitId;
+        }
+        public void SetId(int id) {
+            Id = id;
+        }
     }
 }

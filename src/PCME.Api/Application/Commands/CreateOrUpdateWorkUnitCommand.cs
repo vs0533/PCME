@@ -15,14 +15,12 @@ namespace PCME.Api.Application.Commands
     public class CreateOrUpdateWorkUnitCommand:IRequest<WorkUnit>
     {
         public int Id { get;  set; }
-        [Required(ErrorMessage ="单位编码必须填写")]
-        //[RegularExpression(@"^[A-Za-z0-9]+$", ErrorMessage = "单位编码只能是数字和字母组合")]
-        [String(ErrorMessage = "单位编码只能是数字和字母组合")]
+        [Required(ErrorMessage ="单位代码必须填写")]
+        [String(ErrorMessage = "单位代码是数字和字母组合")]
         public string Code { get; private set; }
         [Required(ErrorMessage = "单位密码必须填写")]
         public string PassWord { get; private set; }
         [Required(ErrorMessage = "单位名称必须填写")]
-        //[RegularExpression(@"^[A-Za-z0-9|_\u4e00-\u9fa5]+$", ErrorMessage = "单位名称不允许非法字符")]
         [StringAndCharacter(ErrorMessage = "单位名称不允许非法字符")]
         public string Name { get; private set; }
         [Required(ErrorMessage = "单位级别必须填写")]

@@ -12,6 +12,10 @@ namespace PCME.Api.Infrastructure.Validation
         private static Regex regex = new Regex(@"^[A-Za-z0-9]+$");
         protected override ValidationResult IsValid(object value,ValidationContext validationContext)
         {
+            if (value == null)
+            {
+                return ValidationResult.Success;
+            }
             bool isVal= regex.IsMatch(value.ToString());
             if (isVal)
             {

@@ -9,9 +9,9 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
 {
     public class Sex:Enumeration
     {
-        public static Sex Man = new Sex(1, nameof(Man).ToLowerInvariant());
-        public static Sex Woman = new Sex(2, nameof(Woman).ToLowerInvariant());
-        public static Sex Unknown = new Sex(3, nameof(Unknown).ToLowerInvariant());
+        public static Sex Man = new Sex(1, "男");
+        public static Sex Woman = new Sex(2, "女");
+        public static Sex Unknown = new Sex(3, "未知");
 
         protected Sex()
         {
@@ -23,7 +23,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         }
 
         public static IEnumerable<Sex> List() =>
-            new[] { Man, Woman };
+            new[] { Man, Woman,Unknown };
 
         public static Sex FromName(string name)
         {

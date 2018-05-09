@@ -42,7 +42,7 @@ namespace PCME.Api.Controllers
         [Route("fetchinfo")]
         public async Task<IActionResult> FindById(int id)
         {
-            var query = await workUnitRepository.FindAsync(c => c.Include(d => d.WorkUnitNature), id);
+            var query = await workUnitRepository.GetFirstOrDefaultAsync(predicate:c => c.Id == id, include: s => s.Include(d => d.WorkUnitNature));
             if (id <= 0)
             {
                 return BadRequest();
@@ -50,20 +50,9 @@ namespace PCME.Api.Controllers
 
             if (query != null)
             {
-                //var result = new
-                //{
-                //    query.Id,
-                //    query.Name,
-                //    parentname = query.Parent?.Name,
-                //    parentid = query.PID,
-                //    query.Level,
-                //    linkman = query.LinkMan,
-                //    linkphone = query.LinkPhone,
-                //    workunitnaturename = WorkUnitNature.From(query.WorkUnitNatureId).Name,
-                //    workunitnatureid = query.WorkUnitNatureId
-                //};
                 var result = new Dictionary<string, object>{
                     { "id",query.Id},
+                    { "code",query.Code},
                     { "name",query.Name},
                     { "Parent.Name",query.Parent?.Name},
                     { "Parent.Id",query.PID},

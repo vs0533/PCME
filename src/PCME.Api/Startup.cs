@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using PCME.Api.Infrastructure.AutofacModules;
 using PCME.Api.Infrastructure.Filters;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
@@ -45,10 +46,20 @@ namespace PCME.Api
                     );
             });
             #endregion
-            services.AddMvc(options=> {
+            services.AddMvc(options => {
                 options.Filters.Add(typeof(CheckPostParametersFilter));
                 options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-            });
+                //Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new IsoDateTimeConverter
+                //{
+                //    DateTimeFormat = "yyyy'-'MM'-'dd' 'HH':'mm':'ss"
+                //});
+
+            }).AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                }
+            );
 
             #region api密码token身份认证设置
 

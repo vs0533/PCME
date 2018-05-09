@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace PCME.Infrastructure.Migrations
 {
-    public partial class INIT : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -143,6 +143,40 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "WorkUnit",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Address = table.Column<string>(nullable: true),
+                    Code = table.Column<string>(maxLength: 50, nullable: false),
+                    Email = table.Column<string>(nullable: true),
+                    Level = table.Column<int>(nullable: false),
+                    LinkMan = table.Column<string>(nullable: true),
+                    LinkPhone = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(maxLength: 60, nullable: false),
+                    PID = table.Column<int>(nullable: true),
+                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
+                    WorkUnitNatureId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkUnit", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkUnit_WorkUnit_PID",
+                        column: x => x.PID,
+                        principalTable: "WorkUnit",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WorkUnit_WorkUnitNature_WorkUnitNatureId",
+                        column: x => x.WorkUnitNatureId,
+                        principalTable: "WorkUnitNature",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -178,43 +212,21 @@ namespace PCME.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Students_StudentStatus_StudentStatusId",
+                        column: x => x.StudentStatusId,
+                        principalTable: "StudentStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Students_StudentType_StudentTypeId",
                         column: x => x.StudentTypeId,
                         principalTable: "StudentType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "WorkUnit",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Address = table.Column<string>(nullable: true),
-                    Code = table.Column<string>(maxLength: 50, nullable: false),
-                    Email = table.Column<string>(nullable: true),
-                    Level = table.Column<int>(nullable: false),
-                    LinkMan = table.Column<string>(nullable: true),
-                    LinkPhone = table.Column<string>(nullable: true),
-                    Name = table.Column<string>(maxLength: 60, nullable: false),
-                    PID = table.Column<int>(nullable: true),
-                    Version = table.Column<byte[]>(rowVersion: true, nullable: true),
-                    WorkUnitNatureId = table.Column<int>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkUnit", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkUnit_WorkUnit_PID",
-                        column: x => x.PID,
+                        name: "FK_Students_WorkUnit_WorkUnitId",
+                        column: x => x.WorkUnitId,
                         principalTable: "WorkUnit",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WorkUnit_WorkUnitNature_WorkUnitNatureId",
-                        column: x => x.WorkUnitNatureId,
-                        principalTable: "WorkUnitNature",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -269,9 +281,19 @@ namespace PCME.Infrastructure.Migrations
                 column: "SexId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Students_StudentStatusId",
+                table: "Students",
+                column: "StudentStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_StudentTypeId",
                 table: "Students",
                 column: "StudentTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Students_WorkUnitId",
+                table: "Students",
+                column: "WorkUnitId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkUnit_Code",
@@ -309,9 +331,6 @@ namespace PCME.Infrastructure.Migrations
                 name: "Students");
 
             migrationBuilder.DropTable(
-                name: "StudentStatus");
-
-            migrationBuilder.DropTable(
                 name: "WorkUnitAccounts");
 
             migrationBuilder.DropTable(
@@ -325,6 +344,9 @@ namespace PCME.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Sex");
+
+            migrationBuilder.DropTable(
+                name: "StudentStatus");
 
             migrationBuilder.DropTable(
                 name: "StudentType");

@@ -145,7 +145,11 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasIndex("SexId");
 
+                    b.HasIndex("StudentStatusId");
+
                     b.HasIndex("StudentTypeId");
+
+                    b.HasIndex("WorkUnitId");
 
                     b.ToTable("Students");
                 });
@@ -297,9 +301,19 @@ namespace PCME.Infrastructure.Migrations
                         .HasForeignKey("SexId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.StudentStatus", "StudentStatus")
+                        .WithMany()
+                        .HasForeignKey("StudentStatusId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.StudentType", "StudentType")
                         .WithMany()
                         .HasForeignKey("StudentTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "WorkUnit")
+                        .WithMany()
+                        .HasForeignKey("WorkUnitId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
