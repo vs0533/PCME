@@ -22,13 +22,12 @@ namespace PCME.Api.Application.Commands
         [String(ErrorMessage = "账号不能包含特殊字符")]
         public string LogName { get; private set; }
         [Required(ErrorMessage = "登陆密码必须填写")]
-        [String(ErrorMessage = "密码不能包含特殊字符")]
         public string LogPassWord { get; private set; }
 
         public TrainingCenterCreateOrUpdateCommand(int id,string logname, string logpassword, string name, string address)
         {
-            Id = id;
-            Name = logname;
+            Id = id;         
+            LogName = logname;
             LogPassWord = logpassword;
             Name = name;
             Address = address;

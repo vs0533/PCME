@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
-using PCME.Domain.AggregatesModel.StudentAggregates;
-using PCME.Domain.AggregatesModel.UnitAggregates;
+﻿using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.SeedWork;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCME.Domain.AggregatesModel.StudentAggregates
 {
-    public class Student : Entity, IAggregateRoot
+	public class Student : Entity, IAggregateRoot
     {
         public string Name { get; private set; }
         public string IDCard { get; private set; }

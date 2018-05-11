@@ -11,14 +11,14 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180508042142_init")]
+    [Migration("20180511114201_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Level", b =>
@@ -181,6 +181,24 @@ namespace PCME.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StudentType");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.TrainingCenterAggregates.TrainingCenter", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Address");
+
+                    b.Property<string>("LogName");
+
+                    b.Property<string>("LogPassWord");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TrainingCenter");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", b =>

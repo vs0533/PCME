@@ -1,54 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2</TargetFramework>
+        <RuntimeFrameworkVersion>2.0.5</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Repository\**" />
     <EmbeddedResource Remove="Repository\**" />
     <None Remove="Repository\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\20180328110256_init.cs" />
-    <Compile Remove="Migrations\20180328112919_init.cs" />
-    <Compile Remove="Migrations\20180329071724_init.cs" />
-    <Compile Remove="Migrations\20180402064222_init.cs" />
-    <Compile Remove="Migrations\20180402065025_init.cs" />
-    <Compile Remove="Migrations\20180403034443_init.cs" />
-    <Compile Remove="Migrations\20180403044758_init.cs" />
-    <Compile Remove="Migrations\20180403074809_init.cs" />
-    <Compile Remove="Migrations\20180403140128_init.cs" />
-    <Compile Remove="Migrations\20180503070032_init.cs" />
-    <Compile Remove="Migrations\20180503092722_init.cs" />
-    <Compile Remove="Migrations\20180503140739_init.cs" />
-    <Compile Remove="Migrations\20180504112409_init.cs" />
-    <Compile Remove="Migrations\20180504112651_init.cs" />
-    <Compile Remove="Migrations\20180504112834_init.cs" />
-    <Compile Remove="Migrations\20180504115945_init.cs" />
-    <Compile Remove="Migrations\20180504121528_init.cs" />
-    <Compile Remove="Migrations\20180504143509_init.cs" />
-    <Compile Remove="Migrations\20180504144620_init.cs" />
-    <Compile Remove="Migrations\20180504150103_init.cs" />
-    <Compile Remove="Migrations\20180506033715_init.cs" />
-    <Compile Remove="Migrations\20180506034614_init.cs" />
-    <Compile Remove="Migrations\20180506035055_init.cs" />
-    <Compile Remove="Migrations\20180506040855_init.cs" />
-    <Compile Remove="Migrations\20180506072358_init.cs" />
-    <Compile Remove="Migrations\20180506073702_init.cs" />
-    <Compile Remove="Migrations\20180506085527_init.cs" />
-    <Compile Remove="Migrations\20180506122627_init.cs" />
-    <Compile Remove="Migrations\20180507035858_init.cs" />
-    <Compile Remove="Migrations\20180507095934_INIT.cs" />
+    <Compile Remove="Migrations\20180508042142_init.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="2.1.2" />
     <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.AutoHistory" Version="2.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -85,6 +85,22 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "TrainingCenter",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Address = table.Column<string>(nullable: true),
+                    LogName = table.Column<string>(nullable: true),
+                    LogPassWord = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingCenter", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "WorkUnitAccountType",
                 columns: table => new
                 {
@@ -329,6 +345,9 @@ namespace PCME.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "TrainingCenter");
 
             migrationBuilder.DropTable(
                 name: "WorkUnitAccounts");

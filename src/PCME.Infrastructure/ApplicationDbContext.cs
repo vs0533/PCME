@@ -67,7 +67,7 @@ namespace PCME.Infrastructure
         {
             public ApplicationDbContext CreateDbContext(string[] args) {
                 var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseSqlServer(@"Server=.;Initial Catalog=PCME;Integrated Security=true");
+					.UseSqlServer(@"Server=.;database=PCME;uid=sa;pwd=Abc@28122661");
 
                 return new ApplicationDbContext(optionsBuilder.Options);
                 //return new ApplicationDbContext(optionsBuilder.Options,new NoMediator());

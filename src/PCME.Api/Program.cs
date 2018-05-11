@@ -30,11 +30,18 @@ namespace PCME.Api
                     var mopdbcontext = services.GetService<MOPDBContext>();
                     //var logger = services.GetService<ILogger<OrderingContextSeed>>();
 
-                    new ApplicationContextSeed()
-                        .SeedAsync(context,mopdbcontext, env, settings)
-                        .Wait();
-                })
-                //.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })
+                    try
+					{
+						new ApplicationContextSeed()
+							.SeedAsync(context, mopdbcontext, env, settings)
+							.Wait();
+					}
+					catch (Exception ex)
+					{
+						throw new Exception(ex.Message);
+					}
+				})
+				//.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })
                 .Run();
         }
 
