@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel;
+using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
@@ -32,8 +34,13 @@ namespace PCME.Infrastructure
         public DbSet<Sex> Sex { get; set; }
         public DbSet<StudentStatus> StudentStatus { get; set; }
         public DbSet<TrainingCenter> TrainingCenter { get; set; }
+		public DbSet<ExamSubject> ExamSubjects { get; set; }
+		public DbSet<ExamSubjectStatus> ExamSubjectStatuses { get; set; }
+        public DbSet<ExamType> ExamTypes { get; set; }
+        public DbSet<OpenType> OpenTypes { get; set; }
+        public DbSet<AuditStatus> AuditStatuses { get; set; }
 
-        //private readonly IMediator _mediator;
+		//private readonly IMediator _mediator;
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -56,6 +63,10 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new ProfessionalTitleEntityTypeConfiguration());
             builder.ApplyConfiguration(new WorkUnitAccountTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new StudentStatusEntityTypeConfiguration());
+			builder.ApplyConfiguration(new ExamSubjectStatusEntityTypeConfiguration());
+			builder.ApplyConfiguration(new ExamTypeEntityTypeConfiguration());
+			builder.ApplyConfiguration(new OpenTypeEntityTypeConfiguration());
+			builder.ApplyConfiguration(new AuditStatusEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 

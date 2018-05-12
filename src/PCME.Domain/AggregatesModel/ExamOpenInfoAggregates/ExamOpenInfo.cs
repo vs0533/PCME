@@ -1,4 +1,5 @@
-﻿using PCME.Domain.SeedWork;
+﻿using PCME.Domain.AggregatesModel.StudentAggregates;
+using PCME.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,22 +15,32 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
         public DateTime SignUpFinishTime { get; private set; }
         public int SignUpFinishOffset { get; private set; }
 
-        public StudentAggregates.StudentType StudentType { get; private set; }
+        /// <summary>
+        /// 考试开始结束时间 字符串类型 仅用于提示作用
+        /// </summary>
+        /// <value>The display exam time.</value>
+        public string DisplayExamTime
+		{
+			get;
+			private set;
+		}
 
+        public int AuditStatusId { get; private set; }
+      
         public ExamOpenInfo()
         {
 
         }
-        public ExamOpenInfo(int trainingCenterId,int examSubjectId,
-            DateTime signUpTime,DateTime signUpFinishTime,
-            StudentAggregates.StudentType studentType,int signUpFinishOffset = 0)
-        {
-            TrainingCenterId = trainingCenterId;
-            ExamSubjectId = examSubjectId;
-            SignUpTime = signUpTime;
-            SignUpFinishTime = signUpFinishTime;
-            StudentType = studentType;
-            SignUpFinishOffset = signUpFinishOffset;
-        }
-    }
+
+		public ExamOpenInfo(int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId)
+		{
+			TrainingCenterId = trainingCenterId;
+			ExamSubjectId = examSubjectId;
+			SignUpTime = signUpTime;
+			SignUpFinishTime = signUpFinishTime;
+			SignUpFinishOffset = signUpFinishOffset;
+			DisplayExamTime = displayExamTime;
+			AuditStatusId = auditStatusId;
+		}
+	}
 }

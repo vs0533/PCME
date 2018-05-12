@@ -1,28 +1,27 @@
-﻿using PCME.Domain.Exceptions;
-using PCME.Domain.SeedWork;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using PCME.Domain.Exceptions;
+using PCME.Domain.SeedWork;
 
 namespace PCME.Domain.AggregatesModel.ExamSubjectAggregates
 {
-    public class OpenType: Enumeration
+	public class ExamType:Enumeration
     {
-        public static OpenType Professional = new OpenType(1, "专业技术人员");
-        public static OpenType CivilServant = new OpenType(2, "公务员");
-        public static IEnumerable<OpenType> List() => new[] { Professional, CivilServant };
-        public OpenType()
+		public static ExamType Scene = new ExamType(1, "现场考试");
+		public static ExamType NoScene = new ExamType(2, "非集中考试");
+		public static IEnumerable<ExamType> List() => new[] { Scene, NoScene };
+		public ExamType()
         {
 
         }
-        public OpenType(int id, string name) :
+		public ExamType(int id, string name) :
             base(id, name)
         {
 
         }
 
-        public static OpenType FromName(string name)
+		public static ExamType FromName(string name)
         {
             var state = List()
                 .SingleOrDefault(s => string.Equals(s.Name, name, StringComparison.CurrentCulture));
@@ -34,7 +33,7 @@ namespace PCME.Domain.AggregatesModel.ExamSubjectAggregates
 
             return state;
         }
-        public static OpenType From(int id)
+		public static ExamType From(int id)
         {
             var state = List().SingleOrDefault(s => s.Id == id);
 
