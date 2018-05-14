@@ -11,7 +11,6 @@ namespace PCME.Api.Controllers
 {
 	[Produces("application/json")]
     [Route("api/Series")]
-    [Authorize]
 	public class SeriesController:Controller
     {
 
@@ -23,7 +22,7 @@ namespace PCME.Api.Controllers
 			seriesRepository = unitOfWork.GetRepository<Series>();
 		}
 
-		[HttpPost]
+		[HttpGet]
 		[Route("read")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
@@ -31,11 +30,10 @@ namespace PCME.Api.Controllers
 
 
             var result = search.Select(c => new Dictionary<string, object> {
-                {"id",c.Id},
-                {"name",c.Name}
+                {"value",c.Id},
+                {"text",c.Name}
             });
-            var total = search.Count();
-            return Ok(new { total, data = result });
+            return Ok(result);
         }
         
 		[HttpPost]

@@ -55,5 +55,21 @@ namespace PCME.Domain.AggregatesModel.ExamSubjectAggregates
 			MSCount = mSCount;
 			CreditHour = creditHour;
 		}
+
+		public void Update(string code, string name, int openTypeId, int examTypeId, int? seriesId, int examSubjectStatusId, int mSCount, int creditHour)
+		{
+			Code = code;
+            Name = name;
+            OpenTypeId = openTypeId;
+            ExamTypeId = examTypeId;
+            SeriesId = seriesId;
+            ExamSubjectStatusId = examSubjectStatusId;
+            MSCount = mSCount;
+            CreditHour = creditHour;
+		}
+
+		public void ChangeExamSubjectStatus(int statusId){
+			ExamSubjectStatusId = statusId;
+		}
 	}
 }

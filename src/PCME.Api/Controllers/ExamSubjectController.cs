@@ -7,6 +7,8 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
@@ -90,5 +92,70 @@ namespace PCME.Api.Controllers
 			var total = search.Count();
 			return Ok(new { total, data = result });
 		}
+		[HttpPost]
+        [Route("saveorupdate")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Post([FromBody]ExamSubjectCreateOrUpdateCommand command, string opertype)
+        {
+            var loginid = int.Parse(User.FindFirstValue("WorkUnitId"));
+
+			var codeExisted = examsubjectRepository.GetFirstOrDefault(predicate: c =>
+                 c.Code == command.Code && c.Id != command.Id
+            );
+			var nameExistend = examsubjectRepository.GetFirstOrDefault(predicate: c =>
+                c.Name == command.Name && c.Id != command.Id
+            );
+			if (codeExisted != null)
+            {
+                ModelState.AddModelError("code", "相同代码的科目已经存在");
+            }
+			if (nameExistend != null)
+            {
+                ModelState.AddModelError("name", "相同名称的科目已经存在");
+            }
+            ModelState.Remove("opertype");
+            
+            if (ModelState.IsValid)
+            {
+                ExamSubject result = await _mediator.Send(command);
+                var data = new Dictionary<string, object>
+                {
+					{"id",result.Id},
+					{"name",result.Name},
+					{"code",result.Code},
+					{"credithour",result.CreditHour},
+					{"ExamSubjectStatus.Id",result.ExamSubjectStatusId},
+					{"ExamSubjectStatus.Name",result.ExamSubjectStatus?.Name},
+					{"ExamType.Id",result.ExamTypeId},
+					{"ExamType.Name",result.ExamType.Name},
+					{"OpenType.Id",result.OpenTypeId},
+					{"OpenType.Name",result.OpenType.Name},
+					{"Series.Id",result.SeriesId},
+					{"Series.Name",result.Series?.Name},
+					{"mscount",result.MSCount}
+                };
+                return Ok(new { success = true, data });
+            }
+            return BadRequest();         
+        }
+
+		[HttpPost]
+        [Route("remove")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Remove([FromBody]JObject data)
+        {
+            var id = data["id"].ToObject<int>();
+
+			var delExamSubject = await examsubjectRepository.FindAsync(id);
+			if (delExamSubject is null)
+            {
+                return Ok(new { message = "该条记录已经被删除" });
+            }
+
+			delExamSubject.ChangeExamSubjectStatus(ExamSubjectStatus.Forbidden.Id);
+			examsubjectRepository.Update(delExamSubject);
+            await unitOfWork.SaveEntitiesAsync();
+			return Ok(new { message = "科目被已被设为禁用" });
+        }
 	}
 }
