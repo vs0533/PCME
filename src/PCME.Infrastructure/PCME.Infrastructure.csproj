@@ -9,7 +9,11 @@
     <Compile Remove="Repository\**" />
     <EmbeddedResource Remove="Repository\**" />
     <None Remove="Repository\**" />
-    <Compile Remove="Migrations\20180508042142_init.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20180512133548_init.cs" />
+    <Compile Remove="Migrations\20180512134634_init.cs" />
   </ItemGroup>
 
   <ItemGroup>

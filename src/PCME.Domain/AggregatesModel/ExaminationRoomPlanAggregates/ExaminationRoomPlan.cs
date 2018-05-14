@@ -1,7 +1,5 @@
 ﻿using PCME.Domain.SeedWork;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
 {
@@ -16,16 +14,17 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
         public DateTime ExamStartTime { get; private set; }
 
         public PlanStatus PlanStatus { get; private set; }
-        public AuditStatus AuditStatus { get; private set; }
+        //public AuditStatus AuditStatus { get; private set; }
+        public int AuditStatusId { get; private set; }
         public ExaminationRoomPlan()
         {
 
         }
 
         public ExaminationRoomPlan(int examinationRoomId, int num,
-            DateTime selectTime, DateTime selectFinishTime, int signInOffset, DateTime examStartTime)
+            DateTime selectTime, DateTime selectFinishTime, int signInOffset, DateTime examStartTime,int auditStatusId)
             :this(examinationRoomId,num,selectTime,selectFinishTime,
-                 null,signInOffset,examStartTime,PlanStatus.Default,AuditStatus.Default)
+                 null,signInOffset,examStartTime,PlanStatus.Default,auditStatusId)
         {
 
         }
@@ -33,7 +32,7 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
         public ExaminationRoomPlan(int examinationRoomId,int num,
             DateTime selectTime,DateTime selectFinishTime,
             DateTime? signInTime,int signInOffset,DateTime examStartTime,
-            PlanStatus planStatus,AuditStatus auditStatus)
+            PlanStatus planStatus,int auditStatusId)
         {
             ExaminationRoomId = examinationRoomId;
             Num = num;
@@ -42,7 +41,7 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
             SignInOffset = signInOffset;
             ExamStartTime = examStartTime;
             PlanStatus = planStatus;
-            AuditStatus = auditStatus;
+            AuditStatusId = auditStatusId;
         }
     }
 }

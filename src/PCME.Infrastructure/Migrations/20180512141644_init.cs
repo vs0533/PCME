@@ -10,6 +10,42 @@ namespace PCME.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "AuditStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamSubjectStatus",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamSubjectStatus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamType", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Levels",
                 columns: table => new
                 {
@@ -20,6 +56,18 @@ namespace PCME.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Levels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OpenType",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false, defaultValue: 1),
+                    Name = table.Column<string>(maxLength: 200, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OpenType", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,6 +170,44 @@ namespace PCME.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkUnitNature", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExamSubjects",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Code = table.Column<string>(nullable: true),
+                    CreditHour = table.Column<int>(nullable: false),
+                    ExamSubjectStatusId = table.Column<int>(nullable: false),
+                    ExamTypeId = table.Column<int>(nullable: false),
+                    MSCount = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    OpenTypeId = table.Column<int>(nullable: false),
+                    SeriesId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamSubjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExamSubjects_ExamSubjectStatus_ExamSubjectStatusId",
+                        column: x => x.ExamSubjectStatusId,
+                        principalTable: "ExamSubjectStatus",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExamSubjects_ExamType_ExamTypeId",
+                        column: x => x.ExamTypeId,
+                        principalTable: "ExamType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ExamSubjects_OpenType_OpenTypeId",
+                        column: x => x.OpenTypeId,
+                        principalTable: "OpenType",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -277,6 +363,21 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExamSubjects_ExamSubjectStatusId",
+                table: "ExamSubjects",
+                column: "ExamSubjectStatusId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamSubjects_ExamTypeId",
+                table: "ExamSubjects",
+                column: "ExamTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExamSubjects_OpenTypeId",
+                table: "ExamSubjects",
+                column: "OpenTypeId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProfessionalTitle_LevelId",
                 table: "ProfessionalTitle",
                 column: "LevelId");
@@ -341,6 +442,12 @@ namespace PCME.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AuditStatus");
+
+            migrationBuilder.DropTable(
+                name: "ExamSubjects");
+
+            migrationBuilder.DropTable(
                 name: "ProfessionalTitle");
 
             migrationBuilder.DropTable(
@@ -351,6 +458,15 @@ namespace PCME.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkUnitAccounts");
+
+            migrationBuilder.DropTable(
+                name: "ExamSubjectStatus");
+
+            migrationBuilder.DropTable(
+                name: "ExamType");
+
+            migrationBuilder.DropTable(
+                name: "OpenType");
 
             migrationBuilder.DropTable(
                 name: "Levels");

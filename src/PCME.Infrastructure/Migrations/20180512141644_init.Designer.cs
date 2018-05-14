@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180511114201_init")]
+    [Migration("20180512141644_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,6 +20,94 @@ namespace PCME.Infrastructure.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.AuditStatusAggregates.AuditStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditStatus");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Code");
+
+                    b.Property<int>("CreditHour");
+
+                    b.Property<int>("ExamSubjectStatusId");
+
+                    b.Property<int>("ExamTypeId");
+
+                    b.Property<int>("MSCount");
+
+                    b.Property<string>("Name");
+
+                    b.Property<int>("OpenTypeId");
+
+                    b.Property<int?>("SeriesId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExamSubjectStatusId");
+
+                    b.HasIndex("ExamTypeId");
+
+                    b.HasIndex("OpenTypeId");
+
+                    b.ToTable("ExamSubjects");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubjectStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExamSubjectStatus");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExamType");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.OpenType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OpenType");
+                });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Level", b =>
                 {
@@ -296,6 +384,24 @@ namespace PCME.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("WorkUnitAccountType");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubjectStatus", "ExamSubjectStatus")
+                        .WithMany()
+                        .HasForeignKey("ExamSubjectStatusId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamType", "ExamType")
+                        .WithMany()
+                        .HasForeignKey("ExamTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.ExamSubjectAggregates.OpenType", "OpenType")
+                        .WithMany()
+                        .HasForeignKey("OpenTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", b =>

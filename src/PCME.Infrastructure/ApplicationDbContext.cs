@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using PCME.Domain.AggregatesModel;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
@@ -10,9 +9,6 @@ using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure.EntityConfigurations;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,9 +34,9 @@ namespace PCME.Infrastructure
 		public DbSet<ExamSubjectStatus> ExamSubjectStatuses { get; set; }
         public DbSet<ExamType> ExamTypes { get; set; }
         public DbSet<OpenType> OpenTypes { get; set; }
-        public DbSet<AuditStatus> AuditStatuses { get; set; }
+        public DbSet<AuditStatus> AuditStatus { get; set; }
 
-		//private readonly IMediator _mediator;
+        //private readonly IMediator _mediator;
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -66,7 +62,7 @@ namespace PCME.Infrastructure
 			builder.ApplyConfiguration(new ExamSubjectStatusEntityTypeConfiguration());
 			builder.ApplyConfiguration(new ExamTypeEntityTypeConfiguration());
 			builder.ApplyConfiguration(new OpenTypeEntityTypeConfiguration());
-			builder.ApplyConfiguration(new AuditStatusEntityTypeConfiguration());
+            builder.ApplyConfiguration(new AuditStatusEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 
