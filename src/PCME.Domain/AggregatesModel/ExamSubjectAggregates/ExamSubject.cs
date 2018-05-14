@@ -1,4 +1,5 @@
-﻿using PCME.Domain.SeedWork;
+﻿using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
+using PCME.Domain.SeedWork;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -20,6 +21,7 @@ namespace PCME.Domain.AggregatesModel.ExamSubjectAggregates
 		public OpenType OpenType { get; private set; }
 		public ExamType ExamType { get; private set; }
 		public ExamSubjectStatus ExamSubjectStatus { get; private set; }
+        public Series Series { get; private set; }
 		public int OpenTypeId { get; private set; }
 		public int ExamTypeId { get; private set; }
 		public int? SeriesId { get; private set; }
@@ -36,6 +38,11 @@ namespace PCME.Domain.AggregatesModel.ExamSubjectAggregates
         /// <value>The series identifier.</value>
 
 		public int CreditHour { get; private set; }
+
+        public ExamSubject()
+		{
+
+		}
 
 		public ExamSubject(string code, string name, int openTypeId, int examTypeId, int? seriesId, int examSubjectStatusId, int mSCount, int creditHour)
 		{

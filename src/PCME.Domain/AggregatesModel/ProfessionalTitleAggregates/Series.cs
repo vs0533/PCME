@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PCME.Domain.AggregatesModel.ProfessionalTitleAggregates
 {
-    public class Series:Entity
+	public class Series:Entity,IAggregateRoot
     {
         public string Name { get; private set; }
         public Series()

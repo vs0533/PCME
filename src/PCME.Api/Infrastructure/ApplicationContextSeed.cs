@@ -107,19 +107,19 @@ namespace PCME.Api.Infrastructure
 				OpenType.CivilServant
 			};
 		}
-        private IEnumerable<AuditStatus> GetPredefinedAuditStatus()
-        {
-            return new List<AuditStatus>()
-            {
-                AuditStatus.Pass,
-                AuditStatus.Veto,
-                AuditStatus.Wait
-            };
-        }
-        #endregion
+		private IEnumerable<AuditStatus> GetPredefinedAuditStatus()
+		{
+			return new List<AuditStatus>()
+			{
+				AuditStatus.Pass,
+				AuditStatus.Veto,
+				AuditStatus.Wait
+			};
+		}
+		#endregion
 
 
-        public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
+		public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
 		{
 			var policy = CreatePolicy(nameof(ApplicationContextSeed));
 
@@ -170,14 +170,14 @@ namespace PCME.Api.Infrastructure
 						context.OpenTypes.AddRange(GetPredefinedOpenType());
 						await context.SaveChangesAsync();
 					}
-                    if (!context.AuditStatus.Any())
-                    {
-                        context.AuditStatus.AddRange(GetPredefinedAuditStatus());
-                        await context.SaveChangesAsync();
-                    }
-                    #endregion
-                    #region 字典表初始化数据
-                    if (!context.WorkUnits.Any())
+					if (!context.AuditStatus.Any())
+					{
+						context.AuditStatus.AddRange(GetPredefinedAuditStatus());
+						await context.SaveChangesAsync();
+					}
+					#endregion
+					#region 字典表初始化数据
+					if (!context.WorkUnits.Any())
 					{
 						List<WorkUnit> workunits = new List<WorkUnit>();
 						var workUnit = new WorkUnit("3703", "淄博市人力资源和社会保障局", 0, "卢瑞生", "", "", "", null, WorkUnitNature.JgUnit.Id);
