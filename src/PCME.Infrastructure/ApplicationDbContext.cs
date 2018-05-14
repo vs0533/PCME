@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
@@ -35,6 +36,7 @@ namespace PCME.Infrastructure
         public DbSet<ExamType> ExamTypes { get; set; }
         public DbSet<OpenType> OpenTypes { get; set; }
         public DbSet<AuditStatus> AuditStatus { get; set; }
+        public DbSet<ExamSubjectOpenInfo> ExamSubjectOpenInfo { get; set; }
 
         //private readonly IMediator _mediator;
 

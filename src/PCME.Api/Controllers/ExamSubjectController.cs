@@ -11,6 +11,8 @@ using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
+using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.SeedWork;
@@ -27,6 +29,7 @@ namespace PCME.Api.Controllers
 		private readonly IRepository<ExamSubject> examsubjectRepository;
 		private readonly IRepository<Series> seriesRepository;
 		private readonly ApplicationDbContext _dbContext;
+		private readonly IRepository<ExamSubjectOpenInfo> examSubjectOpenInfoRepository;
 
 		public ExamSubjectController(ApplicationDbContext _dbContext, IMediator mediator, IUnitOfWork<ApplicationDbContext> unitOfWork)
 		{
@@ -35,13 +38,18 @@ namespace PCME.Api.Controllers
 			this._dbContext = _dbContext;
 			seriesRepository = unitOfWork.GetRepository<Series>();
 			examsubjectRepository = unitOfWork.GetRepository<ExamSubject>();
+			examSubjectOpenInfoRepository = unitOfWork.GetRepository<ExamSubjectOpenInfo>();
 		}
 
 		[HttpPost]
 		[Route("fetchinfo")]
-		public async Task<IActionResult> FindById(int id)
+		public IActionResult FindById(int id)
 		{
-			var query = await examsubjectRepository.GetFirstOrDefaultAsync(predicate: c => c.Id == id);
+			var query = examsubjectRepository.Query(predicate: c => c.Id == id)
+			                                        .Include(s => s.OpenType)
+                                                    .Include(s => s.ExamType)
+                                                    .Include(s => s.ExamSubjectStatus)
+			                                        .Include(s => s.Series).FirstOrDefault();
 			if (id <= 0)
 			{
 				return BadRequest();
@@ -50,14 +58,50 @@ namespace PCME.Api.Controllers
 			if (query != null)
 			{
 				var result = new Dictionary<string, object>{
-					{ "id",query.Id},
-					{ "name",query.Name}
+					{"id",query.Id},
+					{"name",query.Name},
+					{"code",query.Code},
+					{"credithour",query.CreditHour},
+					{"ExamSubjectStatus.Id",query.ExamSubjectStatusId},
+					{"ExamSubjectStatus.Name",query.ExamSubjectStatus?.Name},
+					{"ExamType.Id",query.ExamTypeId},
+					{"ExamType.Name",query.ExamType.Name},
+					{"OpenType.Id",query.OpenTypeId},
+					{"OpenType.Name",query.OpenType.Name},
+					{"Series.Id",query.SeriesId},
+					{"Series.Name",query.Series?.Name},
+					{"mscount",query.MSCount}
 				};
 				return Ok(new { data = result });
 			}
 
 			return NotFound();
 		}
+
+		[HttpGet]
+        [Route("read")]
+        public IActionResult StoreRead()
+        {
+			int trainingId = 0;
+			try
+			{
+				trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
+			}
+			catch(Exception)
+			{
+				trainingId = 0;
+			}
+
+			var search = examsubjectRepository.Query(c=>c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
+            if (trainingId != 0)
+            {
+				var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c=>c.Id);
+				search = search.Where(c => isExists.Contains(c.Id) != true);
+            }
+
+            return Ok(search.Select(c => new { value = c.Id, text = c.Name }));
+        }
+
 		[HttpPost]
 		[Route("read")]
 		[Authorize(Roles = "Admin")]

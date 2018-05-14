@@ -219,7 +219,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 												claims: GetUserClaims(
 										            training.Id.ToString(),
 													training.LogName,
-                                                    "0",
+										            training.Id.ToString(),
                                                     "",
                                                     training.Name,
 													new string[] { valtype },

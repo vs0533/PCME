@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
@@ -124,8 +125,7 @@ namespace PCME.Api.Infrastructure
 			var policy = CreatePolicy(nameof(ApplicationContextSeed));
 
 			await policy.ExecuteAsync(async () =>
-			{
-
+			{            
 				using (context)
 				{
 					context.Database.Migrate();
@@ -690,6 +690,18 @@ namespace PCME.Api.Infrastructure
 
 					}
 
+					#endregion
+
+					#region 导入科目开设申请信息
+					if (!(context.ExamSubjectOpenInfo.Any()))
+					{
+						List<ExamSubjectOpenInfo> examSubjectOpenInfos = new List<ExamSubjectOpenInfo>()
+						{
+							new ExamSubjectOpenInfo(1,1,new DateTime(2018,5,12),new DateTime(2018,06,20),1,"2018-07左右考试",1)
+						};
+						context.ExamSubjectOpenInfo.AddRange(examSubjectOpenInfos);
+						await context.SaveChangesAsync();
+					}
 					#endregion
 				}
 			});

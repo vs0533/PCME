@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
@@ -28,6 +29,32 @@ namespace PCME.Api.Controllers
             trainingCenterRepository = unitOfWork.GetRepository<TrainingCenter>();
             this._mediator = _mediator;
         }
+
+		[HttpPost]
+        [Route("fetchinfo")]
+        public IActionResult FindById(int id)
+        {
+			var query = trainingCenterRepository.Query(predicate: c => c.Id == id).FirstOrDefault();
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            if (query != null)
+            {
+                var result = new Dictionary<string, object>{
+					{ "id",query.Id},
+					{ "name",query.Name},
+					{ "logname",query.LogName},
+					{ "logpassword",query.LogPassWord},
+					{ "address",query.Address}
+                };
+                return Ok(new { data = result });
+            }
+
+            return NotFound();
+        }
+
         [HttpPost]
         [Route("read")]
         [Authorize(Roles = "单位管理员")]
@@ -44,7 +71,7 @@ namespace PCME.Api.Controllers
                 { "name",c.Name},
                 { "logname",c.LogName},
                 { "logpassword",c.LogPassWord},
-                { "address",c.Address},
+                { "address",c.Address}
             });
             var total = search.Count();
             return Ok(new { total, data = result });
