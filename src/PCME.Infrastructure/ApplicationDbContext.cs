@@ -37,8 +37,12 @@ namespace PCME.Infrastructure
         public DbSet<OpenType> OpenTypes { get; set; }
         public DbSet<AuditStatus> AuditStatus { get; set; }
         public DbSet<ExamSubjectOpenInfo> ExamSubjectOpenInfo { get; set; }
+        public DbSet<PromoteType> PromoteTypes { get; private set; }
+        public DbSet<ProfessionalInfo> ProfessionalInfos { get; set; }
+        public DbSet<DutyLevel> DutyLevels { get; set; }
+		public DbSet<CivilServantInfo> CivilServantInfos { get; set; }
 
-        //private readonly IMediator _mediator;
+		//private readonly IMediator _mediator;
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{

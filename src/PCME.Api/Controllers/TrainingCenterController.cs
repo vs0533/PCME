@@ -46,7 +46,9 @@ namespace PCME.Api.Controllers
                     { "name",query.Name},
                     { "logname",query.LogName},
                     { "logpassword",query.LogPassWord},
-                    { "address",query.Address}
+                    { "address",query.Address},
+					{ "OpenType.Id",query.OpenTypeId},
+                    { "OpenType.Name",query.OpenType.Name}
                 };
                 return Ok(new { data = result });
             }
@@ -80,7 +82,9 @@ namespace PCME.Api.Controllers
                 { "name",c.Name},
                 { "logname",c.LogName},
                 { "logpassword",c.LogPassWord},
-                { "address",c.Address}
+                { "address",c.Address},
+				{ "OpenType.Id",c.OpenTypeId},
+                { "OpenType.Name",c.OpenType.Name}
             });
             var total = search.Count();
             return Ok(new { total, data = result });
@@ -117,7 +121,9 @@ namespace PCME.Api.Controllers
                     { "name",result.Name},
                     { "logname",result.LogName},
                     { "logpassword",result.LogPassWord},
-                    { "address",result.Address}
+                    { "address",result.Address},
+					{ "OpenType.Id",result.OpenTypeId},
+					{ "OpenType.Name",result.OpenType.Name}
                 };
                 return Ok(new { success = true, data });
             }

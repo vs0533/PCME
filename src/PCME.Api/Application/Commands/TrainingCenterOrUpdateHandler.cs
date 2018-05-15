@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
@@ -29,10 +30,11 @@ namespace PCME.Api.Application.Commands
                     ,request.LogPassWord
                     ,request.Name
                     ,request.Address
+                    ,request.OpenTypeId
                     );
                 await trainingCenterRepository.InsertAsync(tc);
                 await unitOfWork.SaveEntitiesAsync();
-                return tc;
+                return await GetShow(tc);
             }
             else
             {
@@ -41,11 +43,18 @@ namespace PCME.Api.Application.Commands
                     , request.LogPassWord
                     , request.Name
                     , request.Address
+                    ,request.OpenTypeId
                     );
                 trainingCenterRepository.Update(idIsExisted);
                 await unitOfWork.SaveEntitiesAsync();
-                return idIsExisted;
+				return await GetShow(idIsExisted);
             }
+        }
+		private async Task<TrainingCenter> GetShow(TrainingCenter trainingCenter)
+        {
+			var result = await trainingCenterRepository.Query(c => c.Id == trainingCenter.Id)
+                                                            .Include(s => s.OpenType).FirstOrDefaultAsync();
+            return result;
         }
     }
 }
