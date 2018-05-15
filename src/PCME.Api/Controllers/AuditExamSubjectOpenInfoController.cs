@@ -20,14 +20,14 @@ using PCME.Infrastructure;
 namespace PCME.Api.Controllers
 {
 	[Produces("application/json")]
-	[Route("api/ExamSubjectOpenInfo")]
-	public class ExamSubjectOpenInfoController : Controller
+	[Route("api/AuditExamSubjectOpenInfo")]
+	public class AuditExamSubjectOpenInfoController : Controller
 	{
 		private readonly IMediator _mediator;
 		private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
 		private readonly IRepository<ExamSubjectOpenInfo> examSubjectOpenInfoRepository;
 		private readonly IRepository<TrainingCenter> trainingCenterRepository;
-		public ExamSubjectOpenInfoController(IUnitOfWork<ApplicationDbContext> unitOfWork,IMediator _mediator)
+		public AuditExamSubjectOpenInfoController(IUnitOfWork<ApplicationDbContext> unitOfWork,IMediator _mediator)
 		{
 			this.unitOfWork = unitOfWork;
 			examSubjectOpenInfoRepository = unitOfWork.GetRepository<ExamSubjectOpenInfo>();
@@ -37,11 +37,10 @@ namespace PCME.Api.Controllers
 
 		[HttpPost]
 		[Route("read")]
-		[Authorize(Roles = "TrainingCenter")]
+		[Authorize(Roles = "Admin")]
 		public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
 		{
-			var trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
-			var search = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId)
+			var search = examSubjectOpenInfoRepository.Query(c => c.Id != 0)
 													  .Include(s => s.AuditStatus)
 													  .Include(s => s.ExamSubject)
 													  .Include(s => s.TrainingCenter)
@@ -70,19 +69,13 @@ namespace PCME.Api.Controllers
 
 		[HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "TrainingCenter")]
+        [Authorize(Roles = "Admin")]
 		public async Task<IActionResult> Post([FromBody]ExamSubjectOpenInfoCreateOrUpdateCommand command, string opertype)
-        {
-			var trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());         
-			var loginobj = await trainingCenterRepository.FindAsync(trainingId);
+        {     
 			if (opertype == "new")
             {
                 command.SetId(0);
-            }
-			command.SetTrainingCenter(trainingId);
-			command.SetAuditStatus(AuditStatus.Wait.Id);
-            
-
+            }         
 			var examSubjectExisted = examSubjectOpenInfoRepository.GetFirstOrDefault(predicate: c =>
 			     (c.TrainingCenterId == command.TrainingCenterId && c.Id != command.Id) && c.ExamSubjectId == command.ExamSubjectId
             );
@@ -124,7 +117,7 @@ namespace PCME.Api.Controllers
 
 		[HttpPost]
         [Route("remove")]
-		[Authorize(Roles = "TrainingCenter")]
+		[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();

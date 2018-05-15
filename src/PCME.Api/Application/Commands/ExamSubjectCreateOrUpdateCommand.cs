@@ -68,5 +68,8 @@ namespace PCME.Api.Application.Commands
 			MSCount = mSCount;
 			CreditHour = creditHour;
 		}
+		public void SetId(int id){
+			Id = id;
+		}
 	}
 }

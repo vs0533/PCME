@@ -80,24 +80,26 @@ namespace PCME.Api.Controllers
 
 		[HttpGet]
         [Route("read")]
+        [Authorize(Roles ="TrainingCenter,Admin")]
         public IActionResult StoreRead()
         {
-			int trainingId = 0;
-			try
-			{
-				trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
-			}
-			catch(Exception)
-			{
-				trainingId = 0;
-			}
+            
+			//int trainingId = 0;
+			//try
+			//{
+			//	trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
+			//}
+			//catch(Exception)
+			//{
+			//	trainingId = 0;
+			//}
 
 			var search = examsubjectRepository.Query(c=>c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
-            if (trainingId != 0)
-            {
-				var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c=>c.Id);
-				search = search.Where(c => isExists.Contains(c.Id) != true);
-            }
+    //        if (trainingId != 0)
+    //        {
+				//var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c=>c.Id);
+				//search = search.Where(c => isExists.Contains(c.Id) != true);
+            //}
 
             return Ok(search.Select(c => new { value = c.Id, text = c.Name }));
         }
@@ -142,7 +144,10 @@ namespace PCME.Api.Controllers
         public async Task<IActionResult> Post([FromBody]ExamSubjectCreateOrUpdateCommand command, string opertype)
         {
             var loginid = int.Parse(User.FindFirstValue("WorkUnitId"));
-
+			if (opertype == "new")
+            {
+                command.SetId(0);
+            }
 			var codeExisted = examsubjectRepository.GetFirstOrDefault(predicate: c =>
                  c.Code == command.Code && c.Id != command.Id
             );
@@ -157,6 +162,7 @@ namespace PCME.Api.Controllers
             {
                 ModelState.AddModelError("name", "相同名称的科目已经存在");
             }
+
             ModelState.Remove("opertype");
             
             if (ModelState.IsValid)

@@ -59,5 +59,28 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
 			DisplayExamTime = displayExamTime;
 			AuditStatusId = auditStatusId;
 		}
+
+		public void Update(int trainingCenterId,int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId)
+		{
+			TrainingCenterId = trainingCenterId;
+			ExamSubjectId = examSubjectId;
+            SignUpTime = signUpTime;
+            SignUpFinishTime = signUpFinishTime;
+            SignUpFinishOffset = signUpFinishOffset;
+            DisplayExamTime = displayExamTime;
+            AuditStatusId = auditStatusId;
+		}
+
+		public void SetTrainingCenter(int trainingCenterId){
+			TrainingCenterId = trainingCenterId;
+		}
+
+		public void SetExamSubject(int examSubjectId){
+			ExamSubjectId = examSubjectId;
+		}
+
+		public void ChangeAuditStatus(int auditStatudId){
+			AuditStatusId = auditStatudId;
+		}
 	}
 }

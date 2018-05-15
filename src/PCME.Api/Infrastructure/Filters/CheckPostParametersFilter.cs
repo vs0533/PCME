@@ -29,7 +29,7 @@ namespace PCME.Api.Infrastructure.Filters
                 foreach (var key in context.ModelState.Keys)
                 {
                     sb.Append("\"");
-                    sb.Append(key.ToLower());
+                    sb.Append(key);
                     sb.Append("\"");
                     sb.Append(":");
                     sb.Append("\"");

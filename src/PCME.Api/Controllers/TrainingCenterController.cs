@@ -29,12 +29,11 @@ namespace PCME.Api.Controllers
             trainingCenterRepository = unitOfWork.GetRepository<TrainingCenter>();
             this._mediator = _mediator;
         }
-
-		[HttpPost]
+		[HttpGet]
         [Route("fetchinfo")]
         public IActionResult FindById(int id)
         {
-			var query = trainingCenterRepository.Query(predicate: c => c.Id == id).FirstOrDefault();
+            var query = trainingCenterRepository.Query(predicate: c => c.Id == id).FirstOrDefault();
             if (id <= 0)
             {
                 return BadRequest();
@@ -43,16 +42,26 @@ namespace PCME.Api.Controllers
             if (query != null)
             {
                 var result = new Dictionary<string, object>{
-					{ "id",query.Id},
-					{ "name",query.Name},
-					{ "logname",query.LogName},
-					{ "logpassword",query.LogPassWord},
-					{ "address",query.Address}
+                    { "id",query.Id},
+                    { "name",query.Name},
+                    { "logname",query.LogName},
+                    { "logpassword",query.LogPassWord},
+                    { "address",query.Address}
                 };
                 return Ok(new { data = result });
             }
 
             return NotFound();
+        }
+
+		[HttpGet]
+        [Route("read")]
+		[Authorize(Roles ="Admin")]
+        public IActionResult StoreRead()
+        {
+			var query = trainingCenterRepository.Query(c => c.Id != 0);
+
+            return Ok(query.Select(c => new { value = c.Id, text = c.Name }));
         }
 
         [HttpPost]
