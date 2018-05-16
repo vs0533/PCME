@@ -14,6 +14,12 @@
   <ItemGroup>
     <Compile Remove="Migrations\20180512133548_init.cs" />
     <Compile Remove="Migrations\20180512134634_init.cs" />
+    <Compile Remove="Migrations\20180514020233_init.cs" />
+    <Compile Remove="Migrations\20180514125300_examsubjectopeninfo.cs" />
+    <Compile Remove="Migrations\20180515074642_trainingcenteropentypeid.cs" />
+    <Compile Remove="Migrations\20180515110208_init.cs" />
+    <Compile Remove="Migrations\20180515124103_init.cs" />
+    <Compile Remove="Migrations\20180515150839_init.cs" />
   </ItemGroup>
 
   <ItemGroup>

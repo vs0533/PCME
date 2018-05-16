@@ -202,6 +202,154 @@ namespace PCME.Infrastructure.Migrations
                     b.ToTable("Specialtys");
                 });
 
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.SignUpAggregates.SignUp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<int>("ExamSubjectId");
+
+                    b.Property<int?>("SignUpForUnitId");
+
+                    b.Property<int>("StudentId");
+
+                    b.Property<bool>("TicketIsCreate");
+
+                    b.Property<int>("TrainingCenterId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SignUp");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpCollection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ExamSubjectId");
+
+                    b.Property<int?>("SignUpForUnitId");
+
+                    b.Property<int>("StudentId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SignUpForUnitId");
+
+                    b.ToTable("SignUpCollections");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpForUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Code");
+
+                    b.Property<DateTime>("CreateTime");
+
+                    b.Property<bool>("IsLock");
+
+                    b.Property<bool>("IsPay");
+
+                    b.Property<int>("TrainingCenterId");
+
+                    b.Property<int>("WorkUnitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrainingCenterId");
+
+                    b.HasIndex("WorkUnitId");
+
+                    b.ToTable("SignUpForUnit");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.CivilServantInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Duty");
+
+                    b.Property<int>("DutyLevelId");
+
+                    b.Property<string>("EducationFirst");
+
+                    b.Property<string>("EducationHeight");
+
+                    b.Property<bool>("JoinPromote");
+
+                    b.Property<int>("StudentId");
+
+                    b.Property<DateTime>("TakeDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DutyLevelId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("CivilServantInfos");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.DutyLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DutyLevels");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.ProfessionalInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CalculateDate");
+
+                    b.Property<string>("Education");
+
+                    b.Property<DateTime>("GetDate");
+
+                    b.Property<int>("ProfessionalTitleId");
+
+                    b.Property<int>("PromoteTypeId");
+
+                    b.Property<int?>("StudentId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfessionalTitleId");
+
+                    b.HasIndex("PromoteTypeId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("ProfessionalInfos");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.PromoteType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PromoteType");
+                });
+
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Sex", b =>
                 {
                     b.Property<int>("Id")
@@ -256,6 +404,10 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<int>("StudentStatusId");
 
                     b.Property<int>("StudentTypeId");
+
+                    b.Property<int>("TicketCtr")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(0);
 
                     b.Property<DateTime?>("WorkDate");
 
@@ -436,7 +588,7 @@ namespace PCME.Infrastructure.Migrations
                     b.HasOne("PCME.Domain.AggregatesModel.TrainingCenterAggregates.TrainingCenter", "TrainingCenter")
                         .WithMany()
                         .HasForeignKey("TrainingCenterId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject", b =>
@@ -474,6 +626,56 @@ namespace PCME.Infrastructure.Migrations
                     b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.Specialty", "Specialty")
                         .WithMany()
                         .HasForeignKey("SpecialtyId");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpCollection", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpForUnit")
+                        .WithMany("SignUpCollection")
+                        .HasForeignKey("SignUpForUnitId");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpForUnit", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.TrainingCenterAggregates.TrainingCenter", "TrainingCenter")
+                        .WithMany()
+                        .HasForeignKey("TrainingCenterId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "WorkUnit")
+                        .WithMany()
+                        .HasForeignKey("WorkUnitId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.CivilServantInfo", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.DutyLevel", "DutyLevel")
+                        .WithMany()
+                        .HasForeignKey("DutyLevelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.ProfessionalInfo", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", "ProfessionalTitle")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalTitleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.PromoteType", "PromoteType")
+                        .WithMany()
+                        .HasForeignKey("PromoteTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Student", b =>

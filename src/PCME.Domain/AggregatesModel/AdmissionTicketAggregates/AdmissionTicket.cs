@@ -5,6 +5,9 @@ using System.Text;
 
 namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
 {
+    /// <summary>
+    /// 准考证-考试完毕后会删除
+    /// </summary>
     public class AdmissionTicket:Entity,IAggregateRoot
     {
         public string Num { get; private set; }

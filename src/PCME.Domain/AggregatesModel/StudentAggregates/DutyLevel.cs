@@ -7,6 +7,11 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
     {
         public string Name { get; private set; }
 
+        public DutyLevel()
+        {
+
+        }
+
 		public DutyLevel(string name)
 		{
 			Name = name;

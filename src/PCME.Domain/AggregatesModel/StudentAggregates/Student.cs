@@ -45,6 +45,10 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public int WorkUnitId { get; private set; }
         public StudentStatus StudentStatus{get;private set;}
         public int StudentStatusId { get; private set; }
+        /// <summary>
+        /// 允许考试次数-生成准考证时会扣减 -1
+        /// </summary>
+        public int TicketCtr { get; private set; }
 
         public Student()
         {

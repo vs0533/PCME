@@ -5,19 +5,41 @@ using System.Text;
 
 namespace PCME.Domain.AggregatesModel.SignUpAggregates
 {
-    public class SignUp:Entity, IAggregateRoot
+    /// <summary>
+    /// 正式报名表 生成场次后删除
+    /// </summary>
+    public class SignUp:Entity
     {
+        #region 符合主键不允许重复
         public int StudentId { get; private set; }
         public int ExamSubjectId { get; private set; }
-        public SignUpCollection SignUpCollection { get; private set; }
-        public bool IsPay { get; private set; }
+        #endregion
 
-        public SignUp(int studentId, int examSubjectId, SignUpCollection signUpCollection, bool isPay=false)
+        /// <summary>
+        /// null 的话是个人报名
+        /// </summary>
+        public int? SignUpForUnitId { get; private set; }
+        public int TrainingCenterId { get; private set; }
+
+        /// <summary>
+        /// 是否生成了准考证
+        /// </summary>
+        public bool TicketIsCreate { get; private set; }
+
+        public DateTime CreateTime { get; private set; }
+        public SignUp()
+        {
+
+        }
+
+        public SignUp(int studentId, int examSubjectId, int? signUpForUnitId, int trainingCenterId, bool ticketIsCreate, DateTime createTime)
         {
             StudentId = studentId;
             ExamSubjectId = examSubjectId;
-            SignUpCollection = signUpCollection ?? throw new ArgumentNullException(nameof(signUpCollection));
-            IsPay = isPay;
+            SignUpForUnitId = signUpForUnitId;
+            TrainingCenterId = trainingCenterId;
+            TicketIsCreate = ticketIsCreate;
+            CreateTime = createTime;
         }
     }
 }

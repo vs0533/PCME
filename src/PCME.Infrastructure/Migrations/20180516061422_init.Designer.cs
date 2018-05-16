@@ -11,8 +11,8 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180514125300_examsubjectopeninfo")]
-    partial class examsubjectopeninfo
+    [Migration("20180516061422_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -59,6 +59,8 @@ namespace PCME.Infrastructure.Migrations
                     b.HasIndex("AuditStatusId");
 
                     b.HasIndex("ExamSubjectId");
+
+                    b.HasIndex("TrainingCenterId");
 
                     b.ToTable("ExamSubjectOpenInfo");
                 });
@@ -201,6 +203,88 @@ namespace PCME.Infrastructure.Migrations
                     b.ToTable("Specialtys");
                 });
 
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.CivilServantInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Duty");
+
+                    b.Property<int>("DutyLevelId");
+
+                    b.Property<string>("EducationFirst");
+
+                    b.Property<string>("EducationHeight");
+
+                    b.Property<bool>("JoinPromote");
+
+                    b.Property<int>("StudentId");
+
+                    b.Property<DateTime>("TakeDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DutyLevelId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("CivilServantInfos");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.DutyLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DutyLevels");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.ProfessionalInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CalculateDate");
+
+                    b.Property<string>("Education");
+
+                    b.Property<DateTime>("GetDate");
+
+                    b.Property<int>("ProfessionalTitleId");
+
+                    b.Property<int>("PromoteTypeId");
+
+                    b.Property<int?>("StudentId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfessionalTitleId");
+
+                    b.HasIndex("PromoteTypeId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("ProfessionalInfos");
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.PromoteType", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PromoteType");
+                });
+
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Sex", b =>
                 {
                     b.Property<int>("Id")
@@ -314,7 +398,11 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<int>("OpenTypeId");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("OpenTypeId");
 
                     b.ToTable("TrainingCenter");
                 });
@@ -427,6 +515,11 @@ namespace PCME.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ExamSubjectId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.TrainingCenterAggregates.TrainingCenter", "TrainingCenter")
+                        .WithMany()
+                        .HasForeignKey("TrainingCenterId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("PCME.Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject", b =>
@@ -466,6 +559,36 @@ namespace PCME.Infrastructure.Migrations
                         .HasForeignKey("SpecialtyId");
                 });
 
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.CivilServantInfo", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.DutyLevel", "DutyLevel")
+                        .WithMany()
+                        .HasForeignKey("DutyLevelId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.ProfessionalInfo", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.ProfessionalTitleAggregates.ProfessionalTitle", "ProfessionalTitle")
+                        .WithMany()
+                        .HasForeignKey("ProfessionalTitleId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.PromoteType", "PromoteType")
+                        .WithMany()
+                        .HasForeignKey("PromoteTypeId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+                });
+
             modelBuilder.Entity("PCME.Domain.AggregatesModel.StudentAggregates.Student", b =>
                 {
                     b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Sex", "Sex")
@@ -486,6 +609,14 @@ namespace PCME.Infrastructure.Migrations
                     b.HasOne("PCME.Domain.AggregatesModel.UnitAggregates.WorkUnit", "WorkUnit")
                         .WithMany()
                         .HasForeignKey("WorkUnitId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("PCME.Domain.AggregatesModel.TrainingCenterAggregates.TrainingCenter", b =>
+                {
+                    b.HasOne("PCME.Domain.AggregatesModel.ExamSubjectAggregates.OpenType", "OpenType")
+                        .WithMany()
+                        .HasForeignKey("OpenTypeId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

@@ -5,6 +5,7 @@ using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
+using PCME.Domain.AggregatesModel.SignUpAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
@@ -42,7 +43,12 @@ namespace PCME.Infrastructure
         public DbSet<DutyLevel> DutyLevels { get; set; }
 		public DbSet<CivilServantInfo> CivilServantInfos { get; set; }
 
-		//private readonly IMediator _mediator;
+        public DbSet<SignUp> SignUp { get; set; }
+        public DbSet<SignUpForUnit> SignUpForUnit { get; set; }
+        public DbSet<SignUpCollection> SignUpCollections { get; set; }
+
+
+        //private readonly IMediator _mediator;
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -69,6 +75,9 @@ namespace PCME.Infrastructure
 			builder.ApplyConfiguration(new ExamTypeEntityTypeConfiguration());
 			builder.ApplyConfiguration(new OpenTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new AuditStatusEntityTypeConfiguration());
+            builder.ApplyConfiguration(new PromoteTypeEntityTypeConfiguration());
+            builder.ApplyConfiguration(new ExamSubjectOpenInfoEntityTypeConfiguration());
+            builder.ApplyConfiguration(new StudentEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 
