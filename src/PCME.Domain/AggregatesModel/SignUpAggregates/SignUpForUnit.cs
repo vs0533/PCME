@@ -49,7 +49,7 @@ namespace PCME.Domain.AggregatesModel.SignUpAggregates
 
         public void AddSignUpCollection(int studentId, int examSubjectId)
         {
-            var isExists = _signUpCollection.Where(c => c.ExamSubjectId == examSubjectId && c.StudentId == studentId);
+            var isExists = _signUpCollection.Where(c => c.ExamSubjectId == examSubjectId && c.StudentId == studentId).FirstOrDefault();
             if (isExists == null)
             {
                 SignUpCollection signUpCollection = new SignUpCollection(studentId, examSubjectId);

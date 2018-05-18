@@ -1,11 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
+using PCME.Domain.AggregatesModel.SignUpAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
@@ -25,9 +29,11 @@ namespace PCME.Api.Controllers
     public class SignUpController : Controller
     {
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
-        public SignUpController(IUnitOfWork<ApplicationDbContext> unitOfWork)
+        private readonly ApplicationDbContext context;
+        public SignUpController(IUnitOfWork<ApplicationDbContext> unitOfWork, ApplicationDbContext context)
         {
             this.unitOfWork = unitOfWork;
+            this.context = context;
         }
         [HttpPost]
         [Route("readstudentlist")]
@@ -143,6 +149,31 @@ namespace PCME.Api.Controllers
             return Ok(new { total, data = result });
         }
         [HttpPost]
+        [Route("readsignupcollection")]
+        public IActionResult ReadSignUpCollection(int? signupforunitid)
+        {
+            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
+            var search = signUpCollectionRepository.Query(c=>c.Id != 0,include:c=>c.Include(s => s.ExamSubject).Include(s => s.Student));
+            if (signupforunitid != null)
+            {
+                search = search.Where(c => c.SignUpForUnitId == signupforunitid);
+            }
+            //var item = search.Skip(start).Take(limit);
+            var result = search.ToList().Select(c => new Dictionary<string, object>
+                {
+                    { "id",c.Id},
+                    { "studentidcard",c.Student?.IDCard},
+                    { "studentname",c.Student?.Name},
+                    { "studentid",c.Student?.Id},
+                    { "examsubjectname",c.ExamSubject?.Name},
+                    { "examsubjectid",c.ExamSubject?.Id},
+                    { "signupforunitid",c.SignUpForUnitId},
+                });
+            var total = search.Count();
+            return Ok(new { total, data = result });
+        }
+
+        [HttpPost]
         [Route("readexamsubjectopeninfo")]
         [Authorize]
         public IActionResult ReadExamSubjectOpenInfo(int trainingId, int start, int limit, string filter, string query, string navigates)
@@ -178,5 +209,97 @@ namespace PCME.Api.Controllers
             var total = search.Count();
             return Ok(new { total, data = result });
         }
+        [HttpPost]
+        [Route("saveorupdate")]
+        [Authorize]
+        public IActionResult SaveOrUpdate([FromQuery]int? signupforunitid,[FromQuery]int trainingcenterid, [FromBody]Object data) {
+
+            JArray jsonObjects = new JArray();
+            var typeStr = data.GetType().FullName;
+            
+            if (typeStr == "Newtonsoft.Json.Linq.JArray")
+            {
+                var jarray = JArray.FromObject(data);
+                jsonObjects = jarray;
+            }
+            else
+            {
+                var jobject = JObject.FromObject(data);
+                jsonObjects.Add(data);
+            }
+            
+            var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
+            var workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
+
+            var workUnit = workUnitRepository.Find(loginUnitId);
+            SignUpForUnit signUpForUnit = null;
+            if (signupforunitid != null)
+            {
+                signUpForUnit = signUpForUnitRepository.Query(c=>
+                c.Id == (signupforunitid ?? 0) && c.WorkUnitId == loginUnitId
+                ,include:c=>c.Include(s=>s.SignUpCollection)).FirstOrDefault();
+            }
+            else
+            {
+                string code = workUnit.Code + workUnit.Id;
+                signUpForUnit = new SignUpForUnit(code,loginUnitId,trainingcenterid,false,false);
+            }
+            if (signUpForUnit == null)
+            {
+                return Ok(new { message = "单位报名表错误", success = false });
+            }
+
+            foreach (var item in jsonObjects)
+            {
+                int studentid = (int)item["studentid"];
+                int examsubjectid = (int)item["examsubjectid"];
+                signUpForUnit.AddSignUpCollection(studentid, examsubjectid);
+            }
+            if (signUpForUnit.Id == 0)
+            {
+                context.SignUpForUnit.Add(signUpForUnit);
+            }
+            else
+            {
+                context.SignUpForUnit.Update(signUpForUnit);
+            }
+            context.SaveChanges();
+            
+            return Ok(new { message = "添加成功",success=true});
+        }
+        [HttpPost]
+        [Route("remove")]
+        [Authorize]
+        public IActionResult Remove([FromBody]Object data)
+        {
+            JArray jsonObjects = new JArray();
+            var typeStr = data.GetType().FullName;
+
+            if (typeStr == "Newtonsoft.Json.Linq.JArray")
+            {
+                var jarray = JArray.FromObject(data);
+                jsonObjects = jarray;
+            }
+            else
+            {
+                var jobject = JObject.FromObject(data);
+                jsonObjects.Add(data);
+            }
+            List<object> del = new List<object>();
+            foreach (var item in jsonObjects)
+            {
+                del.Add((int)item["id"]);
+            }
+            var delarray = del.ToArray();
+            IEnumerable<int> s = jsonObjects.Select(c=>(int)c["id"]);
+            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
+            var delobject = signUpCollectionRepository.Query(c => delarray.Contains(c.Id)).ToList();
+            context.SignUpCollections.RemoveRange(delobject);
+            context.SaveChanges();
+            return Ok(new { message = "添加成功", success = true });
+        }
     }
+
+   
 }

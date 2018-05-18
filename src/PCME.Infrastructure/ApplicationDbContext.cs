@@ -78,6 +78,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new PromoteTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new ExamSubjectOpenInfoEntityTypeConfiguration());
             builder.ApplyConfiguration(new StudentEntityTypeConfiguration());
+            builder.ApplyConfiguration(new SignUpCollectionEntityTypeConfiguration());
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 

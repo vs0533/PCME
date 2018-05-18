@@ -11,9 +11,10 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180518065935_signupcollection")]
+    partial class signupcollection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,6 +234,8 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int>("SignUpForUnitId");
 
+                    b.Property<int?>("SignUpForUnitId1");
+
                     b.Property<int>("StudentId");
 
                     b.HasKey("Id");
@@ -240,6 +243,8 @@ namespace PCME.Infrastructure.Migrations
                     b.HasIndex("ExamSubjectId");
 
                     b.HasIndex("SignUpForUnitId");
+
+                    b.HasIndex("SignUpForUnitId1");
 
                     b.HasIndex("StudentId");
 
@@ -640,9 +645,13 @@ namespace PCME.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpForUnit", "SignUpForUnit")
-                        .WithMany("SignUpCollection")
+                        .WithMany()
                         .HasForeignKey("SignUpForUnitId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("PCME.Domain.AggregatesModel.SignUpAggregates.SignUpForUnit")
+                        .WithMany("SignUpCollection")
+                        .HasForeignKey("SignUpForUnitId1");
 
                     b.HasOne("PCME.Domain.AggregatesModel.StudentAggregates.Student", "Student")
                         .WithMany()
