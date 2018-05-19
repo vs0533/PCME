@@ -20,6 +20,7 @@
     <Compile Remove="Migrations\20180515110208_init.cs" />
     <Compile Remove="Migrations\20180515124103_init.cs" />
     <Compile Remove="Migrations\20180515150839_init.cs" />
+    <Compile Remove="Migrations\20180519142944_signupcollection_signuphaskeys.cs" />
   </ItemGroup>
 
   <ItemGroup>

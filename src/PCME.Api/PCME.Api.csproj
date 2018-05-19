@@ -7,6 +7,7 @@
   <ItemGroup>
     <Folder Include="Application\DomainEventHandlers\" />
     <Folder Include="Setup\" />
+    <Folder Include="StaticFile\Export\SignUp\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
@@ -14,11 +15,13 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="3.2.0" />
+    <PackageReference Include="dotnetcore.npoi" Version="1.0.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="7.5.2" />
     <PackageReference Include="identityserver4.accesstokenvalidation" Version="2.4.0" />
     <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
+    <PackageReference Include="QRCoder" Version="1.3.3" />
   </ItemGroup>
 
   <ItemGroup>

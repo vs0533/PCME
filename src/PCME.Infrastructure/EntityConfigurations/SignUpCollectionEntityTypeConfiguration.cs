@@ -15,6 +15,10 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .WithMany(t=>t.SignUpCollection)
                 .HasForeignKey(t => t.SignUpForUnitId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
+            builder.HasKey(c => new { c.ExamSubjectId, c.StudentId });
+            builder.Property(t => t.ExamSubjectId).ValueGeneratedNever();
+            builder.Property(t => t.StudentId).ValueGeneratedNever();
         }
     }
 }
