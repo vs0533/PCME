@@ -121,6 +121,24 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SignUp",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    ExamSubjectId = table.Column<int>(nullable: false),
+                    SignUpForUnitId = table.Column<int>(nullable: true),
+                    StudentId = table.Column<int>(nullable: false),
+                    TicketIsCreate = table.Column<bool>(nullable: false),
+                    TrainingCenterId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SignUp", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Specialtys",
                 columns: table => new
                 {
@@ -354,6 +372,36 @@ namespace PCME.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SignUpForUnit",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Code = table.Column<string>(nullable: true),
+                    CreateTime = table.Column<DateTime>(nullable: false),
+                    IsLock = table.Column<bool>(nullable: false),
+                    IsPay = table.Column<bool>(nullable: false),
+                    TrainingCenterId = table.Column<int>(nullable: false),
+                    WorkUnitId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SignUpForUnit", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SignUpForUnit_TrainingCenter_TrainingCenterId",
+                        column: x => x.TrainingCenterId,
+                        principalTable: "TrainingCenter",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SignUpForUnit_WorkUnit_WorkUnitId",
+                        column: x => x.WorkUnitId,
+                        principalTable: "WorkUnit",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Students",
                 columns: table => new
                 {
@@ -376,6 +424,7 @@ namespace PCME.Infrastructure.Migrations
                     Specialty = table.Column<string>(nullable: true),
                     StudentStatusId = table.Column<int>(nullable: false),
                     StudentTypeId = table.Column<int>(nullable: false),
+                    TicketCtr = table.Column<int>(nullable: false, defaultValue: 0),
                     WorkDate = table.Column<DateTime>(nullable: true),
                     WorkUnitId = table.Column<int>(nullable: false)
                 },
@@ -504,6 +553,39 @@ namespace PCME.Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SignUpCollections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ExamSubjectId = table.Column<int>(nullable: false),
+                    SignUpForUnitId = table.Column<int>(nullable: false),
+                    StudentId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SignUpCollections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SignUpCollections_ExamSubjects_ExamSubjectId",
+                        column: x => x.ExamSubjectId,
+                        principalTable: "ExamSubjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SignUpCollections_SignUpForUnit_SignUpForUnitId",
+                        column: x => x.SignUpForUnitId,
+                        principalTable: "SignUpForUnit",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_SignUpCollections_Students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_CivilServantInfos_DutyLevelId",
                 table: "CivilServantInfos",
@@ -580,6 +662,32 @@ namespace PCME.Infrastructure.Migrations
                 column: "SpecialtyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SignUpCollections_SignUpForUnitId",
+                table: "SignUpCollections",
+                column: "SignUpForUnitId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SignUpCollections_StudentId",
+                table: "SignUpCollections",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SignUpCollections_ExamSubjectId_StudentId",
+                table: "SignUpCollections",
+                columns: new[] { "ExamSubjectId", "StudentId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SignUpForUnit_TrainingCenterId",
+                table: "SignUpForUnit",
+                column: "TrainingCenterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SignUpForUnit_WorkUnitId",
+                table: "SignUpForUnit",
+                column: "WorkUnitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_SexId",
                 table: "Students",
                 column: "SexId");
@@ -643,6 +751,12 @@ namespace PCME.Infrastructure.Migrations
                 name: "ProfessionalInfos");
 
             migrationBuilder.DropTable(
+                name: "SignUp");
+
+            migrationBuilder.DropTable(
+                name: "SignUpCollections");
+
+            migrationBuilder.DropTable(
                 name: "WorkUnitAccounts");
 
             migrationBuilder.DropTable(
@@ -652,16 +766,16 @@ namespace PCME.Infrastructure.Migrations
                 name: "AuditStatus");
 
             migrationBuilder.DropTable(
-                name: "ExamSubjects");
-
-            migrationBuilder.DropTable(
-                name: "TrainingCenter");
-
-            migrationBuilder.DropTable(
                 name: "ProfessionalTitle");
 
             migrationBuilder.DropTable(
                 name: "PromoteType");
+
+            migrationBuilder.DropTable(
+                name: "ExamSubjects");
+
+            migrationBuilder.DropTable(
+                name: "SignUpForUnit");
 
             migrationBuilder.DropTable(
                 name: "Students");
@@ -670,22 +784,22 @@ namespace PCME.Infrastructure.Migrations
                 name: "WorkUnitAccountType");
 
             migrationBuilder.DropTable(
+                name: "Levels");
+
+            migrationBuilder.DropTable(
+                name: "Specialtys");
+
+            migrationBuilder.DropTable(
                 name: "ExamSubjectStatus");
 
             migrationBuilder.DropTable(
                 name: "ExamType");
 
             migrationBuilder.DropTable(
-                name: "OpenType");
-
-            migrationBuilder.DropTable(
-                name: "Levels");
-
-            migrationBuilder.DropTable(
                 name: "Seriess");
 
             migrationBuilder.DropTable(
-                name: "Specialtys");
+                name: "TrainingCenter");
 
             migrationBuilder.DropTable(
                 name: "Sex");
@@ -698,6 +812,9 @@ namespace PCME.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "WorkUnit");
+
+            migrationBuilder.DropTable(
+                name: "OpenType");
 
             migrationBuilder.DropTable(
                 name: "WorkUnitNature");

@@ -13,9 +13,9 @@ namespace PCME.Infrastructure.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<SignUp> builder)
         {
-            builder.HasKey(c => new { c.StudentId, c.ExamSubjectId });
-            builder.Property(t => t.StudentId).ValueGeneratedNever();
-            builder.Property(t => t.ExamSubjectId).ValueGeneratedNever();
+            //builder.HasKey(c => new { c.StudentId, c.ExamSubjectId });
+            //builder.Property(t => t.StudentId).ValueGeneratedNever();
+            //builder.Property(t => t.ExamSubjectId).ValueGeneratedNever();
         }
     }
 }

@@ -11,8 +11,8 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180518070758_signupcollection2")]
-    partial class signupcollection2
+    [Migration("20180520134334_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -238,11 +238,12 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExamSubjectId");
-
                     b.HasIndex("SignUpForUnitId");
 
                     b.HasIndex("StudentId");
+
+                    b.HasIndex("ExamSubjectId", "StudentId")
+                        .IsUnique();
 
                     b.ToTable("SignUpCollections");
                 });

@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using PCME.Infrastructure;
 using System;
 
@@ -235,11 +237,12 @@ namespace PCME.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExamSubjectId");
-
                     b.HasIndex("SignUpForUnitId");
 
                     b.HasIndex("StudentId");
+
+                    b.HasIndex("ExamSubjectId", "StudentId")
+                        .IsUnique();
 
                     b.ToTable("SignUpCollections");
                 });

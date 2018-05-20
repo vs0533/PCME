@@ -421,8 +421,8 @@ namespace PCME.Api.Infrastructure
                         List<WorkUnit> curAddedWorkUnit2 = context.WorkUnits.ToList();
                         foreach (var item in u_2)
                         {
-                            var parentUnitId = u_1.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
-                            var parentUnit = curAddedWorkUnit2.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            var parentUnitId = u_1.FirstOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit2.FirstOrDefault(c => c.Code == parentUnitId.UnitId);
                             if (parentUnit == null)
                             {
                                 break;
@@ -468,8 +468,8 @@ namespace PCME.Api.Infrastructure
                         List<WorkUnit> curAddedWorkUnit3 = context.WorkUnits.ToList();
                         foreach (var item in u_3)
                         {
-                            var parentUnitId = u_2.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
-                            var parentUnit = curAddedWorkUnit3.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            var parentUnitId = u_2.FirstOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit3.FirstOrDefault(c => c.Code == parentUnitId.UnitId);
                             if (parentUnit == null)
                             {
                                 break;
@@ -515,8 +515,8 @@ namespace PCME.Api.Infrastructure
                         List<WorkUnit> curAddedWorkUnit4 = context.WorkUnits.ToList();
                         foreach (var item in u_4)
                         {
-                            var parentUnitId = u_3.SingleOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
-                            var parentUnit = curAddedWorkUnit4.SingleOrDefault(c => c.Code == parentUnitId.UnitId);
+                            var parentUnitId = u_3.FirstOrDefault(c => c.UnitId == item.UnitId.Substring(0, item.UnitId.Length - 3));
+                            var parentUnit = curAddedWorkUnit4.FirstOrDefault(c => c.Code == parentUnitId.UnitId);
                             if (parentUnit == null)
                             {
                                 break;
@@ -582,6 +582,12 @@ namespace PCME.Api.Infrastructure
                         Object thisLock = new Object();
                         Parallel.ForEach(oldPerson, item =>
                         {
+                            //var curworkunit = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId);
+                            //if (curworkunit == null)
+                            //{
+                            //    return;
+                            //}
+                            //int pid = curworkunit.Id;
                             int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
 
                             var m = money.FirstOrDefault(c => c.PersonId == item.PersonId);
@@ -818,7 +824,7 @@ namespace PCME.Api.Infrastructure
                             {
                                 string zwClassName = directoryZwClasses.FirstOrDefault(c => c.ClassId == item.ClassId)?.ClassName;
                                 int? seriesId = zwClassName == null ? null : series.FirstOrDefault(c => c.Name == zwClassName.Trim())?.Id;
-
+                                
 
                                 Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject examSubject = new Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject(
                                 item.SubjectId

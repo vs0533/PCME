@@ -20,7 +20,13 @@
     <Compile Remove="Migrations\20180515110208_init.cs" />
     <Compile Remove="Migrations\20180515124103_init.cs" />
     <Compile Remove="Migrations\20180515150839_init.cs" />
+    <Compile Remove="Migrations\20180516061422_init.cs" />
+    <Compile Remove="Migrations\20180516085937_init2.cs" />
+    <Compile Remove="Migrations\20180518065935_signupcollection.cs" />
+    <Compile Remove="Migrations\20180518070758_signupcollection2.cs" />
     <Compile Remove="Migrations\20180519142944_signupcollection_signuphaskeys.cs" />
+    <Compile Remove="Migrations\20180520133217_init.cs" />
+    <Compile Remove="Migrations\20180520133559_init.cs" />
   </ItemGroup>
 
   <ItemGroup>

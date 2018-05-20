@@ -230,6 +230,7 @@ namespace PCME.Api.Controllers
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
             var workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
+            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
 
             var workUnit = workUnitRepository.Find(loginUnitId);
             SignUpForUnit signUpForUnit = null;
@@ -253,7 +254,7 @@ namespace PCME.Api.Controllers
             {
                 int studentid = (int)item["studentid"];
                 int examsubjectid = (int)item["examsubjectid"];
-                var signupCollectionisExists = context.SignUpCollections.Where(c => c.StudentId == studentid && c.ExamSubjectId == examsubjectid)
+                var signupCollectionisExists = signUpCollectionRepository.Query(c => c.StudentId == studentid && c.ExamSubjectId == examsubjectid)
                     .Include(s => s.Student).Include(s => s.ExamSubject)
                     .ToList();
                 if (signupCollectionisExists.Count() > 0)
@@ -318,6 +319,36 @@ namespace PCME.Api.Controllers
             return Ok(new { message = "删除成功", success = true, data = delobject.FirstOrDefault().SignUpForUnitId });
         }
         [HttpPost]
+        [Route("delete")]
+        [Authorize]
+        public IActionResult Delete([FromBody]Object data) {
+            JArray jsonObjects = new JArray();
+            var typeStr = data.GetType().FullName;
+
+            if (typeStr == "Newtonsoft.Json.Linq.JArray")
+            {
+                var jarray = JArray.FromObject(data);
+                jsonObjects = jarray;
+            }
+            else
+            {
+                var jobject = JObject.FromObject(data);
+                jsonObjects.Add(data);
+            }
+            List<object> del = new List<object>();
+            foreach (var item in jsonObjects)
+            {
+                del.Add((int)item["id"]);
+            }
+            var delarray = del.ToArray();
+            IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
+            var signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
+            var delObje = signUpForUnitRepository.Query(c => s.Contains(c.Id),include:i=>i.Include(c=>c.SignUpCollection)).ToList();
+            signUpForUnitRepository.Delete(delObje);
+            unitOfWork.SaveChangesAsync();
+            return Ok(new { message = "删除成功", success = true });
+        }
+        [HttpPost]
         [Route("readsignupforunit")]
         [Authorize]
         public async Task<IActionResult> ReadSignUpForUnit(int start, int limit, string filter, string query, string navigates)
@@ -362,6 +393,7 @@ namespace PCME.Api.Controllers
             ExcelHelper.ExcelTest();
             return Ok();
         }
+
     }
 
 
