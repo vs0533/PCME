@@ -31,21 +31,42 @@ namespace PCME.Api.Controllers
     {
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly ApplicationDbContext context;
+        private readonly IRepository<SignUpForUnit> signUpForUnitRepository;
+        private readonly IRepository<SignUpCollection> signUpCollectionRepository;
+        private readonly IRepository<Student> studentRepository;
+        private readonly IRepository<WorkUnit> workUnitRepository;
+        private readonly IRepository<WorkUnitAccount> workUnitAccountRepository;
+        private readonly IRepository<ExamSubject> examSubjectRepository;
+        private readonly IRepository<ExamSubjectOpenInfo> examSubjectOpenInfoRepository;
         public SignUpController(IUnitOfWork<ApplicationDbContext> unitOfWork, ApplicationDbContext context)
         {
             this.unitOfWork = unitOfWork;
             this.context = context;
+            signUpForUnitRepository = this.unitOfWork.GetRepository<SignUpForUnit>();
+            signUpCollectionRepository = this.unitOfWork.GetRepository<SignUpCollection>();
+            studentRepository = this.unitOfWork.GetRepository<Student>();
+            workUnitRepository = this.unitOfWork.GetRepository<WorkUnit>();
+            workUnitAccountRepository = this.unitOfWork.GetRepository<WorkUnitAccount>();
+            examSubjectRepository = this.unitOfWork.GetRepository<ExamSubject>();
+            examSubjectOpenInfoRepository = this.unitOfWork.GetRepository<ExamSubjectOpenInfo>();
         }
+        /// <summary>
+        /// 读取本单位报名人员列表
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("readstudentlist")]
-        [Authorize]
+        [Authorize(Roles ="Unit")]
         public IActionResult ReadStudentList(int start, int limit, string filter, string query, string navigates)
         {
-            var studentRepository = unitOfWork.GetRepository<Student>();
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var loginAccountId = int.Parse(User.FindFirstValue("AccountId"));
-
-            var workUnitAccountRepository = unitOfWork.GetRepository<WorkUnitAccount>();
+            
             var curWorkUnit = workUnitAccountRepository.Find(loginAccountId);
             StudentType type = StudentType.Professional;
 
@@ -102,15 +123,23 @@ namespace PCME.Api.Controllers
             return Ok(new { total, data = result });
         }
 
+        /// <summary>
+        /// 读取当前可以表报名的培训点列表
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("readtrainingcenterlist")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public IActionResult ReadTrainingCenterList(int start, int limit, string filter, string query, string navigates)
         {
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var loginAccountId = int.Parse(User.FindFirstValue("AccountId"));
-
-            var workUnitAccountRepository = unitOfWork.GetRepository<WorkUnitAccount>();
+            
             var curWorkUnit = workUnitAccountRepository.Find(loginAccountId);
             OpenType type = OpenType.Professional;
 
@@ -122,8 +151,7 @@ namespace PCME.Api.Controllers
             {
                 type = OpenType.Professional;
             }
-
-            var examSubjectOpenInfoRepository = unitOfWork.GetRepository<ExamSubjectOpenInfo>();
+            
             var search = examSubjectOpenInfoRepository.Query(c =>
                 c.AuditStatusId == AuditStatus.Pass.Id && c.TrainingCenter.OpenTypeId == type.Id
                 &&
@@ -149,11 +177,17 @@ namespace PCME.Api.Controllers
             var total = search.Count();
             return Ok(new { total, data = result });
         }
+
+        /// <summary>
+        /// 根据显示单位报名表详情列表（单位报名表的人员列表）
+        /// </summary>
+        /// <param name="signupforunitid"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("readsignupcollection")]
+        [Authorize(Roles = "Unit")]
         public IActionResult ReadSignUpCollection(int? signupforunitid)
         {
-            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
             var search = signUpCollectionRepository.Query(c => c.Id != 0, include: c => c.Include(s => s.ExamSubject).Include(s => s.Student));
             search = search.Where(c => c.SignUpForUnitId == signupforunitid);
             //var item = search.Skip(start).Take(limit);
@@ -171,12 +205,21 @@ namespace PCME.Api.Controllers
             return Ok(new { total, data = result });
         }
 
+        /// <summary>
+        /// 读取指定培训点开设的表报名科目
+        /// </summary>
+        /// <param name="trainingId"></param>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("readexamsubjectopeninfo")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public IActionResult ReadExamSubjectOpenInfo(int trainingId, int start, int limit, string filter, string query, string navigates)
         {
-            var examSubjectOpenInfoRepository = unitOfWork.GetRepository<ExamSubjectOpenInfo>();
             var search = examSubjectOpenInfoRepository.Query(c =>
                 c.TrainingCenterId == trainingId && c.AuditStatusId == AuditStatus.Pass.Id
                 &&
@@ -207,9 +250,16 @@ namespace PCME.Api.Controllers
             var total = search.Count();
             return Ok(new { total, data = result });
         }
+        /// <summary>
+        /// 创建或修改报名表
+        /// </summary>
+        /// <param name="signupforunitid"></param>
+        /// <param name="trainingcenterid"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public IActionResult SaveOrUpdate([FromQuery]int? signupforunitid, [FromQuery]int trainingcenterid, [FromBody]Object data)
         {
 
@@ -228,9 +278,6 @@ namespace PCME.Api.Controllers
             }
 
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
-            var signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
-            var workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
-            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
 
             var workUnit = workUnitRepository.Find(loginUnitId);
             SignUpForUnit signUpForUnit = null;
@@ -242,14 +289,18 @@ namespace PCME.Api.Controllers
             }
             else
             {
-                string code = DateTime.Now.ToLongTimeString() + workUnit.Id;
+                var count = signUpForUnitRepository.Query(c => c.WorkUnitId == loginUnitId).Count();
+                string code = DateTime.Now.ToString("yyMMddHHssmm") + (count+1).ToString(); //DateTime.Now.ToLongTimeString() + workUnit.Id;
                 signUpForUnit = new SignUpForUnit(code, loginUnitId, trainingcenterid, false, false);
             }
             if (signUpForUnit == null)
             {
                 return BadRequest(new { message = "单位报名表错误", success = false });
             }
-
+            if (signUpForUnit.IsPay)
+            {
+                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = signupforunitid });
+            }
             foreach (var item in jsonObjects)
             {
                 int studentid = (int)item["studentid"];
@@ -287,9 +338,14 @@ namespace PCME.Api.Controllers
 
             return Ok(new { message = "添加成功", success = true, data = signUpForUnit.Id });
         }
+        /// <summary>
+        /// 删除报名表详情
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("remove")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public IActionResult Remove([FromBody]Object data)
         {
             JArray jsonObjects = new JArray();
@@ -312,15 +368,27 @@ namespace PCME.Api.Controllers
             }
             var delarray = del.ToArray();
             IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
-            var signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
             var delobject = signUpCollectionRepository.Query(c => delarray.Contains(c.Id)).ToList();
+
+            var signUpForUnit = signUpForUnitRepository.Find(delobject.FirstOrDefault().SignUpForUnitId);
+            if (signUpForUnit.IsPay)
+            {
+                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = delobject.FirstOrDefault().SignUpForUnitId });
+            }
+
             context.SignUpCollections.RemoveRange(delobject);
             context.SaveChanges();
             return Ok(new { message = "删除成功", success = true, data = delobject.FirstOrDefault().SignUpForUnitId });
         }
+
+        /// <summary>
+        /// 删除报名表并和报名表人员
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("delete")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public IActionResult Delete([FromBody]Object data) {
             JArray jsonObjects = new JArray();
             var typeStr = data.GetType().FullName;
@@ -342,15 +410,33 @@ namespace PCME.Api.Controllers
             }
             var delarray = del.ToArray();
             IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
-            var signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
-            var delObje = signUpForUnitRepository.Query(c => s.Contains(c.Id),include:i=>i.Include(c=>c.SignUpCollection)).ToList();
+            
+            var delObje = signUpForUnitRepository.Query(c => s.Contains(c.Id)).FirstOrDefault();
+
+            if (delObje.IsPay)
+            {
+                return BadRequest(new { message = "删除失败，已经扫描成功的把报名表不允许删除", success = false });
+            }
+
+            var delcollections = signUpCollectionRepository.Query(c => c.SignUpForUnitId == delObje.Id).ToList();
+            signUpCollectionRepository.Delete(delcollections);
             signUpForUnitRepository.Delete(delObje);
-            unitOfWork.SaveChangesAsync();
+            unitOfWork.SaveChanges();
             return Ok(new { message = "删除成功", success = true });
         }
+
+        /// <summary>
+        /// 读取当前单位的报名表
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("readsignupforunit")]
-        [Authorize]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> ReadSignUpForUnit(int start, int limit, string filter, string query, string navigates)
         {
             var loginWorkUnitAccountId = int.Parse(User.FindFirstValue("AccountId"));
@@ -387,11 +473,29 @@ namespace PCME.Api.Controllers
             var total = search.Count();
             return Ok(new { total, data = result });
         }
+        /// <summary>
+        /// 报名表到处Excel 未完成
+        /// </summary>
+        /// <returns></returns>
         [Route("export")]
+        [Authorize(Roles = "Unit")]
         public IActionResult Export()
         {
             ExcelHelper.ExcelTest();
             return Ok();
+        }
+        [HttpPost]
+        [Route("saveorupdatesignupforunit")]
+        [Authorize(Roles = "Unit")]
+        public IActionResult SaveOrUpdate([FromBody]JToken data) {
+            //int s = int.TryParse(data.islock);
+            int key = (int)data["id"];
+            bool islock = (bool)data["islock"];
+            var signUpForUnit = signUpForUnitRepository.Find(key);
+            signUpForUnit.ChangeIsLock(islock);
+            signUpForUnitRepository.Update(signUpForUnit);
+            unitOfWork.SaveChanges();
+            return Ok(new { message = "锁定成功", success = true });
         }
 
     }

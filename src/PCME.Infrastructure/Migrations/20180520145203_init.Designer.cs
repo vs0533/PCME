@@ -11,7 +11,7 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180520134334_init")]
+    [Migration("20180520145203_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

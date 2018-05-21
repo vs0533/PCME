@@ -59,5 +59,8 @@ namespace PCME.Domain.AggregatesModel.SignUpAggregates
                 throw new Exception("该人员已经存在报名表内");
             }
         }
+        public void ChangeIsLock(bool islock) {
+            IsLock = islock;
+        }
     }
 }
