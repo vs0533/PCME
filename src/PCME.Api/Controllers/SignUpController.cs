@@ -61,12 +61,12 @@ namespace PCME.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("readstudentlist")]
-        [Authorize(Roles ="Unit")]
+        [Authorize(Roles = "Unit")]
         public IActionResult ReadStudentList(int start, int limit, string filter, string query, string navigates)
         {
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var loginAccountId = int.Parse(User.FindFirstValue("AccountId"));
-            
+
             var curWorkUnit = workUnitAccountRepository.Find(loginAccountId);
             StudentType type = StudentType.Professional;
 
@@ -78,7 +78,6 @@ namespace PCME.Api.Controllers
             {
                 type = StudentType.Professional;
             }
-
             var search = studentRepository.Query(f =>
                 f.WorkUnitId == loginUnitId && f.StudentStatusId == StudentStatus.Normal.Id && f.StudentTypeId == type.Id,
                 include: s => s
@@ -139,7 +138,7 @@ namespace PCME.Api.Controllers
         {
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var loginAccountId = int.Parse(User.FindFirstValue("AccountId"));
-            
+
             var curWorkUnit = workUnitAccountRepository.Find(loginAccountId);
             OpenType type = OpenType.Professional;
 
@@ -151,7 +150,7 @@ namespace PCME.Api.Controllers
             {
                 type = OpenType.Professional;
             }
-            
+
             var search = examSubjectOpenInfoRepository.Query(c =>
                 c.AuditStatusId == AuditStatus.Pass.Id && c.TrainingCenter.OpenTypeId == type.Id
                 &&
@@ -290,7 +289,7 @@ namespace PCME.Api.Controllers
             else
             {
                 var count = signUpForUnitRepository.Query(c => c.WorkUnitId == loginUnitId).Count();
-                string code = DateTime.Now.ToString("yyMMddHHssmm") + (count+1).ToString(); //DateTime.Now.ToLongTimeString() + workUnit.Id;
+                string code = DateTime.Now.ToString("yyMMddHHssmm") + (count + 1).ToString(); //DateTime.Now.ToLongTimeString() + workUnit.Id;
                 signUpForUnit = new SignUpForUnit(code, loginUnitId, trainingcenterid, false, false);
             }
             if (signUpForUnit == null)
@@ -301,31 +300,55 @@ namespace PCME.Api.Controllers
             {
                 return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = signupforunitid });
             }
+
+
+            List<dynamic> badRequest = new List<dynamic>();
+
             foreach (var item in jsonObjects)
             {
                 int studentid = (int)item["studentid"];
                 int examsubjectid = (int)item["examsubjectid"];
                 var signupCollectionisExists = signUpCollectionRepository.Query(c => c.StudentId == studentid && c.ExamSubjectId == examsubjectid)
                     .Include(s => s.Student).Include(s => s.ExamSubject)
-                    .ToList();
-                if (signupCollectionisExists.Count() > 0)
+                    .FirstOrDefault();
+                if (signupCollectionisExists != null)
                 {
-                    return BadRequest(
+                    badRequest.Add(
                         new
                         {
-                            message = signupCollectionisExists.Select(c => string.Format("存在已报名人员【{0}】【{1}】,修改已经撤销", c.Student.Name, c.ExamSubject.Name)),
-                            success = false,
-                            data = signupforunitid
+                            message= string.Format("存在已报名人员【{0}】【{1}】,修改已经撤销",signupCollectionisExists.Student.Name,signupCollectionisExists.ExamSubject.Name),
+                            signupforunitid = signupCollectionisExists.SignUpForUnitId,
+                            examsubjectid = signupCollectionisExists.ExamSubjectId,
+                            studentid = signupCollectionisExists.StudentId,
+                            studentname = signupCollectionisExists.Student.Name,
+                            examsubjectname = signupCollectionisExists.ExamSubject.Name,
+                            idcard = signupCollectionisExists.Student.IDCard
                         });
                 }
-                signUpForUnit.AddSignUpCollection(studentid, examsubjectid);
+                else { signUpForUnit.AddSignUpCollection(studentid, examsubjectid); }
+            }
+            if (badRequest.Any())
+            {
+                return BadRequest(
+                    new
+                    {
+                        badRequest.FirstOrDefault().message,
+                        success = false,
+                        data = badRequest
+                    });
             }
 
             var isExists = signUpForUnitRepository.Query(c => c.Code == signUpForUnit.Code && c.Id != signUpForUnit.Id).Any();
             if (isExists)
             {
-                return BadRequest(new { message = "已经存在相同订单号的报名表", success = false, data = signupforunitid });
+                return BadRequest(new { message = "已经存在相同编号的报名表", success = false, data = signupforunitid });
             }
+
+            if (!signUpForUnit.SignUpCollection.Any())
+            {
+                return BadRequest(new { message = "您不能申报一张空报名表", success = false, data = signupforunitid });
+            }
+
             if (signUpForUnit.Id == 0)
             {
                 context.SignUpForUnit.Add(signUpForUnit);
@@ -389,7 +412,8 @@ namespace PCME.Api.Controllers
         [HttpPost]
         [Route("delete")]
         [Authorize(Roles = "Unit")]
-        public IActionResult Delete([FromBody]Object data) {
+        public IActionResult Delete([FromBody]Object data)
+        {
             JArray jsonObjects = new JArray();
             var typeStr = data.GetType().FullName;
 
@@ -410,7 +434,7 @@ namespace PCME.Api.Controllers
             }
             var delarray = del.ToArray();
             IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
-            
+
             var delObje = signUpForUnitRepository.Query(c => s.Contains(c.Id)).FirstOrDefault();
 
             if (delObje.IsPay)
@@ -487,7 +511,8 @@ namespace PCME.Api.Controllers
         [HttpPost]
         [Route("saveorupdatesignupforunit")]
         [Authorize(Roles = "Unit")]
-        public IActionResult SaveOrUpdate([FromBody]JToken data) {
+        public IActionResult SaveOrUpdate([FromBody]JToken data)
+        {
             //int s = int.TryParse(data.islock);
             int key = (int)data["id"];
             bool islock = (bool)data["islock"];

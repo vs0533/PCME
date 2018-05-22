@@ -83,7 +83,7 @@ namespace PCME.Api.Controllers
             try
             {
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode("code", QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(code, QRCodeGenerator.ECCLevel.Q);
                 QRCode qrCode = new QRCode(qrCodeData);
                 bmp = qrCode.GetGraphic(40);
                 g = Graphics.FromImage(bmp);
