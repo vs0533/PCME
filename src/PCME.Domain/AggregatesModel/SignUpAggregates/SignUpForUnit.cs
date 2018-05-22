@@ -62,5 +62,8 @@ namespace PCME.Domain.AggregatesModel.SignUpAggregates
         public void ChangeIsLock(bool islock) {
             IsLock = islock;
         }
+        public void DoPay() {
+            IsPay = true;
+        }
     }
 }

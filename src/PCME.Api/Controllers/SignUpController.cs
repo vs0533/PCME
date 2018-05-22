@@ -508,6 +508,11 @@ namespace PCME.Api.Controllers
             ExcelHelper.ExcelTest();
             return Ok();
         }
+        /// <summary>
+        /// 单位锁定报名按钮
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("saveorupdatesignupforunit")]
         [Authorize(Roles = "Unit")]
@@ -522,7 +527,7 @@ namespace PCME.Api.Controllers
             unitOfWork.SaveChanges();
             return Ok(new { message = "锁定成功", success = true });
         }
-
+        
     }
 
 
