@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using PCME.Api.Infrastructure.AutofacModules;
 using PCME.Api.Infrastructure.Filters;
+using PCME.Api.Infrastructure.NewtonsoftResolver;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
 using PCME.Infrastructure.Repositories;
@@ -58,6 +59,7 @@ namespace PCME.Api
                 {
                     options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                     //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    options.SerializerSettings.ContractResolver = new LowercaseContractResolver();
                 }
             );
 

@@ -45,9 +45,8 @@ namespace PCME.Api.Application.Commands
 
                     return await GetShow(examSubject);
                 }
-                catch (Exception ex)
+                catch
                 {
-
                     throw;
                 }
             }

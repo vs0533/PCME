@@ -844,9 +844,9 @@ namespace PCME.Api.Infrastructure
                             Console.Write("导入科目...完成");
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
-
+                        throw;
                     }
 
                     #endregion

@@ -79,9 +79,8 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { total = items_child.Count(), data = result });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
                 throw;
             }
         }
@@ -102,7 +101,7 @@ namespace PCME.Api.Controllers
                 bmp.Save(ms, ImageFormat.Jpeg);
                 return File(ms.ToArray(), "image/jpeg");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest();
             }
@@ -152,15 +151,7 @@ namespace PCME.Api.Controllers
                     signupforunitid = c.SignUpForUnitId
                 })}
             };
-            try
-            {
-                return Ok(new { total = 1, data = result });
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
+            return Ok(new { total = 1, data = result });
         }
 
         /// <summary>

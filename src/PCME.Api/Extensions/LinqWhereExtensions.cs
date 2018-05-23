@@ -27,7 +27,7 @@ namespace PCME.Api.Extensions
                     exp = exp == null ? equal : Expression.Or(exp, equal);
 
                 }
-                catch (Exception ex)
+                catch
                 {
                 }
             }
@@ -56,7 +56,7 @@ namespace PCME.Api.Extensions
                     //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
                     exp = exp == null ? contains : Expression.And(exp, contains);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
             }
@@ -88,7 +88,7 @@ namespace PCME.Api.Extensions
                     //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
                     exp = exp == null ? contains : Expression.Or(exp, contains);
                 }
-                catch (Exception ex)
+                catch
                 {
                 }
             }

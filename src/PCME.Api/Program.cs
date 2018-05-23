@@ -23,25 +23,28 @@ namespace PCME.Api
         public static void Main(string[] args)
         {
             BuildWebHost(args)
-                .MigrateDbContext<ApplicationDbContext>((context, services) =>
-                {
-                    var env = services.GetService<IHostingEnvironment>();
-                    var settings = services.GetService<IOptions<ApplicationSettings>>();
-                    var mopdbcontext = services.GetService<MOPDBContext>();
-                    //var logger = services.GetService<ILogger<OrderingContextSeed>>();
+            #region 启用/关闭导入数据库
+                //            .MigrateDbContext<ApplicationDbContext>((context, services) =>
+                //            {
+                //                var env = services.GetService<IHostingEnvironment>();
+                //                var settings = services.GetService<IOptions<ApplicationSettings>>();
+                //                var mopdbcontext = services.GetService<MOPDBContext>();
+                //                //var logger = services.GetService<ILogger<OrderingContextSeed>>();
 
-                    try
-					{
-						new ApplicationContextSeed()
-							.SeedAsync(context, mopdbcontext, env, settings)
-							.Wait();
-					}
-					catch (Exception ex)
-					{
-						throw new Exception(ex.Message);
-					}
-				})
-				//.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })
+                //                try
+                //	{
+                //		new ApplicationContextSeed()
+                //			.SeedAsync(context, mopdbcontext, env, settings)
+                //			.Wait();
+                //	}
+                //	catch (Exception ex)
+                //	{
+                //		throw new Exception(ex.Message);
+                //	}
+                //})
+
+                //.MigrateDbContext<IntegrationEventLogContext>((_, __) => { })
+            #endregion
                 .Run();
         }
 

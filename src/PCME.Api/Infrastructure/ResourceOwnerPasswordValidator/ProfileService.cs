@@ -15,9 +15,8 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
             {
                 context.IssuedClaims = context.Subject.Claims.ToList();
             }
-            catch (Exception ex)
+            catch
             {
-
                 throw;
             }
             return Task.FromResult(0);

@@ -50,9 +50,8 @@ namespace PCME.Api.Application.Commands
                     await unitOfWork.SaveEntitiesAsync();
                     return workUnit;
                 }
-                catch (Exception ex)
+                catch
                 {
-
                     throw;
                 }
             }
