@@ -46,7 +46,7 @@ namespace PCME.CustomWebHost
 
                     //logger.LogInformation($"Migrated database associated with context {typeof(TContext).Name}");
                 }
-                catch (Exception ex)
+                catch
                 {
                     //logger.LogError(ex, $"An error occurred while migrating the database used on context {typeof(TContext).Name}");
                 }

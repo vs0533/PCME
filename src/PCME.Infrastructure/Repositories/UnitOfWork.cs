@@ -141,9 +141,8 @@ namespace PCME.Infrastructure.Repositories
             {
                 return await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch
             {
-
                 throw;
             }
 
