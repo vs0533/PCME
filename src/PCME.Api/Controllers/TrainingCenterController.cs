@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
+using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
+using PCME.Domain.AggregatesModel.SignUpAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
@@ -23,11 +25,15 @@ namespace PCME.Api.Controllers
         private readonly IMediator _mediator;
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<TrainingCenter> trainingCenterRepository;
+        private readonly IRepository<ExaminationRoom> examinationRoomRepository;
+        private readonly IRepository<SignUpForUnit> signUpForUnitRepository;
         public TrainingCenterController(IUnitOfWork<ApplicationDbContext> unitOfWork,IMediator _mediator)
         {
             this.unitOfWork = unitOfWork;
             trainingCenterRepository = unitOfWork.GetRepository<TrainingCenter>();
             this._mediator = _mediator;
+            examinationRoomRepository = unitOfWork.GetRepository<ExaminationRoom>();
+            signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
         }
         [HttpPost]
         [Route("fetchinfo")]
@@ -176,12 +182,18 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "该条记录已经被删除" });
             }
-            //注意检测是否存在考点
-            //var delUnit_IsChild = await trainingCenterRepository.GetFirstOrDefaultAsync(predicate: c => c.PID == delUnit.Id);
-            //if (delUnit_IsChild != null)
-            //{
-            //    return Ok(new { message = "存在下级单位不允许删除" });
-            //}
+            //注意检测是否存在报名信息
+            var signupforunitisExists = signUpForUnitRepository.Query(c => c.TrainingCenterId == delTrainingCenter.Id).Any();
+            if (signupforunitisExists)
+            {
+                return Ok(new { message = "存在 报名信息 不允许删除" });
+            }
+
+            var examationroomisExists = examinationRoomRepository.Query(c=>c.TrainingCenterId == delTrainingCenter.Id).Any();
+            if (examationroomisExists)
+            {
+                return Ok(new { message = "存在 教室信息 不允许删除" });
+            }
 
 
             trainingCenterRepository.Delete(delTrainingCenter);

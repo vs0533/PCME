@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
@@ -46,6 +47,7 @@ namespace PCME.Infrastructure
         public DbSet<SignUp> SignUp { get; set; }
         public DbSet<SignUpForUnit> SignUpForUnit { get; set; }
         public DbSet<SignUpCollection> SignUpCollections { get; set; }
+        public DbSet<ExaminationRoom> ExaminationRooms { get; set; }
 
 
         //private readonly IMediator _mediator;

@@ -27,7 +27,7 @@ namespace PCME.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
         }
@@ -90,6 +90,7 @@ namespace PCME.Api
                     options.ApiSecret = "secret";
                 });
             #endregion
+            
 
             services.AddEntityFrameworkSqlServer()
                     .AddDbContext<ApplicationDbContext>(options =>
