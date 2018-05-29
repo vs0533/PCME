@@ -81,25 +81,36 @@ namespace PCME.Api.Controllers
 		[HttpGet]
         [Route("read")]
         [Authorize(Roles ="TrainingCenter,Admin")]
-        public IActionResult StoreRead()
+        public IActionResult StoreRead(string target)
         {
+            var loginType = User.FindAll("role");
+            var istrainingcenter = loginType.Select(c => c.Value == "TrainingCenter").FirstOrDefault();
             
-			//int trainingId = 0;
-			//try
-			//{
-			//	trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
-			//}
-			//catch(Exception)
-			//{
-			//	trainingId = 0;
-			//}
+            int trainingId = 0;
+            try
+            {
+                trainingId = int.Parse(User.FindFirstValue("WorkUnitId").ToString());
+            }
+            catch (Exception)
+            {
+                trainingId = 0;
+            }
 
-			var search = examsubjectRepository.Query(c=>c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
-    //        if (trainingId != 0)
-    //        {
-				//var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c=>c.Id);
-				//search = search.Where(c => isExists.Contains(c.Id) != true);
-            //}
+            var search = examsubjectRepository.Query(c=>c.Id != 0);
+            if (trainingId != 0 && istrainingcenter) //如果是培训点访问
+            {
+                //search = search.Where(c=>c.OpenType.)
+                if (target == "ExaminationRoomPlan") //如果是添加场次时访问
+                {
+                    var isopenid = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c => c.Id);
+                    search = search.Where(c => isopenid.Contains(c.Id) == true && c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
+                }
+                else if(target == "ExamSubjectOpenInfo")//如果是申请科目访问
+                {
+                    var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c => c.Id);
+                    search = search.Where(c => isExists.Contains(c.Id) != true && c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
+                }
+            }
 
             return Ok(search.Select(c => new { value = c.Id, text = c.Name }));
         }

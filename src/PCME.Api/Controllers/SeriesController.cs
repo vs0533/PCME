@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
@@ -38,9 +39,14 @@ namespace PCME.Api.Controllers
         
 		[HttpPost]
         [Route("fetchinfo")]
-        public IActionResult FindById(int id)
+        public async Task<IActionResult> FindById(int id)
         {
-			return Ok(new { data = seriesRepository.FindAsync(id) });
+            var search = await seriesRepository.FindAsync(id);
+            var result = new Dictionary<string, object> {
+                {"value",search.Id},
+                {"text",search.Name}
+            };
+            return Ok(new { data = search });
         }
 
     }
