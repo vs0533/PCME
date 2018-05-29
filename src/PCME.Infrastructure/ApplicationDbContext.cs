@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
+using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
@@ -48,6 +49,8 @@ namespace PCME.Infrastructure
         public DbSet<SignUpForUnit> SignUpForUnit { get; set; }
         public DbSet<SignUpCollection> SignUpCollections { get; set; }
         public DbSet<ExaminationRoom> ExaminationRooms { get; set; }
+        public DbSet<ExaminationRoomPlan> ExaminationRoomPlans { get; set; }
+        public DbSet<PlanStatus> PlanStatus { get; set; }
 
 
         //private readonly IMediator _mediator;
@@ -82,6 +85,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new StudentEntityTypeConfiguration());
             builder.ApplyConfiguration(new SignUpCollectionEntityTypeConfiguration());
             builder.ApplyConfiguration(new SignUpEntityTypeConfiguration());
+            builder.ApplyConfiguration(new PlanStatusEntityTypeConfiguration());
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

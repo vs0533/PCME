@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
@@ -125,6 +126,18 @@ namespace PCME.Api.Infrastructure
                 PromoteType.Review
             };
         }
+        private IEnumerable<PlanStatus> GetPredefinedPlanStatus()
+        {
+            return new List<PlanStatus>()
+            {
+                PlanStatus.Default,
+                PlanStatus.SelectStart,
+                PlanStatus.SelectFinish,
+                PlanStatus.SignInStart,
+                PlanStatus.Over,
+                PlanStatus.Close
+            };
+        }
         #endregion
 
 
@@ -186,6 +199,11 @@ namespace PCME.Api.Infrastructure
                     if (!context.PromoteTypes.Any())
                     {
                         context.PromoteTypes.AddRange(GetPredefinedPromoteType());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.PlanStatus.Any())
+                    {
+                        context.PlanStatus.AddRange(GetPredefinedPlanStatus());
                         await context.SaveChangesAsync();
                     }
                     #endregion

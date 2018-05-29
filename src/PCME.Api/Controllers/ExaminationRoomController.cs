@@ -31,6 +31,36 @@ namespace PCME.Api.Controllers
             this.examinationRoomRepository = unitOfWork.GetRepository<ExaminationRoom>();
         }
         [HttpPost]
+        [Route("fetchinfo")]
+        [Authorize]
+        public IActionResult FindById(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+            var search = (from examinationrooms in context.ExaminationRooms
+                                   join trainingcenter in context.TrainingCenter on examinationrooms.TrainingCenterId equals trainingcenter.Id into left1
+                                   from trainingcenter in left1.DefaultIfEmpty()
+                                   where examinationrooms.Id == id
+                                   select new { examinationrooms,trainingcenter }).FirstOrDefault();
+            
+            if (search != null)
+            {
+                var result = new Dictionary<string, object>{
+                    { "id",search.examinationrooms.Id},
+                    { "name",search.examinationrooms.Name},
+                    { "galleryful",search.examinationrooms.Galleryful},
+                    { "description",search.examinationrooms.Description},
+                    { "TrainingCenter.Id",search.trainingcenter.Id},
+                    { "TrainingCenter.Name",search.trainingcenter.Name}
+                };
+                return Ok(new { data = result });
+            }
+
+            return NotFound();
+        }
+        [HttpPost]
         [Route("read")]
         [Authorize(Roles = "TrainingCenter")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
@@ -42,10 +72,6 @@ namespace PCME.Api.Controllers
                                    on c.TrainingCenterId equals t.Id //into temp
                                    //from tmp in temp.DefaultIfEmpty()
                                    select new { c,t};
-
-
-            
-
 
             var item = examinationRooms.Skip(start).Take(limit);
             var result = item.ToList().Select(c => new Dictionary<string, object>

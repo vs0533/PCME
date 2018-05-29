@@ -11,9 +11,10 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180529041049_changeplannumtype")]
+    partial class changeplannumtype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,11 +60,11 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<int>("AuditStatusId");
 
-                    b.Property<DateTime>("ExamEndTime");
-
                     b.Property<DateTime>("ExamStartTime");
 
                     b.Property<int>("ExamSubjectID");
+
+                    b.Property<DateTime>("ExamTime");
 
                     b.Property<int>("ExaminationRoomId");
 
@@ -75,9 +76,9 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<DateTime>("SelectTime");
 
-                    b.Property<DateTime>("SignInTime");
+                    b.Property<int>("SignInOffset");
 
-                    b.Property<int>("TrainingCenterId");
+                    b.Property<DateTime>("SignInTime");
 
                     b.HasKey("Id");
 

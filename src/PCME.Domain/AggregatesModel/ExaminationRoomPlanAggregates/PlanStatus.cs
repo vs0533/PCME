@@ -9,12 +9,12 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
 {
     public class PlanStatus: Enumeration
     {
-        public static PlanStatus Default = new PlanStatus(1, nameof(Default));
-        public static PlanStatus SelectStart = new PlanStatus(2, nameof(SelectStart));
-        public static PlanStatus SelectFinish = new PlanStatus(3, nameof(SelectFinish));
-        public static PlanStatus SignInStart = new PlanStatus(4, nameof(SignInStart));
-        public static PlanStatus Over = new PlanStatus(5, nameof(Over));
-        public static PlanStatus Close = new PlanStatus(6, nameof(Close));
+        public static PlanStatus Default = new PlanStatus(1, "正常");
+        public static PlanStatus SelectStart = new PlanStatus(2, "选场");
+        public static PlanStatus SelectFinish = new PlanStatus(3, "选场结束");
+        public static PlanStatus SignInStart = new PlanStatus(4, "签到");
+        public static PlanStatus Over = new PlanStatus(5, "考试结束");
+        public static PlanStatus Close = new PlanStatus(6, "关闭");
 
         public static IEnumerable<PlanStatus> List() => new[] {Default, SelectStart, SelectFinish,SignInStart,Over,Close };
         public PlanStatus()

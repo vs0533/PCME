@@ -59,7 +59,7 @@ namespace PCME.Api
                 {
                     options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
                     //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    options.SerializerSettings.ContractResolver = new LowercaseContractResolver();
+                    //options.SerializerSettings.ContractResolver = new LowercaseContractResolver();
                 }
             );
 

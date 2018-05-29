@@ -41,6 +41,7 @@ namespace PCME.Api.Extensions
         public static IQueryable<TSource> FilterAnd<TSource>(
         this IQueryable<TSource> query, IEnumerable<Filter> filter)
         where TSource : class
+
         {
 
             ParameterExpression parameter = Expression.Parameter(typeof(TSource), "s");
@@ -50,13 +51,13 @@ namespace PCME.Api.Extensions
             {
                 try
                 {
-                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
+                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Operator, item.Property, item.Value);
                     //Expression property = Expression.Property(parameter, item.Property);
                     //Expression value = Expression.Constant(item.Value);
                     //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
                     exp = exp == null ? contains : Expression.And(exp, contains);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                 }
             }
@@ -134,7 +135,7 @@ namespace PCME.Api.Extensions
             if (baseTypeName == "Entity")
             {
                 var p = t.GetProperty(split[0]);
-                var p1 = p.PropertyType.GetProperty("Name");
+                var p1 = p.PropertyType.GetProperty(split[1]);
                 var exp = Expression.Property(left, p);
                 exp_property = Expression.Property(exp, p1);
                 exp_value = Expression.Constant(value);
@@ -144,6 +145,98 @@ namespace PCME.Api.Extensions
             }
             return null;
 
+        }
+
+        private static Expression GetMemberExpression(Expression left, Type t, string Operator, string property, string value)
+        {
+            Expression exp_property = null;
+            Expression exp_value = null;
+            string baseTypeName = string.Empty;
+            string[] split = property.Split('.');
+            if (split.Length != 2)
+            {
+                exp_property = Expression.Property(left, property);
+                Expression contains = null;
+
+                var s = exp_property.Type;
+                if (exp_property.Type == typeof(DateTime))
+                {
+                    GetDateTimeExp(Operator, value, exp_property, ref contains);
+                }
+                else
+                {
+                    exp_value = Expression.Constant(value);
+                    contains = Expression.Call(exp_property, "Contains", null, new Expression[] { exp_value });
+                }
+                return contains;
+            }
+            baseTypeName = t.GetProperty(split[0]).PropertyType.BaseType.Name;
+            if (baseTypeName == "Enumeration")
+            {
+                exp_property = Expression.Property(left, split[0] + "Id");
+
+                var p_enumeration = t.GetProperty(split[0]);
+                var p = p_enumeration.PropertyType;
+                var instance = t.Assembly.CreateInstance(p.FullName);
+                var method = p.GetMethod("FromName");
+                dynamic obj = method.Invoke(instance, new object[] { value });
+                var result = obj.Id;
+
+                exp_value = Expression.Constant(result);
+
+                Expression contains = Expression.Equal(exp_property, exp_value);
+                return contains;
+            }
+            if (baseTypeName == "Entity")
+            {
+                var p = t.GetProperty(split[0]);
+                var p1 = p.PropertyType.GetProperty(split[1]);
+                var exp = Expression.Property(left, p);
+                exp_property = Expression.Property(exp, p1);
+
+                Expression contains = null;
+                if (p1.PropertyType == typeof(string))
+                {
+                    exp_value = Expression.Constant(value);
+                    contains = Expression.Call(exp_property, "Contains", null, new Expression[] { exp_value });
+                }
+                if (p1.PropertyType == typeof(DateTime))
+                {
+                    GetDateTimeExp(Operator, value, exp_property, ref contains);
+                }
+
+
+                return contains;
+            }
+            return null;
+
+        }
+
+        private static void GetDateTimeExp(string Operator, string value, Expression exp_property, ref Expression contains)
+        {
+            Expression exp_value;
+            var datevalue = Convert.ToDateTime(value);//.ToString("yyyy-MM-dd HH:ss:mm");
+            exp_value = Expression.Constant(datevalue);
+            switch (Operator)
+            {
+                case "eq":
+                    var start = new DateTime(datevalue.Year, datevalue.Month, datevalue.Day);
+                    var end = new DateTime(datevalue.Year, datevalue.Month, datevalue.Day, 23, 59, 59);
+                    var exp_value_start = Expression.Constant(start);
+                    var exp_value_end = Expression.Constant(end);
+                    var exp_gte = Expression.GreaterThanOrEqual(exp_property, exp_value_start);
+                    var exp_lte = Expression.LessThanOrEqual(exp_property, exp_value_end);
+                    contains = Expression.And(exp_gte, exp_lte);
+                    break;
+                case "lt":
+                    contains = Expression.LessThanOrEqual(exp_property, exp_value);
+                    break;
+                case "gt":
+                    contains = Expression.GreaterThanOrEqual(exp_property, exp_value);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
