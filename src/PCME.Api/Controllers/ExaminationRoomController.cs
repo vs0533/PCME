@@ -69,8 +69,8 @@ namespace PCME.Api.Controllers
 
             var examinationRooms = from c in context.ExaminationRooms
                                    join t in context.TrainingCenter
-                                   on c.TrainingCenterId equals t.Id //into temp
-                                   //from tmp in temp.DefaultIfEmpty()
+                                   on c.TrainingCenterId equals t.Id
+                                   where c.TrainingCenterId == loginTrainingCenterId
                                    select new { c,t};
 
             var item = examinationRooms.Skip(start).Take(limit);
@@ -142,6 +142,17 @@ namespace PCME.Api.Controllers
             examinationRoomRepository.Delete(del);
             await unitOfWork.SaveEntitiesAsync();
             return NoContent();
+        }
+        [HttpGet]
+        [Route("read")]
+        [Authorize(Roles = "TrainingCenter")]
+        public async Task<IActionResult> StoreRead(string target) {
+            var logintrainingcenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var search = await (from examinationroom in context.ExaminationRooms
+                         where examinationroom.TrainingCenterId == logintrainingcenterId
+                         select new { value = examinationroom.Id, text = examinationroom.Name }).ToListAsync();
+
+            return Ok(search);
         }
     }
 }

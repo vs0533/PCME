@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
@@ -66,6 +67,19 @@ namespace PCME.Api.Controllers
             
             var total = examinationRoomPlan.Count();
             return Ok(new { total, data = result });
+        }
+
+        [HttpPost]
+        [Route("saveorupdate")]
+        [Authorize(Roles = "TrainingCenter")]
+        public async Task<IActionResult> Post([FromBody]ExaminationRoomPlanCreateOrUpdateCommand command, string opertype)
+        {
+            var logintrainingcenterId = User.FindFirstValue("WorkUnitId");
+            //if (opertype == "new")
+            //{
+            //    command.SetId(0);
+            //}
+            return Ok();
         }
     }
 }
