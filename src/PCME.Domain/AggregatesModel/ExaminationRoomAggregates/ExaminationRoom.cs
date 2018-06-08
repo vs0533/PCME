@@ -10,7 +10,11 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomAggregates
     /// </summary>
     public class ExaminationRoom:Entity,IAggregateRoot
     {
+        public string Num { get; private set; }
         public string Name { get; private set; }
+        /// <summary>
+        /// 暂时弃用
+        /// </summary>
         public int Galleryful { get; private set; }
         public string Description { get; private set; }
         public int TrainingCenterId { get; private set; }
@@ -19,8 +23,9 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomAggregates
         {
 
         }
-        public ExaminationRoom(string name,int galleryful,int trainingcenterid,string description)
+        public ExaminationRoom(string num,string name,int galleryful,int trainingcenterid,string description)
         {
+            Num = num;
             Name = name;
             Galleryful = galleryful;
             TrainingCenterId = trainingcenterid;

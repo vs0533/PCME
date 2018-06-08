@@ -25,12 +25,12 @@ namespace PCME.Api.Application.Commands
             var isExists = await examinationRepository.FindAsync(request.Id);
             if (isExists != null)
             {
-                isExists.Update(request.Name, request.Galleryful, request.Description);
+                isExists.Update(request.Name, 0, request.Description);
                 examinationRepository.Update(isExists);
                 returnInfo = isExists;
             }
             else {
-                ExaminationRoom examinationRoom = new ExaminationRoom(request.Name,request.Galleryful,request.TrainingCenterId,request.Description);
+                ExaminationRoom examinationRoom = new ExaminationRoom(request.Num, request.Name,0,request.TrainingCenterId,request.Description);
                 await examinationRepository.InsertAsync(examinationRoom);
                 returnInfo = examinationRoom;
             }

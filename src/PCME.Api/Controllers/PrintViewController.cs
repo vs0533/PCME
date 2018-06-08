@@ -214,14 +214,15 @@ namespace PCME.Api.Controllers
             foreach (var item in signUpCollection)
             {
                 var isExists = signUpRepository.Query(c => c.StudentId == item.StudentId && c.ExamSubjectId == item.ExamSubjectId).Any();
-                if (isExists)
+                if (isExists)//如果报名表详情中人员和科目存在正式报名表中了 则添加到存在列表中用于返回客户端显示
                 {
                     exists.Add(item.Student.Name, item.ExamSubject.Name);
                 }
-                else
+                else//否则添加到正式报名表中 并增加人员生成准考证权限
                 {
                     SignUp signUp = new SignUp(item.StudentId, item.ExamSubjectId, signUpForUnit.Id, loginTrainingCenterId, false, DateTime.Now);
                     signUps.Add(signUp);
+                    item.Student.AddaTicketCtr();
                 }
             }
             if (exists.Any())
@@ -233,9 +234,10 @@ namespace PCME.Api.Controllers
             //{
             //    return Ok("发生错误，本次表报名失败");
             //}
-            signUpForUnit.DoPay();
+            signUpForUnit.PayToSuccess();
             signUpForUnitRepository.Update(signUpForUnit);
             await signUpRepository.InsertAsync(signUps);
+            signUpCollectionRepository.Update(signUpCollection);
             await unitOfWork.SaveChangesAsync();
             return Ok("报名成功");
         }

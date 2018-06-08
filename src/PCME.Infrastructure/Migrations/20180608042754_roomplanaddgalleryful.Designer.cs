@@ -11,9 +11,10 @@ using System;
 namespace PCME.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180608042754_roomplanaddgalleryful")]
+    partial class roomplanaddgalleryful
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,8 +46,6 @@ namespace PCME.Infrastructure.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Num");
-
                     b.Property<int>("TrainingCenterId");
 
                     b.HasKey("Id");
@@ -64,6 +63,8 @@ namespace PCME.Infrastructure.Migrations
                     b.Property<DateTime>("ExamEndTime");
 
                     b.Property<DateTime>("ExamStartTime");
+
+                    b.Property<int>("ExamSubjectID");
 
                     b.Property<int>("ExaminationRoomId");
 

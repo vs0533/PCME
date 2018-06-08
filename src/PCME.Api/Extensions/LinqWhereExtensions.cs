@@ -116,23 +116,23 @@ namespace PCME.Api.Extensions
                 return contains;
             }
             baseTypeName = t.GetProperty(split[0]).PropertyType.BaseType.Name;
-            if (baseTypeName == "Enumeration")
-            {
-                exp_property = Expression.Property(left, split[0] + "Id");
+            //if (baseTypeName == "Enumeration")
+            //{
+            //    exp_property = Expression.Property(left, split[0] + "Id");
 
-                var p_enumeration = t.GetProperty(split[0]);
-                var p = p_enumeration.PropertyType;
-                var instance = t.Assembly.CreateInstance(p.FullName);
-                var method = p.GetMethod("FromName");
-                dynamic obj = method.Invoke(instance, new object[] { value });
-                var result = obj.Id;
+            //    var p_enumeration = t.GetProperty(split[0]);
+            //    var p = p_enumeration.PropertyType;
+            //    var instance = t.Assembly.CreateInstance(p.FullName);
+            //    var method = p.GetMethod("FromName");
+            //    dynamic obj = method.Invoke(instance, new object[] { value });
+            //    var result = obj.Id;
 
-                exp_value = Expression.Constant(result);
+            //    exp_value = Expression.Constant(result);
 
-                Expression contains = Expression.Equal(exp_property, exp_value);
-                return contains;
-            }
-            if (baseTypeName == "Entity")
+            //    Expression contains = Expression.Equal(exp_property, exp_value);
+            //    return contains;
+            //}
+            if (baseTypeName == "Entity" || baseTypeName == "Enumeration")
             {
                 var p = t.GetProperty(split[0]);
                 var p1 = p.PropertyType.GetProperty(split[1]);
@@ -171,23 +171,23 @@ namespace PCME.Api.Extensions
                 return contains;
             }
             baseTypeName = t.GetProperty(split[0]).PropertyType.BaseType.Name;
-            if (baseTypeName == "Enumeration")
-            {
-                exp_property = Expression.Property(left, split[0] + "Id");
+            //if (baseTypeName == "Enumeration")
+            //{
+            //    exp_property = Expression.Property(left, split[0] + "Id");
 
-                var p_enumeration = t.GetProperty(split[0]);
-                var p = p_enumeration.PropertyType;
-                var instance = t.Assembly.CreateInstance(p.FullName);
-                var method = p.GetMethod("FromName");
-                dynamic obj = method.Invoke(instance, new object[] { value });
-                var result = obj.Id;
+            //    var p_enumeration = t.GetProperty(split[0]);
+            //    var p = p_enumeration.PropertyType;
+            //    var instance = t.Assembly.CreateInstance(p.FullName);
+            //    var method = p.GetMethod("FromName");
+            //    dynamic obj = method.Invoke(instance, new object[] { value });
+            //    var result = obj.Id;
 
-                exp_value = Expression.Constant(result);
+            //    exp_value = Expression.Constant(result);
 
-                Expression contains = Expression.Equal(exp_property, exp_value);
-                return contains;
-            }
-            if (baseTypeName == "Entity")
+            //    Expression contains = Expression.Equal(exp_property, exp_value);
+            //    return contains;
+            //}
+            if (baseTypeName == "Entity" || baseTypeName == "Enumeration")
             {
                 var p = t.GetProperty(split[0]);
                 var p1 = p.PropertyType.GetProperty(split[1]);

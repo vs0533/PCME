@@ -19,19 +19,28 @@ using System.Threading.Tasks;
 namespace PCME.Api.Controllers
 {
     [Produces("application/json")]
-    [Route("api/ExaminationRoomPlan")]
-    public class ExaminationRoomPlanController : Controller
+    [Route("api/AuditExaminationRoomPlan")]
+    public class AuditExaminationRoomPlanController : Controller
     {
         private readonly IMediator _mediator;
         private readonly ApplicationDbContext context;
-        public ExaminationRoomPlanController(ApplicationDbContext context,IMediator _mediator)
+        public AuditExaminationRoomPlanController(ApplicationDbContext context,IMediator _mediator)
         {
             this.context = context;
             this._mediator = _mediator;
         }
+        /// <summary>
+        /// 主列表视图
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles = "TrainingCenter")]
+        [Authorize(Roles = "Admin")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
@@ -71,13 +80,18 @@ namespace PCME.Api.Controllers
             var total = examinationRoomPlan.Count();
             return Ok(new { total, data = result });
         }
-
+        /// <summary>
+        /// 新增修改视图
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="opertype"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "TrainingCenter")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody]ExaminationRoomPlanCreateOrUpdateCommand command, string opertype)
         {
-            var logintrainingcenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            //var logintrainingcenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
 
             string roomnum = await (from c in context.ExaminationRooms
                                     where c.Id == command.ExaminationRoomId
@@ -96,14 +110,14 @@ namespace PCME.Api.Controllers
                 }
             }
             ModelState.Remove("opertype");
-            command.TrainingCenterToAddSetInfo(num, AuditStatus.Wait.Id, PlanStatus.Default.Id, logintrainingcenterId);
+            command.AdminToSetInfo(command.AuditStatusId, command.PlanStatusId);
 
-            var isaudit = await context.ExaminationRoomPlans.Where(c => c.Id == command.Id && c.AuditStatusId == AuditStatus.Pass.Id).AnyAsync();
-            if (isaudit)
-            {
-                ModelState.AddModelError("num", "审核通过的场次不允许编辑");
-                return BadRequest();
-            }
+            //var isaudit = await context.ExaminationRoomPlans.Where(c => c.Id == command.Id && c.AuditStatusId == AuditStatus.Pass.Id).AnyAsync();
+            //if (isaudit)
+            //{
+            //    ModelState.AddModelError("num", "审核通过的场次不允许编辑");
+            //    return BadRequest();
+            //}
 
             var numExists = await context.ExaminationRoomPlans.Where(c => c.Num == num && c.Id != command.Id).AnyAsync();
             if (numExists)
@@ -126,19 +140,19 @@ namespace PCME.Api.Controllers
             if (ModelState.IsValid)
             {
                 Dictionary<string, object> result = await _mediator.Send(command);
-                return Ok(new { success = true, data=result });
+                return Ok(new { success = true, data = result });
             }
             return BadRequest();
         }
 
         [HttpPost]
         [Route("remove")]
-        [Authorize(Roles = "TrainingCenter")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();
 
-            var del = await context.ExaminationRoomPlans.Where(c=>c.Id == id).FirstOrDefaultAsync();
+            var del = await context.ExaminationRoomPlans.Where(c => c.Id == id).FirstOrDefaultAsync();
             if (del is null)
             {
                 return Ok(new { message = "该条记录已经被删除" });

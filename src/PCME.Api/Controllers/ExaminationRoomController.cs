@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
+using PCME.Api.Application.ParameBinder;
+using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
@@ -49,6 +51,7 @@ namespace PCME.Api.Controllers
             {
                 var result = new Dictionary<string, object>{
                     { "id",search.examinationrooms.Id},
+                    { "num",search.examinationrooms.Num},
                     { "name",search.examinationrooms.Name},
                     { "galleryful",search.examinationrooms.Galleryful},
                     { "description",search.examinationrooms.Description},
@@ -62,8 +65,8 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles = "TrainingCenter")]
-        public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
+        [Authorize(Roles = "TrainingCenter,Admin")]
+        public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates,string target)
         {
             var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
 
@@ -73,10 +76,14 @@ namespace PCME.Api.Controllers
                                    where c.TrainingCenterId == loginTrainingCenterId
                                    select new { c,t};
 
+            examinationRooms = examinationRooms.FilterAnd(filter.ToObject<Filter>())
+                .FilterOr(query.ToObject<Filter>());
+
             var item = examinationRooms.Skip(start).Take(limit);
             var result = item.ToList().Select(c => new Dictionary<string, object>
                 {
                     {"id",c.c.Id},
+                    {"num",c.c.Num},
                     {"name",c.c.Name},
                     {"galleryful",c.c.Galleryful},
                     {"description",c.c.Description},
@@ -101,9 +108,16 @@ namespace PCME.Api.Controllers
             var nameExisted = examinationRoomRepository.GetFirstOrDefault(predicate: c =>
                  c.Name == command.Name && c.Id != command.Id
             );
+            var numExisted = examinationRoomRepository.GetFirstOrDefault(predicate: c =>
+                 c.Num == command.Num && c.Id != command.Id
+            );
             if (nameExisted != null)
             {
                 ModelState.AddModelError("name", "相同名称的教室已经存在");
+            }
+            if (numExisted != null)
+            {
+                ModelState.AddModelError("num", "相同编号的教室已经存在");
             }
             ModelState.Remove("opertype");
 
@@ -114,6 +128,7 @@ namespace PCME.Api.Controllers
                 {
                     { "id", result.Id },
                     { "name",result.Name},
+                    { "num",result.Num},
                     { "galleryful",result.Galleryful},
                     { "description",result.Description}
                 };
@@ -136,7 +151,11 @@ namespace PCME.Api.Controllers
                 return Ok(new { message = "该条记录已经被删除" });
             }
             #region 注意检测场次
-
+            var roomPlan = await context.ExaminationRoomPlans.Where(c => c.ExaminationRoomId == del.Id).AnyAsync();
+            if (roomPlan)
+            {
+                return Ok(new { message = "该教室下面存在场次不允许删除" });
+            }
             #endregion
 
             examinationRoomRepository.Delete(del);

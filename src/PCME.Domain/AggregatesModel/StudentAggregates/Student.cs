@@ -122,6 +122,9 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public void ChangeStudentStatus(int statusId) {
             StudentStatusId = StudentStatus.From(statusId).Id;
         }
+        public void AddaTicketCtr() {
+            TicketCtr = TicketCtr+1;
+        }
 
     }
 }
