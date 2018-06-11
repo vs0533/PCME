@@ -29,6 +29,7 @@ namespace PCME.Api.Application.Commands
         [JsonProperty("StudentType.Id")]
         public int StudentTypeId { get; private set; }
         public string Password { get; private set; }
+        public string Favicon { get; private set; }
 
         public DateTime? BirthDay { get; private set; }
         /// <summary>
@@ -58,10 +59,12 @@ namespace PCME.Api.Application.Commands
         [Required(ErrorMessage = "学员状态必须选择")]
         [JsonProperty("StudentStatus.Id")]
         public int StudentStatusId { get; private set; }
-
+        public void SetPhoto(string photo) {
+            Photo = photo;
+        }
         public StudentCreateOrUpdateCommand(int id, string name, string iDCard, int sexId, int studentTypeId,
             string password, DateTime? birthDay, string graduationSchool, string specialty,
-            DateTime? workDate, string officeName,  string email, string address, int workUnitId, int studentStatusId)
+            DateTime? workDate, string officeName,  string email, string address, int workUnitId, int studentStatusId, string favicon)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -78,6 +81,7 @@ namespace PCME.Api.Application.Commands
             Address = address;
             WorkUnitId = workUnitId;
             StudentStatusId = studentStatusId;
+            Favicon = favicon;
         }
 
         public void SetWorkUnitId(int workUnitId) {

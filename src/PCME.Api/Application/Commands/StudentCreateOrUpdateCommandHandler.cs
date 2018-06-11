@@ -1,9 +1,12 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Hosting;
+using PCME.Api.Infrastructure;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +15,14 @@ namespace PCME.Api.Application.Commands
 {
     public class StudentCreateOrUpdateCommandHandler : IRequestHandler<StudentCreateOrUpdateCommand,Student>
     {
+        private readonly IHostingEnvironment hostingEnv;
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<Student> studentRepository;
-        public StudentCreateOrUpdateCommandHandler(IUnitOfWork<ApplicationDbContext> unitOfWork)
+        public StudentCreateOrUpdateCommandHandler(IHostingEnvironment hostingEnv,IUnitOfWork<ApplicationDbContext> unitOfWork)
         {
             this.unitOfWork = unitOfWork;
-            this.studentRepository = unitOfWork.GetRepository<Student>();
+            studentRepository = unitOfWork.GetRepository<Student>();
+            this.hostingEnv = hostingEnv;
         }
 
         public async Task<Student> Handle(StudentCreateOrUpdateCommand request, CancellationToken cancellationToken)
@@ -61,7 +66,15 @@ namespace PCME.Api.Application.Commands
                         , request.OfficeName
                         , request.Address
                         , request.StudentStatusId
+                        , request.Email
                     );
+                if ((!string.IsNullOrEmpty(request.Favicon)) && !idIsExisted.EmailIsValid)
+                {
+                    string filename = idIsExisted.Id.ToString() + ".jpg";
+                    string filepath = Path.Combine(hostingEnv.WebRootPath, "Files", filename);
+                    ImageHelper.Base64StringToImage(request.Favicon, filepath);
+                    idIsExisted.UpdatePhoto(filename, true);
+                }
                 studentRepository.Update(idIsExisted);
                 await unitOfWork.SaveEntitiesAsync();
                 return idIsExisted;

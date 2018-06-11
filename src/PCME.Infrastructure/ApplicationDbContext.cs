@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using PCME.Domain.AggregatesModel.AdmissionTicketAggregates;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
@@ -51,6 +52,7 @@ namespace PCME.Infrastructure
         public DbSet<ExaminationRoom> ExaminationRooms { get; set; }
         public DbSet<ExaminationRoomPlan> ExaminationRoomPlans { get; set; }
         public DbSet<PlanStatus> PlanStatus { get; set; }
+        public DbSet<AdmissionTicket> AdmissionTickets { get; set; }
 
 
         //private readonly IMediator _mediator;

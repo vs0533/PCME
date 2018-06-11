@@ -54,7 +54,7 @@ namespace PCME.Api.Controllers
                     { "id",query.Id},
                     { "name",query.Name},
                     { "logname",query.LogName},
-                    { "logpassword",query.LogPassWord},
+                    //{ "logpassword",query.LogPassWord},
                     { "address",query.Address},
                     { "OpenType.Id",query.OpenTypeId},
                     { "OpenType.Name",query.OpenType.Name}

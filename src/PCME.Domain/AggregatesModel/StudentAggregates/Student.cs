@@ -98,7 +98,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public void Update(string name, string password, int sex, int studentTypeId,
             DateTime? birthDay, string graduationSchool, string specialty,
             DateTime? workdate, string officeName,
-            string address, int studentStatus
+            string address, int studentStatus,string email
             )
         {
             StudentTypeId = StudentType.From(studentTypeId).Id;
@@ -110,9 +110,14 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             Specialty = specialty;
             WorkDate = workdate;
             OfficeName = officeName;
-            EmailIsValid = EmailIsValid;
+            Email = email;
+            //EmailIsValid = EmailIsValid;
             Address = address;
             StudentStatusId = studentStatus;
+        }
+        public void UpdatePhoto(string photo,bool photoIsValid) {
+            Photo = photo;
+            PhotoIsValid = photoIsValid;
         }
 
         public void UpdateWorkUnit(int workUnitId) {

@@ -19,10 +19,16 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
         public DateTime? LoginTime { get; private set; }
         public DateTime? PostPaperTime { get; private set; }
         public DateTime CreateTime { get; private set; }
+        public int ExaminationRoomPlanId { get; private set; }
+
+        public AdmissionTicket()
+        {
+
+        }
 
         public AdmissionTicket(string num, int studentId, int examinationRoomId, int signUpId, 
             int examSubjectId, DateTime? signInTime, DateTime? loginTime, DateTime? postPaperTime,
-            DateTime createTime)
+            DateTime createTime, int examinationRoomPlanId)
         {
             Num = num;
             StudentId = studentId;
@@ -33,6 +39,7 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
             LoginTime = loginTime;
             PostPaperTime = postPaperTime;
             CreateTime = createTime;
+            ExaminationRoomPlanId = examinationRoomPlanId;
         }
     }
 }

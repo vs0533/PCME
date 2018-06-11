@@ -15,7 +15,7 @@
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Setup\" />
     <Folder Include="StaticFile\Export\SignUp\" />
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\Files\" />
   </ItemGroup>
 
   <ItemGroup>
