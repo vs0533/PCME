@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -18,41 +20,63 @@ namespace PCME.Api.Controllers
         {
             this.hostingEnv = hostingEnv;
         }
+        [HttpPost]
+        [Route("favicon")]
         public IActionResult Post()
         {
             var files = Request.Form.Files;
             long size = files.Sum(f => f.Length);
 
             //size > 100MB refuse upload !
-
-            if (size > 104857600)
+            string base64 = string.Empty;
+            if (size > 307200)
             {
-                return BadRequest(new { success = false,message="文件大小超出限制" });
+                return BadRequest(new { success = false,msg="文件大小超出300KB限制" });
             }
-            List<string> filePathResultList = new List<string>();
-            foreach (var file in files)
+            try
             {
-                var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-
-                string filePath = hostingEnv.WebRootPath + $@"\Files";
-
-                if (!Directory.Exists(filePath))
+                using (var ms = new MemoryStream())
                 {
-                    Directory.CreateDirectory(filePath);
+                    Image image = Image.FromStream(files[0].OpenReadStream(), true, true);
+                    Bitmap bmp = new Bitmap(image);
+                    bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    byte[] arr = new byte[ms.Length];
+                    ms.Position = 0;
+                    ms.Read(arr, 0, (int)ms.Length);
+                    ms.Close();
+                    base64 = Convert.ToBase64String(arr);
                 }
-
-                fileName = Guid.NewGuid() + "." + fileName.Split('.')[1];
-                string fileFullName = Path.Combine(filePath,fileName);
-                using (FileStream fs = System.IO.File.Create(fileFullName))
-                {
-                    file.CopyTo(fs);
-                    fs.Flush();
-                }
-                filePathResultList.Add($"/src/Files/{fileName}");
+                return Content(JsonConvert.SerializeObject(new { msg = base64, success = true }));
             }
-            string message = $"{files.Count} file(s) /{size} bytes uploaded successfully!";
+            catch (Exception ex)
+            {
+                return BadRequest(new { msg = ex.Message, success = true }); ;
+            }
+            //List<string> filePathResultList = new List<string>();
+            //foreach (var file in files)
+            //{
 
-            return Json(new { success=true,paths=filePathResultList,count=filePathResultList.Count()});
+            //var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+
+            //string filePath = hostingEnv.WebRootPath + $@"\Files";
+
+            //if (!Directory.Exists(filePath))
+            //{
+            //    Directory.CreateDirectory(filePath);
+            //}
+
+            //fileName = Guid.NewGuid() + "." + fileName.Split('.')[1];
+            //string fileFullName = Path.Combine(filePath,fileName);
+            //using (FileStream fs = System.IO.File.Create(fileFullName))
+            //{
+            //    file.CopyTo(fs);
+            //    fs.Flush();
+            //}
+            //filePathResultList.Add($"/src/Files/{fileName}");
+            //}
+            //string message = $"{files.Count} file(s) /{size} bytes uploaded successfully!";
+
+            //return Json(new { success=true,paths=filePathResultList,count=filePathResultList.Count()});
         }
     }
 }

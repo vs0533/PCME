@@ -13,15 +13,25 @@ namespace PCME.Api.Infrastructure
         {
             try
             {
-                Bitmap bmp = new Bitmap(Imagefilename);
-
-                MemoryStream ms = new MemoryStream();
-                bmp.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                byte[] arr = new byte[ms.Length];
-                ms.Position = 0;
-                ms.Read(arr, 0, (int)ms.Length);
-                ms.Close();
-                return Convert.ToBase64String(arr);
+                string base64 = string.Empty;
+                using (var ms = new MemoryStream())
+                {
+                    Bitmap bmp = new Bitmap(Imagefilename);
+                    Bitmap bmp2 = new Bitmap(bmp, bmp.Width, bmp.Height);
+                    //将第一个bmp拷贝到bmp2中
+                    Graphics draw = Graphics.FromImage(bmp2);
+                    draw.DrawImage(bmp, 0, 0);
+                    draw.Dispose();
+                    bmp2.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    byte[] arr = new byte[ms.Length];
+                    ms.Position = 0;
+                    ms.Read(arr, 0, (int)ms.Length);
+                    ms.Close();
+                    bmp2.Dispose();
+                    bmp.Dispose();
+                    base64 = Convert.ToBase64String(arr);
+                }
+                return base64;
             }
             catch (Exception ex)
             {
@@ -41,9 +51,9 @@ namespace PCME.Api.Infrastructure
                 {
                     Bitmap bmp = new Bitmap(ms);
                     //新建第二个bitmap类型的bmp2变量。
-                    //Bitmap bmp2 = new Bitmap(bmp, bmp.Width, bmp.Height,bmp.PixelFormat);
+                    //Bitmap bmp2 = new Bitmap(bmp, bmp.Width, bmp.Height);
                     //将第一个bmp拷贝到bmp2中
-                   // Graphics draw = Graphics.FromImage(bmp2);
+                    //Graphics draw = Graphics.FromImage(bmp2);
                     //draw.DrawImage(bmp, 0, 0);
                     //draw.Dispose();
                     bmp.Save(filePath, System.Drawing.Imaging.ImageFormat.Jpeg);
@@ -51,6 +61,10 @@ namespace PCME.Api.Infrastructure
                 }
             }
             catch (Exception ex)
+            {
+
+            }
+            finally
             {
 
             }
