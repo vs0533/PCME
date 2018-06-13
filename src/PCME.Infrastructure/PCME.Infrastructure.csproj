@@ -12,25 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Migrations\20180512133548_init.cs" />
-    <Compile Remove="Migrations\20180512134634_init.cs" />
-    <Compile Remove="Migrations\20180514020233_init.cs" />
-    <Compile Remove="Migrations\20180514125300_examsubjectopeninfo.cs" />
-    <Compile Remove="Migrations\20180515074642_trainingcenteropentypeid.cs" />
-    <Compile Remove="Migrations\20180515110208_init.cs" />
-    <Compile Remove="Migrations\20180515124103_init.cs" />
-    <Compile Remove="Migrations\20180515150839_init.cs" />
-    <Compile Remove="Migrations\20180516061422_init.cs" />
-    <Compile Remove="Migrations\20180516085937_init2.cs" />
-    <Compile Remove="Migrations\20180518065935_signupcollection.cs" />
-    <Compile Remove="Migrations\20180518070758_signupcollection2.cs" />
-    <Compile Remove="Migrations\20180519142944_signupcollection_signuphaskeys.cs" />
-    <Compile Remove="Migrations\20180520133217_init.cs" />
-    <Compile Remove="Migrations\20180520133559_init.cs" />
-    <Compile Remove="Migrations\20180520134334_init.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="2.1.2" />
     <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.AutoHistory" Version="2.0.3" />
