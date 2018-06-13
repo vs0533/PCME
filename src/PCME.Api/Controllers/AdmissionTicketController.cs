@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
+using PCME.Domain.AggregatesModel.AdmissionTicketAggregates;
+using PCME.Domain.AggregatesModel.AdmissionTicketLogAggregates;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -13,17 +16,17 @@ namespace PCME.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/AdmissionTicket")]
-    public class AdmissionTicketController:Controller
+    public class AdmissionTicketController : Controller
     {
         private readonly ApplicationDbContext context;
         public AdmissionTicketController(ApplicationDbContext context)
         {
             this.context = context;
-            
+
         }
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles="Student")]
+        [Authorize(Roles = "Student")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var studentId = int.Parse(User.FindFirstValue("AccountId"));
@@ -39,7 +42,7 @@ namespace PCME.Api.Controllers
                                   join examinationroomplan in context.ExaminationRoomPlans on admissionticket.ExaminationRoomPlanId equals examinationroomplan.Id into left5
                                   from examinationroomplan in left5.DefaultIfEmpty()
                                   where admissionticket.StudentId == studentId
-                                  select new { examinationroomplan, admissionticket, examsubject, examinationroom,trainingcenter,signup };
+                                  select new { examinationroomplan, admissionticket, examsubject, examinationroom, trainingcenter, signup };
 
             admissionTicket = admissionTicket
                 .FilterAnd(filter.ToObject<Filter>())
@@ -66,6 +69,54 @@ namespace PCME.Api.Controllers
             });
             var total = admissionTicket.Count();
             return Ok(new { total, data = result });
+        }
+
+        [HttpPost]
+        [Route("saveorupdate")]
+        [Authorize(Roles = "Student")]
+        public IActionResult Post([FromBody]AdmissionTicketCreateOrUpdateCommand command, string opertype) {
+            var studentId = int.Parse(User.FindFirstValue("AccountId"));
+            if (opertype == "new")
+            {
+                command.SetId(0);
+            }
+            var plan = context.ExaminationRoomPlans.Where(c => c.Id == command.ExaminationRoomPlanId).FirstOrDefault();
+            int plancount = context.AdmissionTickets.Where(c => c.ExaminationRoomPlanId == command.ExaminationRoomPlanId).Count();
+            if (plancount >= plan.Galleryful)
+            {
+                return Ok(new { success = false, message = "超出场次设置的人数限制，生成失败" });
+            }
+            if (plancount >= 999)
+            {
+                return Ok(new { success = false, message = "超出系统允许的场次人数限制，生成失败" });
+            }
+
+            string num = command.ExamSubjectId + plan.Num + (plancount + 1).ToString().PadLeft(3, '0');
+            AdmissionTicket ticket = new AdmissionTicket(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
+                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId);
+
+            var numisExists = context.AdmissionTickets.Where(c => c.Num == num).Any();
+            if (numisExists)
+            {
+                return Ok(new { success = false, message = "存在相同的准考证号，生成失败" });
+            }
+            var examsubjectisExists = context.AdmissionTickets.Where(c => c.ExamSubjectId == ticket.ExamSubjectId && c.StudentId == ticket.StudentId).Any();
+            if (examsubjectisExists)
+            {
+                return Ok(new { success = false, message = "存在相同科目的准考证号，生成失败" });
+            }
+
+            var signup = context.SignUp.Where(c => c.Id == command.SignUpId).FirstOrDefault();
+            signup.TicketChangeCreate();
+            context.AdmissionTickets.Add(ticket);
+            context.SignUp.Update(signup);
+
+            AdmissionTicketLogs logs = new AdmissionTicketLogs(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
+                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId);
+            context.AdmissionTicketLogs.Add(logs);
+
+            context.SaveChanges();
+            return Ok(new { success = true, message = "生成成功！" });
         }
     }
 }

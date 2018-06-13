@@ -31,6 +31,9 @@ namespace PCME.Domain.AggregatesModel.SignUpAggregates
         {
 
         }
+        public void TicketChangeCreate() {
+            TicketIsCreate = true;
+        }
 
         public SignUp(int studentId, int examSubjectId, int? signUpForUnitId, int trainingCenterId, bool ticketIsCreate, DateTime createTime)
         {
