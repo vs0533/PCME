@@ -130,6 +130,13 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public void AddaTicketCtr() {
             TicketCtr = TicketCtr+1;
         }
+        public void SubtractTicketCtr() {
+            TicketCtr = TicketCtr - 1;
+            if (TicketCtr <0)
+            {
+                TicketCtr = 0;
+            }
+        }
 
     }
 }

@@ -106,11 +106,22 @@ namespace PCME.Api.Controllers
                 return Ok(new { success = false, message = "存在相同科目的准考证号，生成失败" });
             }
 
+            //更改报名标记 保存准考证
             var signup = context.SignUp.Where(c => c.Id == command.SignUpId).FirstOrDefault();
             signup.TicketChangeCreate();
             context.AdmissionTickets.Add(ticket);
             context.SignUp.Update(signup);
 
+            //扣减选场权限次数1
+            var student = context.Students.Where(c => c.Id == studentId).FirstOrDefault();
+            if (student.TicketCtr <1)
+            {
+                return Ok(new { success = false, message = "您的选场权限次数小于1，生成失败" });
+            }
+            student.SubtractTicketCtr();
+            context.Students.Update(student);
+
+            //添加准考证生成日志
             AdmissionTicketLogs logs = new AdmissionTicketLogs(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
                 , null, null, null, DateTime.Now, command.ExaminationRoomPlanId);
             context.AdmissionTicketLogs.Add(logs);

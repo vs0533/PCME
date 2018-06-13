@@ -162,7 +162,11 @@ namespace PCME.Api.Controllers
                 return Ok(new { message = "禁止删除已经审核通过的场次" });
             }
             #region 注意检测选场人员
-
+            var ticket = await context.AdmissionTickets.Where(c => c.ExaminationRoomPlanId == del.Id).AnyAsync();
+            if (ticket)
+            {
+                return Ok(new { message = "已经存在选择该场次的准考证，不允许删除" });
+            }
             #endregion
 
             context.ExaminationRoomPlans.Remove(del);
