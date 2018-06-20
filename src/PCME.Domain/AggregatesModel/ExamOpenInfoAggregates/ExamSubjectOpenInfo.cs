@@ -31,6 +31,10 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
         /// </summary>
         /// <value>The sign up finish offset.</value>
         public int SignUpFinishOffset { get; private set; }
+        /// <summary>
+        /// 报名费
+        /// </summary>
+        public decimal Pirce { get; private set; }
 
         /// <summary>
         /// 考试开始结束时间 字符串类型 仅用于提示作用
@@ -49,7 +53,7 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
 
         }
 
-		public ExamSubjectOpenInfo(int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId)
+		public ExamSubjectOpenInfo(int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId,decimal pirce)
 		{
 			TrainingCenterId = trainingCenterId;
 			ExamSubjectId = examSubjectId;
@@ -58,9 +62,10 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
 			SignUpFinishOffset = signUpFinishOffset;
 			DisplayExamTime = displayExamTime;
 			AuditStatusId = auditStatusId;
+            Pirce = pirce;
 		}
 
-		public void Update(int trainingCenterId,int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId)
+		public void Update(int trainingCenterId,int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce)
 		{
 			TrainingCenterId = trainingCenterId;
 			ExamSubjectId = examSubjectId;
@@ -69,6 +74,7 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
             SignUpFinishOffset = signUpFinishOffset;
             DisplayExamTime = displayExamTime;
             AuditStatusId = auditStatusId;
+            Pirce = pirce;
 		}
 
 		public void SetTrainingCenter(int trainingCenterId){

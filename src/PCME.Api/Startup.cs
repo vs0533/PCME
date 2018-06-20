@@ -44,28 +44,13 @@ namespace PCME.Api
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:1841", "http://loclahost:5003")
+                    builder => builder.WithOrigins("http://localhost:1841", "http://60.210.113.43", "http://60.210.113.42","http://pems.zbpe.gov.cn")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
+                    .AllowCredentials()
                     );
             });
             #endregion
-            services.AddMvc(options => {
-                options.Filters.Add(typeof(CheckPostParametersFilter));
-                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
-                //Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new IsoDateTimeConverter
-                //{
-                //    DateTimeFormat = "yyyy'-'MM'-'dd' 'HH':'mm':'ss"
-                //});
-
-            }).AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-                    //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    //options.SerializerSettings.ContractResolver = new LowercaseContractResolver();
-                }
-            );
-
             #region api密码token身份认证设置
 
             services.AddIdentityServer()
@@ -80,21 +65,39 @@ namespace PCME.Api
                         ClientSecrets = {
                             new Secret("secret".Sha256())
                         },
-                        AllowedScopes = { "api1"}
+                        AllowedScopes = { "api1"},
+                        AccessTokenLifetime = 10800,//过期时间秒 3小时
+                        AllowedCorsOrigins = { "http://localhost:1841", "http://60.210.113.43", "http://60.210.113.42", "http://pems.zbpe.gov.cn" }
                     }
                 });
 
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = "http://localhost:8888";
+                    //options.Authority = "http://60.210.113.42:5000";
+                    options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
+                    options.JwtValidationClockSkew = TimeSpan.FromSeconds(0);//过期偏移为零
                     options.ApiName = "api1";
                     options.ApiSecret = "secret";
                 });
             #endregion
-            
 
+            services.AddMvc(options => {
+                options.Filters.Add(typeof(CheckPostParametersFilter));
+                options.Filters.Add(typeof(HttpGlobalExceptionFilter));
+                //Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new IsoDateTimeConverter
+                //{
+                //    DateTimeFormat = "yyyy'-'MM'-'dd' 'HH':'mm':'ss"
+                //});
+
+            }).AddJsonOptions(options =>
+            {
+                options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                //options.SerializerSettings.ContractResolver = new LowercaseContractResolver();
+            }
+            );
             services.AddEntityFrameworkSqlServer()
                     .AddDbContext<ApplicationDbContext>(options =>
                     {

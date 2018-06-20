@@ -15,6 +15,9 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .WithMany()
                 .HasForeignKey(t => t.TrainingCenterId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(t => t.Pirce)
+                .HasDefaultValue(0);
         }
     }
 }

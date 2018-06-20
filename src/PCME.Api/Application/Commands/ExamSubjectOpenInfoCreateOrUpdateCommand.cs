@@ -54,8 +54,9 @@ namespace PCME.Api.Application.Commands
         }
 		[JsonProperty("AuditStatus.Id")]
         public int? AuditStatusId { get; private set; }
+        public decimal Pirce { get; private set; }
 
-		public ExamSubjectOpenInfoCreateOrUpdateCommand(int id, int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId)
+        public ExamSubjectOpenInfoCreateOrUpdateCommand(int id, int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce)
 		{
 			Id = id;
 			TrainingCenterId = trainingCenterId;
@@ -65,6 +66,7 @@ namespace PCME.Api.Application.Commands
 			SignUpFinishOffset = signUpFinishOffset;
 			DisplayExamTime = displayExamTime;
 			AuditStatusId = auditStatusId;
+            Pirce = pirce;
 		}
 
         public void SetTrainingCenter(int trainingCenterId)

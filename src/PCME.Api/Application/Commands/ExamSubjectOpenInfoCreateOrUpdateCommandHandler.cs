@@ -35,6 +35,7 @@ namespace PCME.Api.Application.Commands
 					,request.SignUpFinishOffset
                     ,request.DisplayExamTime
 					,request.AuditStatusId ?? 0
+                    ,request.Pirce
                    );
                 try
                 {
@@ -56,7 +57,8 @@ namespace PCME.Api.Application.Commands
 				                   ,request.SignUpFinishTime
 				                   ,request.SignUpFinishOffset
 				                   ,request.DisplayExamTime
-				                   ,request.AuditStatusId ?? 0);
+				                   ,request.AuditStatusId ?? 0
+                                   ,request.Pirce);
 				examSubjectOpenInfoRepository.Update(idIsExisted);
                 await unitOfWork.SaveEntitiesAsync();
                 return await GetShow(idIsExisted);
