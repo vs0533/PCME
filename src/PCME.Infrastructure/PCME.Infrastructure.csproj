@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20180621022531_addbook.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="IdentityServer4" Version="2.1.2" />
     <PackageReference Include="MediatR" Version="4.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.AutoHistory" Version="2.0.3" />
