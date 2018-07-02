@@ -55,7 +55,7 @@ namespace PCME.Api.Controllers
             var search_child = signUpCollectionRepository.Query(c => c.SignUpForUnitId == items.Id, include: s => s
                   .Include(c => c.ExamSubject)
                   .Include(c => c.Student)
-            );
+            ).OrderBy(c=>c.ExamSubjectId);
             var items_child = await search_child.ToListAsync();
 
             var result = new Dictionary<string, object>

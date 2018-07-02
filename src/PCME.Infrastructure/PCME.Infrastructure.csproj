@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <Compile Remove="Migrations\20180621022531_addbook.cs" />
+    <Compile Remove="Migrations\20180702035528_addcreditexam.cs" />
+    <Compile Remove="Migrations\20180702040059_addcreditexam.cs" />
   </ItemGroup>
 
   <ItemGroup>

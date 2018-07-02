@@ -27,7 +27,7 @@ namespace PCME.Api.Controllers
             company.Add("companylongname", "淄博卫盛科技有限公司");
             company.Add("address", "人民西路45号");
             company.Add("linkmen", "技术支持");
-            company.Add("telnumber", "18653311771");
+            company.Add("telnumber", "0533-2791836");
             company.Add("servicedepartment", "研发部");
             company.Add("servicemen", "技术支持");
             company.Add("servicetelnumber", "18653311771");
@@ -40,8 +40,8 @@ namespace PCME.Api.Controllers
             systeminfo.Add("iconurl", "");
             systeminfo.Add("iconcls", "");
             systeminfo.Add("systemaddition", "");
-            systeminfo.Add("copyrightowner", "卫盛科技");
-            systeminfo.Add("copyrightinfo", "卫盛科技2018");
+            systeminfo.Add("copyrightowner", "淄博市人力资源和社会保障局");
+            systeminfo.Add("copyrightinfo", "淄博市人力资源和社会保障局");
             systeminfo.Add("allowsavepassword", "");
             systeminfo.Add("savepassworddays", "");
             systeminfo.Add("needidentifingcode", "");

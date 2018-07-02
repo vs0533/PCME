@@ -112,7 +112,7 @@ namespace PCME.Api.Controllers
                 }
             }
 
-            return Ok(search.Select(c => new { value = c.Id, text = c.Name }));
+            return Ok(search.OrderByDescending(c=>c.Id).Select(c => new { value = c.Id, text = c.Name }));
         }
 
 		[HttpPost]
@@ -120,13 +120,14 @@ namespace PCME.Api.Controllers
 		[Authorize(Roles = "Admin")]
 		public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
 		{
-			var search = examsubjectRepository.Query(c => c.Id != 0)
-											  .Include(s => s.OpenType)
-											  .Include(s => s.ExamType)
-											  .Include(s => s.ExamSubjectStatus)
-											  .Include(s => s.Series)
-			                                  .FilterAnd(filter.ToObject<Filter>())
-                                              .FilterOr(query.ToObject<Filter>());;
+            var search = examsubjectRepository.Query(c => c.Id != 0)
+                                              .Include(s => s.OpenType)
+                                              .Include(s => s.ExamType)
+                                              .Include(s => s.ExamSubjectStatus)
+                                              .Include(s => s.Series)
+                                              .FilterAnd(filter.ToObject<Filter>())
+                                              .FilterOr(query.ToObject<Filter>())
+                                              .OrderByDescending(c => c.Id);
 
 
 			var item = search.Skip(start).Take(limit);
@@ -212,11 +213,19 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "该条记录已经被删除" });
             }
+            
 
-			delExamSubject.ChangeExamSubjectStatus(ExamSubjectStatus.Forbidden.Id);
-			examsubjectRepository.Update(delExamSubject);
+            var isopen = examSubjectOpenInfoRepository.Query(predicate:c => c.ExamSubjectId == delExamSubject.Id).Any();
+            if (isopen)
+            {
+                return Ok(new { message = "该科目已经存在申请记录，不允许删除" });
+            }
+
+            //delExamSubject.ChangeExamSubjectStatus(ExamSubjectStatus.Forbidden.Id);
+            //examsubjectRepository.Update(delExamSubject);
+            examsubjectRepository.Delete(delExamSubject);
             await unitOfWork.SaveEntitiesAsync();
-			return Ok(new { message = "科目被已被设为禁用" });
+            return NoContent();
         }
 	}
 }

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.CreditExamAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
@@ -600,13 +601,13 @@ namespace PCME.Api.Infrastructure
                         Object thisLock = new Object();
                         Parallel.ForEach(oldPerson, item =>
                         {
-                            //var curworkunit = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId);
-                            //if (curworkunit == null)
-                            //{
-                            //    return;
-                            //}
-                            //int pid = curworkunit.Id;
-                            int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
+                        //var curworkunit = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId);
+                        //if (curworkunit == null)
+                        //{
+                        //    return;
+                        //}
+                        //int pid = curworkunit.Id;
+                        int pid = curWorkUnits.FirstOrDefault(c => c.Code == item.WorkUnitId).Id;
 
                             var m = money.FirstOrDefault(c => c.PersonId == item.PersonId);
                             decimal mV = m is null ? 0 : m.MoneyVirtual;
@@ -693,7 +694,7 @@ namespace PCME.Api.Infrastructure
                         IReadOnlyCollection<PromoteType> promoteTypes = context.PromoteTypes.ToList();
 
                         List<ProfessionalInfo> professionalInfos = new List<ProfessionalInfo>();
-                        
+
                         int ctr = 0;
                         int insertCtr = 0;
                         int insertCount = 0;
@@ -714,12 +715,12 @@ namespace PCME.Api.Infrastructure
                                 , PromoteType.FromName(item.AuditCategory).Id
                                 , student.Id
                                 );
-                                //professionalInfos.Add(pinfo);
-                                lock (thisLock)
+                            //professionalInfos.Add(pinfo);
+                            lock (thisLock)
                                 {
                                     professionalInfos.Add(pinfo);
-                                    //Console.WriteLine(string.Format("公务员信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
-                                    ctr++;
+                                //Console.WriteLine(string.Format("公务员信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
+                                ctr++;
                                     if ((ctr >= technicaian.Count() / SAVECTR) ||
                                         ((ctr == (technicaian.Count % SAVECTR)) && insertCtr == SAVECTR)
                                         )
@@ -736,9 +737,9 @@ namespace PCME.Api.Infrastructure
                                 }
                             }
 
-                            
-                            //Console.WriteLine(string.Format("专业技术职务信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
-                        });
+
+                        //Console.WriteLine(string.Format("专业技术职务信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
+                    });
                         //context.ProfessionalInfos.AddRange(professionalInfos);
                         //await context.SaveChangesAsync();
                     }
@@ -782,8 +783,8 @@ namespace PCME.Api.Infrastructure
                                 lock (thisLock)
                                 {
                                     civilServantInfos.Add(civilServantInfo);
-                                    //Console.WriteLine(string.Format("公务员信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
-                                    ctr++;
+                                //Console.WriteLine(string.Format("公务员信息 身份证:{0},性名:{1},ID:{2}", student.IDCard, student.Name, item.PersonId));
+                                ctr++;
                                     if ((ctr >= personCivilServants.Count() / SAVECTR) ||
                                         ((ctr == (personCivilServants.Count % SAVECTR)) && insertCtr == SAVECTR)
                                         )
@@ -842,7 +843,7 @@ namespace PCME.Api.Infrastructure
                             {
                                 string zwClassName = directoryZwClasses.FirstOrDefault(c => c.ClassId == item.ClassId)?.ClassName;
                                 int? seriesId = zwClassName == null ? null : series.FirstOrDefault(c => c.Name == zwClassName.Trim())?.Id;
-                                
+
 
                                 Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject examSubject = new Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject(
                                 item.SubjectId
@@ -869,6 +870,87 @@ namespace PCME.Api.Infrastructure
 
                     #endregion
 
+                    #region 导入老系统考试合格信息
+                    /*
+                //IReadOnlyCollection<ExamAudit> examAudits = mopcontext.ExamAudit.Include(i=>i.)
+                IReadOnlyCollection<Student> students_ = context.Students.ToList();
+                IReadOnlyCollection<Domain.AggregatesModel.ExamSubjectAggregates.ExamSubject> examsubject_ = context.ExamSubjects.ToList();
+                var query = from examaudit in mopcontext.ExamAudit
+                            join person in mopcontext.Person on examaudit.PersonId equals person.PersonId into left1
+                            from person in left1.DefaultIfEmpty()
+                            join examsubject in mopcontext.ExamSubject on examaudit.ExamId.Substring(0, 4) equals examsubject.SubjectId into left2
+                            from examsubject in left2.DefaultIfEmpty()
+                                //let student = context.Students.Where(c=> c.IDCard == person.Idcard.Trim()).FirstOrDefault()
+                                //let subject = context.ExamSubjects.Where(c=>c.Code == examsubject.SubjectId).FirstOrDefault()
+                                //where student != null && subject != null
+                            select new
+                            {
+                                examaudit.ExamId,
+                                person.Idcard,
+                                examsubject.SubjectId,
+                                examaudit.SumResult,
+                                examaudit.CreditHour,
+                                examaudit.ExamDate
+                            };
+
+                var examaudititems = await query
+                //.Skip(0).Take(100)
+                .ToListAsync();
+                List<CreditExam> examAudits = new List<CreditExam>();
+
+                int ctr1 = 0;
+                int insertCtr1 = 0;
+                int insertCount1 = 0;
+                const int SAVECTR1 = 88;
+                Object thisLock1 = new Object();
+                //Parallel.ForEach(examaudititems, (s, ParallelLoopState) =>
+                foreach (var s in examaudititems)
+                {
+                    var student_new = students_.FirstOrDefault(c => c.IDCard == s.Idcard);
+                    var examsubject_new = examsubject_.FirstOrDefault(c => c.Code == s.SubjectId);
+                    if (student_new == null || examsubject_new == null || s.CreditHour == null)
+                    {
+                        //ParallelLoopState.Break();
+                        //return;
+                        continue;
+                    }
+
+                    CreditExam creditexam = new CreditExam();
+                    creditexam.AdmissionTicketNum = s.ExamId;
+                    creditexam.StudentId = student_new.Id;
+                    creditexam.SubjectId = examsubject_new.Id;
+                    creditexam.Credit = (float)s.CreditHour;
+                    creditexam.CreateTime = (s.ExamDate ?? DateTime.Now);
+
+                    //lock (thisLock1)
+                    //{
+                    //    Console.WriteLine(string.Format("sf:{0},ctr:{1}", creditexam.AdmissionTicketNum,ctr1));
+                    //    ctr1 = ctr1 + 1;
+                    //}
+
+                    lock (thisLock1)
+                    {
+                        examAudits.Add(creditexam);
+                        ctr1++;
+                        if ((ctr1 >= examaudititems.Count() / SAVECTR1) ||
+                            ((ctr1 == (examaudititems.Count % SAVECTR1)) && insertCtr1 == SAVECTR1)
+                            )
+                        {
+                            Console.Write("开始提交数据库");
+                            //context.CreditExams.AddRange(examAudits);
+                            //context.SaveChanges();
+                            insertCount1 += examAudits.Count();
+                            insertCtr1++;
+                            Console.WriteLine(string.Format("已经提交...{0}次；本次提交{1}条;共提交{2}条", insertCtr1.ToString(), examAudits.Count(), insertCount1.ToString()));
+                            examAudits.Clear();
+                            ctr1 = 0;
+                        }
+                    }
+                }
+                     //)
+                     ;
+            ;*/
+                    #endregion
                     #region 导入科目开设申请信息
                     //if (!(context.ExamSubjectOpenInfo.Any()))
                     //{
