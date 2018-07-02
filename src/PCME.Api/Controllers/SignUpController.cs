@@ -78,6 +78,8 @@ namespace PCME.Api.Controllers
             {
                 type = StudentType.Professional;
             }
+            
+
             var search = studentRepository.Query(f =>
                 f.WorkUnitId == loginUnitId && f.StudentStatusId == StudentStatus.Normal.Id && f.StudentTypeId == type.Id,
                 include: s => s
@@ -312,6 +314,29 @@ namespace PCME.Api.Controllers
                     .Include(s => s.Student).Include(s => s.ExamSubject)
                     .FirstOrDefault();
 
+                var signupisExists_query = from signup in context.SignUp
+                                           join students in context.Students on signup.StudentId equals students.Id into left1
+                                           from students in left1.DefaultIfEmpty()
+                                           join examsubjects in context.ExamSubjects on signup.ExamSubjectId equals examsubjects.Id into left2
+                                           from examsubjects in left2.DefaultIfEmpty()
+                                           where signup.StudentId == studentid && signup.ExamSubjectId == examsubjectid
+                                           select new { signup, students, examsubjects };
+                if (signupisExists_query.Any())
+                {
+                    var existsFirst = signupisExists_query.FirstOrDefault();
+                    badRequest.Add(
+                       new
+                       {
+                           message = string.Format("存在已 【报名成功】 人员【{0}】【{1}】,修改已经撤销", existsFirst.students.Name, existsFirst.examsubjects.Name),
+                           signupforunitid,
+                           examsubjectid = existsFirst.examsubjects.Id,
+                           studentid = existsFirst.students.Id,
+                           studentname = existsFirst.students.Name,
+                           examsubjectname = existsFirst.examsubjects.Name,
+                           idcard = existsFirst.students.IDCard
+                       });
+                }
+
                 var creditexamisExists_query = from creditexams in context.CreditExams
                                                join students in context.Students on creditexams.StudentId equals students.Id into left1
                                                from students in left1.DefaultIfEmpty()
@@ -340,7 +365,7 @@ namespace PCME.Api.Controllers
                     badRequest.Add(
                         new
                         {
-                            message= string.Format("存在已 【报名】 人员【{0}】【{1}】,修改已经撤销",signupCollectionisExists.Student.Name,signupCollectionisExists.ExamSubject.Name),
+                            message= string.Format("已有【报名表中】中存在已 【报名】 人员【{0}】【{1}】,修改已经撤销",signupCollectionisExists.Student.Name,signupCollectionisExists.ExamSubject.Name),
                             signupforunitid = signupCollectionisExists.SignUpForUnitId,
                             examsubjectid = signupCollectionisExists.ExamSubjectId,
                             studentid = signupCollectionisExists.StudentId,
