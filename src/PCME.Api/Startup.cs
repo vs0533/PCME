@@ -74,8 +74,8 @@ namespace PCME.Api
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = "http://60.210.113.42:5000";
-                    //options.Authority = "http://localhost:5000";
+                    //options.Authority = "http://60.210.113.42:5000";
+                    options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
                     options.JwtValidationClockSkew = TimeSpan.FromSeconds(0);//过期偏移为零
                     options.ApiName = "api1";

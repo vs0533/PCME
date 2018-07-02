@@ -311,12 +311,36 @@ namespace PCME.Api.Controllers
                 var signupCollectionisExists = signUpCollectionRepository.Query(c => c.StudentId == studentid && c.ExamSubjectId == examsubjectid)
                     .Include(s => s.Student).Include(s => s.ExamSubject)
                     .FirstOrDefault();
+
+                var creditexamisExists_query = from creditexams in context.CreditExams
+                                               join students in context.Students on creditexams.StudentId equals students.Id into left1
+                                               from students in left1.DefaultIfEmpty()
+                                               join examsubjects in context.ExamSubjects on creditexams.SubjectId equals examsubjects.Id into left2
+                                               from examsubjects in left2.DefaultIfEmpty()
+                                               where creditexams.StudentId == studentid && creditexams.SubjectId == examsubjectid
+                                               select new { creditexams, students, examsubjects };
+                if (creditexamisExists_query.Any())
+                {
+                    var existsFirst = creditexamisExists_query.FirstOrDefault();
+                    badRequest.Add(
+                       new
+                       {
+                           message = string.Format("存在已 【合格】 人员【{0}】【{1}】,修改已经撤销", existsFirst.students.Name, existsFirst.examsubjects.Name),
+                           signupforunitid,
+                           examsubjectid = existsFirst.examsubjects.Id,
+                           studentid = existsFirst.students.Id,
+                           studentname = existsFirst.students.Name,
+                           examsubjectname = existsFirst.examsubjects.Name,
+                           idcard = existsFirst.students.IDCard
+                       });
+                }
+
                 if (signupCollectionisExists != null)
                 {
                     badRequest.Add(
                         new
                         {
-                            message= string.Format("存在已报名人员【{0}】【{1}】,修改已经撤销",signupCollectionisExists.Student.Name,signupCollectionisExists.ExamSubject.Name),
+                            message= string.Format("存在已 【报名】 人员【{0}】【{1}】,修改已经撤销",signupCollectionisExists.Student.Name,signupCollectionisExists.ExamSubject.Name),
                             signupforunitid = signupCollectionisExists.SignUpForUnitId,
                             examsubjectid = signupCollectionisExists.ExamSubjectId,
                             studentid = signupCollectionisExists.StudentId,
