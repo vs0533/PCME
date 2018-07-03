@@ -10,7 +10,9 @@ using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
+using PCME.Domain.AggregatesModel.PaperAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
+using PCME.Domain.AggregatesModel.ScientificPayoffsAggregates;
 using PCME.Domain.AggregatesModel.SignUpAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
@@ -58,7 +60,19 @@ namespace PCME.Infrastructure
         public DbSet<AdmissionTicket> AdmissionTickets { get; set; }
         public DbSet<AdmissionTicketLogs> AdmissionTicketLogs { get; set; }
         public DbSet<Book> Books { get; set; }
+
+
+        #region 学分申报类
         public DbSet<CreditExam> CreditExams { get; set; }
+        public DbSet<Paper> PaperAudit { get; set; }
+        public DbSet<AreaLevel> AreaLevels { get; set; }
+        public DbSet<AwardPaperLevel> AwardPaperLevels { get; set; }
+        public DbSet<Periodical> Periodicals { get; set; }
+        public DbSet<PublishType> PublishTypes { get; set; }
+
+        public DbSet<ScientificPayoffsAudit> ScientificPayoffsAudits { get; set; }
+        public DbSet<AwardSPLevel> AwardSPLevels { get; set; }
+        #endregion
 
 
         //private readonly IMediator _mediator;
@@ -96,6 +110,14 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new PlanStatusEntityTypeConfiguration());
             builder.ApplyConfiguration(new AdmissionTicketEntityTypeConfiguration());
             builder.ApplyConfiguration(new CreditExamEntityTypeConfiguration());
+
+            builder.ApplyConfiguration(new AreLevelTypeEntityTypeConfiguration());
+            builder.ApplyConfiguration(new AwardPaperLevelEntityTypeConfiguration());
+            builder.ApplyConfiguration(new AwardSPLevelEntityTypeConfiguration());
+            builder.ApplyConfiguration(new PublishTypeEntityTypeConfiguration());
+
+
+
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
