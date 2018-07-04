@@ -64,13 +64,13 @@ namespace PCME.Infrastructure
 
         #region 学分申报类
         public DbSet<CreditExam> CreditExams { get; set; }
-        public DbSet<Paper> PaperAudit { get; set; }
+        public DbSet<Paper> Paper { get; set; }
         public DbSet<AreaLevel> AreaLevels { get; set; }
         public DbSet<AwardPaperLevel> AwardPaperLevels { get; set; }
         public DbSet<Periodical> Periodicals { get; set; }
         public DbSet<PublishType> PublishTypes { get; set; }
 
-        public DbSet<ScientificPayoffsAudit> ScientificPayoffsAudits { get; set; }
+        public DbSet<ScientificPayoffs> ScientificPayoffs { get; set; }
         public DbSet<AwardSPLevel> AwardSPLevels { get; set; }
         #endregion
 
@@ -115,9 +115,6 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new AwardPaperLevelEntityTypeConfiguration());
             builder.ApplyConfiguration(new AwardSPLevelEntityTypeConfiguration());
             builder.ApplyConfiguration(new PublishTypeEntityTypeConfiguration());
-
-
-
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

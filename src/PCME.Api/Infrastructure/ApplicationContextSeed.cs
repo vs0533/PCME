@@ -6,7 +6,9 @@ using PCME.Domain.AggregatesModel.CreditExamAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
+using PCME.Domain.AggregatesModel.PaperAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
+using PCME.Domain.AggregatesModel.ScientificPayoffsAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
@@ -25,6 +27,7 @@ namespace PCME.Api.Infrastructure
 
     public class ApplicationContextSeed
     {
+
         private Policy CreatePolicy(string prefix, int retries = 3)
         {
             return Policy.Handle<SqlException>().
@@ -124,7 +127,8 @@ namespace PCME.Api.Infrastructure
             return new List<PromoteType>()
             {
                 PromoteType.Exam,
-                PromoteType.Review
+                PromoteType.Review,
+                PromoteType.WaitConfirmation
             };
         }
         private IEnumerable<PlanStatus> GetPredefinedPlanStatus()
@@ -205,6 +209,27 @@ namespace PCME.Api.Infrastructure
                     if (!context.PlanStatus.Any())
                     {
                         context.PlanStatus.AddRange(GetPredefinedPlanStatus());
+                        await context.SaveChangesAsync();
+                    }
+
+                    if (!context.AreaLevels.Any())
+                    {
+                        context.AreaLevels.AddRange(AreaLevel.List());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.AwardPaperLevels.Any())
+                    {
+                        context.AwardPaperLevels.AddRange(AwardPaperLevel.List());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.PublishTypes.Any())
+                    {
+                        context.PublishTypes.AddRange(PublishType.List());
+                        await context.SaveChangesAsync();
+                    }
+                    if (!context.AwardSPLevels.Any())
+                    {
+                        context.AwardSPLevels.AddRange(AwardSPLevel.List());
                         await context.SaveChangesAsync();
                     }
                     #endregion
@@ -366,6 +391,7 @@ namespace PCME.Api.Infrastructure
                         var levels = context.Levels.ToList();
                         var serieses = context.Seriess.ToList();
                         var specialtys = context.Specialtys.ToList();
+                        var promoteType = context.PromoteTypes.ToList();
 
                         List<ProfessionalTitle> ptitles = new List<ProfessionalTitle>();
 
@@ -375,8 +401,8 @@ namespace PCME.Api.Infrastructure
                             Specialty specialty = specialtys.FirstOrDefault(c => c.Name == item.Zy.Trim()) ?? specialtys.FirstOrDefault(c => c.Name == "其他");
                             Level level = levels.FirstOrDefault(c => c.Name == item.ZcJb.Trim()) ?? levels.FirstOrDefault(c => c.Name == "未定");
                             Series series = serieses.FirstOrDefault(c => c.Name == item.ClassNameNavigation?.ClassName.Trim()) ?? serieses.FirstOrDefault(c => c.Name == "其他");
-
-                            ProfessionalTitle ptitle = new ProfessionalTitle(name, specialty, series, level);
+                            PromoteType pt = promoteType.FirstOrDefault(c => c.Name == item.Promotionway.Trim());
+                            ProfessionalTitle ptitle = new ProfessionalTitle(name, specialty, series, level,pt);
                             ptitles.Add(ptitle);
                         }
                         context.ProfessionalTitles.AddRange(ptitles);
@@ -876,6 +902,14 @@ namespace PCME.Api.Infrastructure
                     #endregion
 
                     #region 导入老系统已缴费未合格的报名
+                    //见setup/sql
+                    #endregion
+
+                    #region 导入刊物信息
+                    //见setup/sql
+                    #endregion
+
+                    #region 导入论文总数
                     //见setup/sql
                     #endregion
                 }

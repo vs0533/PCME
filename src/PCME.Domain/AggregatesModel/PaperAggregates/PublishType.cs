@@ -14,7 +14,7 @@ namespace PCME.Domain.AggregatesModel.PaperAggregates
         public static PublishType Compile = new PublishType(1, "编著");
         public static PublishType Treatise = new PublishType(2, "专著");
         public static PublishType Paper = new PublishType(3, "论文");
-        public static PublishType ExchangePaper = new PublishType(4, "交流文论");
+        public static PublishType ExchangePaper = new PublishType(4, "交流论文");
 
         protected PublishType()
         {

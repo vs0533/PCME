@@ -12,9 +12,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20180613121557_init.cs" />
+    <Compile Remove="Migrations\20180620064643_change_examsubjectopeninfo_add_pirce.cs" />
     <Compile Remove="Migrations\20180621022531_addbook.cs" />
+    <Compile Remove="Migrations\20180621022925_addbook.cs" />
     <Compile Remove="Migrations\20180702035528_addcreditexam.cs" />
     <Compile Remove="Migrations\20180702040059_addcreditexam.cs" />
+    <Compile Remove="Migrations\20180702055532_addcreditexam.cs" />
+    <Compile Remove="Migrations\20180703035230_addcreditall.cs" />
+    <Compile Remove="Migrations\20180703035859_addcreditall_removeTagAudit.cs" />
+    <Compile Remove="Migrations\20180703042808_addcreditall.cs" />
+    <Compile Remove="Migrations\20180703075338_addcreditall.cs" />
+    <Compile Remove="Migrations\20180704003944_addcreditall.cs" />
+    <Compile Remove="Migrations\20180704013856_addcreditall.cs" />
+    <Compile Remove="Migrations\20180704015325_addcreditall.cs" />
   </ItemGroup>
 
   <ItemGroup>

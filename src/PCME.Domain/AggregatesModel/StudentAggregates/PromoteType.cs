@@ -9,7 +9,8 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
     {
 		public static PromoteType Review = new PromoteType(1, "评审");
 		public static PromoteType Exam = new PromoteType(2, "考试");
-		public static IEnumerable<PromoteType> List() => new[] { Review, Exam };
+        public static PromoteType WaitConfirmation = new PromoteType(3, "待定");
+        public static IEnumerable<PromoteType> List() => new[] { Review, Exam, WaitConfirmation };
 		public PromoteType()
         {
 
