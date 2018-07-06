@@ -26,6 +26,11 @@
     <Compile Remove="Migrations\20180704003944_addcreditall.cs" />
     <Compile Remove="Migrations\20180704013856_addcreditall.cs" />
     <Compile Remove="Migrations\20180704015325_addcreditall.cs" />
+    <Compile Remove="Migrations\20180704032109_init.cs" />
+    <Compile Remove="Migrations\20180704072729_changepaperandsp_addstudentid.cs" />
+    <Compile Remove="Migrations\20180704125951_addCreditTrain.cs" />
+    <Compile Remove="Migrations\20180704131116_addCreditTrain.cs" />
+    <Compile Remove="Migrations\20180704133316_addCreditTrain.cs" />
   </ItemGroup>
 
   <ItemGroup>

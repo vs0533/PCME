@@ -22,6 +22,10 @@ namespace PCME.Domain.AggregatesModel.ScientificPayoffsAggregates
         public int AuditStateId { get; set; }
         public string AuditAccount { get; set; }
         public int StudentId { get; set; }
+        public ScientificPayoffs()
+        {
+
+        }
 
         public ScientificPayoffs(string name, DateTime complateDate, int areaLevelId, int awardSPLevelId, int joinLevel, float credit, int auditStateId, string auditAccount, int studentId)
         {

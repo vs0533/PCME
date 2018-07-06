@@ -88,11 +88,29 @@ FROM
 	creditHour,
 	joinLevel,
 	fruitName,
-	dbo.Students.Id AS studentid
+	PCME.dbo.Students.Id AS studentid
 	FROM
 	MOPDB.DBO.fruitAudit LEFT JOIN MOPDB.DBO.Person ON Person.personID = fruitAudit.personID
 	LEFT JOIN PCME.DBO.Students ON Students.IDCard = Person.IDCard
 ) AS tb
+
+/*导入学历/培训 类（学员申报）*/
+INSERT INTO PCME.DBO.CreditTrains
+SELECT 
+	AuditAccount,
+	case auditstate
+	when 1 then 1
+	when 2 then 3
+	when 3 then 2
+	end as auditstateid,
+	creditHour,
+	trainPeriod,
+	frontUnit,
+	PCME.dbo.Students.Id AS studentid,
+	trainContent,trainDate,trainType
+	FROM
+	MOPDB.DBO.TrainAudit LEFT JOIN MOPDB.DBO.Person ON Person.personID = TrainAudit.personID
+	LEFT JOIN PCME.DBO.Students ON Students.IDCard = Person.IDCard
 
 
 /* 一些清空表数据

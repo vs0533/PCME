@@ -17,6 +17,10 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         
         public Student Student { get; private set; }
 		public int? StudentId { get; private set; }
+        public ProfessionalInfo()
+        {
+
+        }
 
 		public ProfessionalInfo(int professionalTitleId, DateTime getDate, string education, int promoteTypeId,int? studentId)
 		{

@@ -6,6 +6,7 @@ using PCME.Domain.AggregatesModel.AdmissionTicketLogAggregates;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.BookAggregates;
 using PCME.Domain.AggregatesModel.CreditExamAggregates;
+using PCME.Domain.AggregatesModel.CreditTrainAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
@@ -72,6 +73,8 @@ namespace PCME.Infrastructure
 
         public DbSet<ScientificPayoffs> ScientificPayoffs { get; set; }
         public DbSet<AwardSPLevel> AwardSPLevels { get; set; }
+
+        public DbSet<CreditTrain> CreditTrains { get; set; }
         #endregion
 
 

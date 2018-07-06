@@ -1,11 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
-using IdentityServer4;
 using IdentityServer4.AccessTokenValidation;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using IdentityServer4.Test;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,13 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Newtonsoft.Json.Serialization;
 using PCME.Api.Infrastructure.AutofacModules;
 using PCME.Api.Infrastructure.Filters;
-using PCME.Api.Infrastructure.NewtonsoftResolver;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
-using PCME.Infrastructure.Repositories;
 using PCME.MOPDB;
 using System;
 using System.Collections.Generic;
@@ -74,8 +69,8 @@ namespace PCME.Api
             services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
                 .AddIdentityServerAuthentication(options =>
                 {
-                    //options.Authority = "http://60.210.113.42:5000";
-                    options.Authority = "http://localhost:5000";
+                    options.Authority = "http://60.210.113.42:5000";
+                    //options.Authority = "http://localhost:5000";
                     options.RequireHttpsMetadata = false;
                     options.JwtValidationClockSkew = TimeSpan.FromSeconds(0);//过期偏移为零
                     options.ApiName = "api1";

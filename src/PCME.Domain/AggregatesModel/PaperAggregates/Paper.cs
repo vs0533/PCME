@@ -37,7 +37,10 @@ namespace PCME.Domain.AggregatesModel.PaperAggregates
         public string AuditAccount { get; set; }
         public DateTime PublishDate { get; set; }
         public int StudentId { get; set; }
+        public Paper()
+        {
 
+        }
         public Paper(string name, int awardPaperLevelId, int areaLevelId, int publishTypeId, int? periodicalId, int joinLevel, int joinCount, float credit, int auditStatusId, string auditAccount, DateTime publishDate, int studentId)
         {
             Name = name;
