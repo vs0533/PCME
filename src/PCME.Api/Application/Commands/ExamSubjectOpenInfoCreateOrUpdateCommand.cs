@@ -42,6 +42,9 @@ namespace PCME.Api.Application.Commands
 		[Required(ErrorMessage = "扫描结束时间偏移量必须设置，如果不想设置可以输入0")]
         public int SignUpFinishOffset { get; private set; }
 
+        [Required(ErrorMessage = "扫描时间必须设置")]
+        public DateTime GoToValDateTime { get; private set; }
+
         /// <summary>
         /// 考试开始结束时间 字符串类型 仅用于提示作用
         /// </summary>
@@ -56,7 +59,7 @@ namespace PCME.Api.Application.Commands
         public int? AuditStatusId { get; private set; }
         public decimal Pirce { get; private set; }
 
-        public ExamSubjectOpenInfoCreateOrUpdateCommand(int id, int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce)
+        public ExamSubjectOpenInfoCreateOrUpdateCommand(int id, int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce,DateTime gotoValDateTime)
 		{
 			Id = id;
 			TrainingCenterId = trainingCenterId;
@@ -67,6 +70,7 @@ namespace PCME.Api.Application.Commands
 			DisplayExamTime = displayExamTime;
 			AuditStatusId = auditStatusId;
             Pirce = pirce;
+            GoToValDateTime = gotoValDateTime;
 		}
 
         public void SetTrainingCenter(int trainingCenterId)

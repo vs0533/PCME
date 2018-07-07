@@ -32,6 +32,10 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
         /// <value>The sign up finish offset.</value>
         public int SignUpFinishOffset { get; private set; }
         /// <summary>
+        /// 去培训点扫描的时间
+        /// </summary>
+        public DateTime GoToValDateTime { get; private set; }
+        /// <summary>
         /// 报名费
         /// </summary>
         public decimal Pirce { get; private set; }
@@ -53,7 +57,7 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
 
         }
 
-		public ExamSubjectOpenInfo(int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId,decimal pirce)
+		public ExamSubjectOpenInfo(int trainingCenterId, int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId,decimal pirce,DateTime goToValDateTime)
 		{
 			TrainingCenterId = trainingCenterId;
 			ExamSubjectId = examSubjectId;
@@ -63,9 +67,11 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
 			DisplayExamTime = displayExamTime;
 			AuditStatusId = auditStatusId;
             Pirce = pirce;
-		}
+            GoToValDateTime = goToValDateTime;
 
-		public void Update(int trainingCenterId,int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce)
+        }
+
+		public void Update(int trainingCenterId,int examSubjectId, DateTime signUpTime, DateTime signUpFinishTime, int signUpFinishOffset, string displayExamTime, int auditStatusId, decimal pirce, DateTime goToValDateTime)
 		{
 			TrainingCenterId = trainingCenterId;
 			ExamSubjectId = examSubjectId;
@@ -75,7 +81,8 @@ namespace PCME.Domain.AggregatesModel.ExamOpenInfoAggregates
             DisplayExamTime = displayExamTime;
             AuditStatusId = auditStatusId;
             Pirce = pirce;
-		}
+            GoToValDateTime = goToValDateTime;
+        }
 
 		public void SetTrainingCenter(int trainingCenterId){
 			TrainingCenterId = trainingCenterId;

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
@@ -34,6 +35,26 @@ namespace PCME.Api.Controllers
             workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
             this._mediator = _mediator;
             
+        }
+        [HttpPost]
+        [Route("changepwd")]
+        [Authorize(Roles ="Student")]
+        public async Task<IActionResult> ChangePwd(string oldpwd,string newpwd)
+        {
+            //var req = JsonConvert.DeserializeObject(str);
+            var studentId = int.Parse(User.FindFirstValue("AccountId"));
+            var student = await studentRepository.Query(predicate: c => c.Id == studentId).FirstOrDefaultAsync();
+            if (student == null)
+            {
+                return BadRequest(new { success = false, message = "请登录" });
+            }
+            if (student.Password != oldpwd)
+            {
+                return BadRequest(new { success = false, message = "旧密码不正确" });
+            }
+            student.ChangePwd(newpwd);
+            await unitOfWork.SaveChangesAsync();
+            return Ok(new { success=true,message="修改成功"});
         }
         [HttpPost]
         [Route("read")]

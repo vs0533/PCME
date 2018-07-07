@@ -112,7 +112,14 @@ namespace PCME.Api.Controllers
                 }
             }
 
-            return Ok(search.OrderByDescending(c=>c.Id).Select(c => new { value = c.Id, text = c.Name }));
+            return Ok(
+                search.OrderByDescending(c=>c.Code.Substring(0,2)).ThenBy(c=>c.Code).Select(c => 
+                    new
+                    {
+                        value = c.Id,
+                        text = string.Format("[{0}]{1}", c.Code, c.Name, c.Code.Substring(0, 2))
+                    })
+                );
         }
 
 		[HttpPost]

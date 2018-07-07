@@ -31,6 +31,9 @@
     <Compile Remove="Migrations\20180704125951_addCreditTrain.cs" />
     <Compile Remove="Migrations\20180704131116_addCreditTrain.cs" />
     <Compile Remove="Migrations\20180704133316_addCreditTrain.cs" />
+    <Compile Remove="Migrations\20180707025341_change_examsubjectopeninfo_SignUpFinishOffset.cs" />
+    <Compile Remove="Migrations\20180707030745_drop_examsubjectopeninfo.cs" />
+    <Compile Remove="Migrations\20180707031024_create_examsubjectopeninfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

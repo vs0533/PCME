@@ -27,14 +27,14 @@ namespace PCME.Api.Application.Commands
             if (isExists != null)
             {
                 isExists.Update(request.Num
-                    , request.Num, request.PublishingHouse, request.ExamSubjectId, request.Pirce, request.Discount);
+                    , request.Name, request.PublishingHouse, request.ExamSubjectId, request.Pirce, request.Discount);
                 bookRepository.Update(isExists);
                 await unitOfWork.SaveChangesAsync();
                 return GetShow(isExists.Id);
 
             }
             else {
-                Book book = new Book(request.Num, request.Num, request.PublishingHouse, request.ExamSubjectId, request.Pirce, request.Discount);
+                Book book = new Book(request.Num, request.Name, request.PublishingHouse, request.ExamSubjectId, request.Pirce, request.Discount);
                 await bookRepository.InsertAsync(book);
                 await unitOfWork.SaveChangesAsync();
                 return GetShow(book.Id);

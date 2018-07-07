@@ -49,6 +49,9 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         /// 允许考试次数-生成准考证时会扣减 -1
         /// </summary>
         public int TicketCtr { get; private set; }
+        public void ChangePwd(string newpwd) {
+            Password = newpwd;
+        }
 
         public Student()
         {

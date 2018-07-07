@@ -29,12 +29,14 @@ namespace PCME.Api.Controllers
         private readonly IRepository<SignUpForUnit> signUpForUnitRepository;
         private readonly IRepository<SignUpCollection> signUpCollectionRepository;
         private readonly IRepository<SignUp> signUpRepository;
-        public PrintViewController(IUnitOfWork<ApplicationDbContext> unitOfWork)
+        private readonly ApplicationDbContext context;
+        public PrintViewController(IUnitOfWork<ApplicationDbContext> unitOfWork, ApplicationDbContext context)
         {
             this.unitOfWork = unitOfWork;
             signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
             signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
             signUpRepository = unitOfWork.GetRepository<SignUp>();
+            this.context = context;
         }
         /// <summary>
         /// 单位显示报名表
@@ -52,6 +54,10 @@ namespace PCME.Api.Controllers
             );
             var items = await search.FirstOrDefaultAsync();
 
+            ///取得科目开设信息
+            var examsubjectOpenInfo = context.ExamSubjectOpenInfo.FirstOrDefault(c => c.TrainingCenterId == items.TrainingCenterId);
+
+
             var search_child = signUpCollectionRepository.Query(c => c.SignUpForUnitId == items.Id, include: s => s
                   .Include(c => c.ExamSubject)
                   .Include(c => c.Student)
@@ -66,6 +72,7 @@ namespace PCME.Api.Controllers
                 { "trainingcentername",items.TrainingCenter.Name},
                 { "islock",items.IsLock},
                 { "ispay",items.IsPay},
+                { "gotovaldatetime",examsubjectOpenInfo.GoToValDateTime},
                 { "signupcollectioncount",items_child.Count()},
                 { "signupcollection",items_child.Select(c=>new {
                     id = c.Id,
@@ -182,6 +189,18 @@ namespace PCME.Api.Controllers
             var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var signUpForUnit = await signUpForUnitRepository.Query(c => c.Id == signupforunitid)
                 .FirstOrDefaultAsync();
+
+
+            ///取得科目开设信息
+            var examsubjectOpenInfo = context.ExamSubjectOpenInfo.FirstOrDefault(c => c.TrainingCenterId == loginTrainingCenterId);
+            if (examsubjectOpenInfo == null)
+            {
+                return Ok("未取得任何开设科目信息，报名失败");
+            }
+            if (DateTime.Now > examsubjectOpenInfo.SignUpFinishTime.AddDays(examsubjectOpenInfo.SignUpFinishOffset))
+            {
+                return Ok("当前时间大于报名截止时间了，报名失败");
+            }
 
             if (signUpForUnit == null)
             {
