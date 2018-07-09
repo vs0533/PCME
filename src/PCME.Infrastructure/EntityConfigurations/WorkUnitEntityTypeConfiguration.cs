@@ -16,6 +16,7 @@ namespace PCME.Infrastructure.EntityConfigurations
             builder
                 .HasOne(o => o.Parent)
                 .WithMany(o => o.Childs)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasForeignKey(d=>d.PID);
             
 
@@ -41,6 +42,7 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .WithMany()
                 //.OnDelete(DeleteBehavior.Cascade)
                 .HasForeignKey("WorkUnitNatureId");
+            
                 
         }
     }

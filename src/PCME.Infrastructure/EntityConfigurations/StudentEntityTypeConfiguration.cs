@@ -13,6 +13,7 @@ namespace PCME.Infrastructure.EntityConfigurations
         {
             builder.Property(d => d.TicketCtr)
                 .HasDefaultValue(0);
+            
         }
     }
 }

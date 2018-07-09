@@ -215,7 +215,8 @@ namespace PCME.Api.Controllers
         {
             var id = data["id"].ToObject<int>();
             //var loginid = int.Parse(User.FindFirstValue("id"));
-            var delUnit = await workUnitRepository.FindAsync(id);
+            var delUnit = await _dbContext.WorkUnits.FindAsync(id);
+            //var delUnit = await workUnitRepository.FindAsync(id);
             if (delUnit is null)
             {
                 return Ok(new { message = "该条记录已经被删除" });
@@ -224,15 +225,31 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "系统单位不允许删除" });
             }
-            var delUnit_IsChild = await workUnitRepository.GetFirstOrDefaultAsync(predicate: c => c.PID == delUnit.Id);
+            var delUnit_IsChild = await _dbContext.WorkUnits.FirstOrDefaultAsync(c => c.PID == delUnit.Id);
             if (delUnit_IsChild != null)
             {
                 return Ok(new { message = "存在下级单位不允许删除" });
             }
 
+            var isExistsStudent = await _dbContext.Students.Where(c => c.WorkUnitId == delUnit.Id).AnyAsync();
+            if (isExistsStudent)
+            {
+                return Ok(new { message = "存在人员不允许删除" });
+            }
 
-            workUnitRepository.Delete(delUnit);
-            await unitOfWork.SaveEntitiesAsync();
+
+            //workUnitRepository.Delete(delUnit);
+            _dbContext.WorkUnits.Remove(delUnit);
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                
+                throw;
+            }
+            
             return NoContent();
         }
     }

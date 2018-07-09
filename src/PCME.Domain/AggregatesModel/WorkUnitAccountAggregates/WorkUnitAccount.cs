@@ -24,7 +24,14 @@ namespace PCME.Domain.AggregatesModel.WorkUnitAccountAggregates
         {
 
         }
-
+        public void SetWorkUnitId(int id) {
+            WorkUnitId = id;
+        }
+        public void Update(string passWord, string holderName)
+        {
+            PassWord = passWord ?? throw new ArgumentNullException(nameof(passWord));
+            HolderName = holderName;
+        }
         public WorkUnitAccount(string accountName, int workAccountTypeId,string passWord,string holderName)
         {
             AccountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
