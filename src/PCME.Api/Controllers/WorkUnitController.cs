@@ -112,7 +112,7 @@ namespace PCME.Api.Controllers
         {
             
             var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
-            var id = User.FindFirstValue("AccountId");
+            var id = User.FindFirstValue("WorkUnitId");
             var sqlparameId = new SqlParameter("id", navigate == null ? id : navigate.FieldValue.ToString());
             //var search = workUnitRepository.Query(c => c.Id != 0).Include(s=>s.Parent);
             string sql = @"WITH temp  
