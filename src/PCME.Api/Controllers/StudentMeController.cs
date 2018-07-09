@@ -79,7 +79,7 @@ namespace PCME.Api.Controllers
                 { "address",c.Address},
                 { "email",c.Email},
                 { "birthday",c.BirthDay},
-                { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",c.Photo))}
+                { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",(c.Photo ?? "")))}
             });
             var total = search.Count();
             return Ok(new { total, data = result });

@@ -87,43 +87,50 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 				{
 					case "Student":
 						var student = await GetStudentByName(context.UserName);
-						var studentUnit = await (from c in dbContext.WorkUnits
-												 where c.Id == student.WorkUnitId
-												 select c).FirstOrDefaultAsync();
-						if (student == null)
-						{
-							context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
-						}
-						else
-						{
-							if (!(student.Password == context.Password))
-							{
-								context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "密码不正确");
-							}
-							else
-							{
-								try
-								{
-									context.Result = new GrantValidationResult(
-												subject: student.Name,
-												authenticationMethod: "custom",
-												claims: GetUserClaims(
-													student.Id.ToString(),
-													student.IDCard,
-													student.WorkUnitId.ToString(),
-													studentUnit.Name,
-													student.Name,
-													new string[] { valtype, StudentType.Professional.Name },
-													StudentType.Professional.Id.ToString()
-													)
-											);
-								}
-								catch (Exception ex)
-								{
-									throw new Exception(ex.Message);
-								}
-							}
-						}
+                        if (student == null)
+                        {
+                            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
+                        }
+                        else
+                        {
+                            var studentUnit = await (from c in dbContext.WorkUnits
+                                                     where c.Id == student.WorkUnitId
+                                                     select c).FirstOrDefaultAsync();
+                            if (student == null)
+                            {
+                                context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
+                            }
+                            else
+                            {
+                                if (!(student.Password == context.Password))
+                                {
+                                    context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "密码不正确");
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        context.Result = new GrantValidationResult(
+                                                    subject: student.Name,
+                                                    authenticationMethod: "custom",
+                                                    claims: GetUserClaims(
+                                                        student.Id.ToString(),
+                                                        student.IDCard,
+                                                        student.WorkUnitId.ToString(),
+                                                        studentUnit.Name,
+                                                        student.Name,
+                                                        new string[] { valtype, StudentType.Professional.Name },
+                                                        StudentType.Professional.Id.ToString()
+                                                        )
+                                                );
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        throw new Exception(ex.Message);
+                                    }
+                                }
+                            }
+                        }
 						break;
 					case "Unit":
 						var account = await GetUnitAccountByAccountName(context.UserName);

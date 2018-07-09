@@ -35,7 +35,7 @@ namespace PCME.Api.Controllers
             company.Add("serviceemail", "3447063@qq.com");
             company.Add("servicehomepage", "http://www.zbpe.gov.cn");
 
-            systeminfo.Add("systemname", "继续教育管理系统");
+            systeminfo.Add("systemname", "教育培训管理系统");
             systeminfo.Add("systemversion", "ver 1.0.0.0");
             systeminfo.Add("iconurl", "");
             systeminfo.Add("iconcls", "");

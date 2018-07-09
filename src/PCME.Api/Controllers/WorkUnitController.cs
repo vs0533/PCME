@@ -69,7 +69,7 @@ namespace PCME.Api.Controllers
         }
         [HttpGet]
         [Route("navigatedata")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public IActionResult NavigateData(int? id, int? node)
         {
             node = node == 0 ? null : node;
@@ -107,9 +107,10 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
+            
             var navigate = navigates.ToObject<Navigate>().FirstOrDefault();
             var id = User.FindFirstValue("AccountId");
             var sqlparameId = new SqlParameter("id", navigate == null ? id : navigate.FieldValue.ToString());
@@ -146,9 +147,10 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> Post([FromBody]CreateOrUpdateWorkUnitCommand command,string opertype)
         {
+
             WorkUnit result = null;
             var loginid = int.Parse(User.FindFirstValue("WorkUnitId"));
             
@@ -157,6 +159,7 @@ namespace PCME.Api.Controllers
             {
                 command.NewInitData(loginid,loginobj.Level);
             }
+
             
             var nameExisted = workUnitRepository.GetFirstOrDefault(predicate: c =>
                  c.Name == command.Name && c.Id != command.Id
@@ -164,6 +167,14 @@ namespace PCME.Api.Controllers
             var codeExistend = workUnitRepository.GetFirstOrDefault(predicate: c =>
                 c.Code == command.Code && c.Id != command.Id
             );
+
+            var islevel4 = workUnitRepository.Query(predicate: c=>c.Id == loginid && c.Level ==4).Any();
+
+            if (islevel4)
+            {
+                ModelState.AddModelError("name", "4级单位不允许创建下级单位");
+            }
+
             if (nameExisted != null)
             {
                 ModelState.AddModelError("name", "单位名称存在");
@@ -199,7 +210,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("remove")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();
