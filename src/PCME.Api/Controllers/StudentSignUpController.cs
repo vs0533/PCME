@@ -21,6 +21,15 @@ namespace PCME.Api.Controllers
         {
             this.context = context;
         }
+        /// <summary>
+        /// 未生成准考证的报名
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
         [Route("read")]
         [HttpPost]
         [Authorize(Roles= "Student")]

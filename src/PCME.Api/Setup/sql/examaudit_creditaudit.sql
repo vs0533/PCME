@@ -20,7 +20,7 @@ insert into PCME.dbo.SignUp(createtime,examsubjectid,signupforunitid,studentid,t
 select * from 
 (SELECT 
 trainapply2.CreateDate,
-examsubjects.Code,
+examsubjects.Id,
 null as signupforunitid,
 students.Id as studentid,
 0 as ticketiscreate,

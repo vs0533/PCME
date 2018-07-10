@@ -148,6 +148,11 @@ namespace PCME.Api.Controllers
                 return Ok(new { message = "非本单位账号不允许删除" });
             }
 
+            if (delAccount.WorkUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
+            {
+                return Ok(new { message = "只有具备【单位管理】权限的账号才可进行删除" });
+            }
+
             //workUnitRepository.Delete(delUnit);
             context.WorkUnitAccounts.Remove(delAccount);
             await context.SaveChangesAsync();

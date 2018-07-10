@@ -107,7 +107,7 @@ namespace PCME.Api.Controllers
                 }
                 else if(target == "ExamSubjectOpenInfo")//如果是申请科目访问
                 {
-                    var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c => c.Id);
+                    var isExists = examSubjectOpenInfoRepository.Query(c => c.TrainingCenterId == trainingId).Select(c => c.ExamSubjectId);
                     search = search.Where(c => isExists.Contains(c.Id) != true && c.ExamSubjectStatusId == ExamSubjectStatus.Default.Id);
                 }
             }

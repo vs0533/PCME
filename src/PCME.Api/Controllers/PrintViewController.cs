@@ -180,7 +180,11 @@ namespace PCME.Api.Controllers
             unitOfWork.SaveChanges();
             return Ok(new { message = "解锁定成功", success = true });
         }
-
+        /// <summary>
+        /// 正式报名
+        /// </summary>
+        /// <param name="signupforunitid"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("signupofficial")]
         [Authorize(Roles = "TrainingCenter")]
