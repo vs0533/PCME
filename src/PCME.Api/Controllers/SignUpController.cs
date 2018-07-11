@@ -164,16 +164,19 @@ namespace PCME.Api.Controllers
                                                         .ThenInclude(s => s.OpenType)
                                               .FilterAnd(filter.ToObject<Filter>())
                                               .FilterOr(query.ToObject<Filter>());
+            var search2 = from c in search.ToList()
+                          group c by c.TrainingCenter into g
+                          select new { g.Key.Id,g.Key.Name,g.Key.Address, OpenTypeId = g.Key.OpenType.Name, OpenTypeName = g.Key.OpenType.Name };
+            
 
-
-            var item = search.Skip(start).Take(limit);
+            var item = search2.Skip(start).Take(limit);
             var result = item.ToList().Select(c => new Dictionary<string, object>
                 {
-                    { "id",c.TrainingCenterId},
-                    { "name",c.TrainingCenter.Name},
-                    { "address",c.TrainingCenter?.Address},
-                    { "OpenType.Id",c.TrainingCenter.OpenTypeId},
-                    { "OpenType.Name",c.TrainingCenter.OpenType.Name}
+                    { "id",c.Id},
+                    { "name",c.Name},
+                    { "address",c.Address},
+                    { "OpenType.Id",c.OpenTypeId},
+                    { "OpenType.Name",c.OpenTypeName}
                 });
             var total = search.Count();
             return Ok(new { total, data = result });
