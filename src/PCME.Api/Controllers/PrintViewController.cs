@@ -62,7 +62,7 @@ namespace PCME.Api.Controllers
                   .Include(c => c.ExamSubject)
                   .Include(c => c.Student)
             ).OrderBy(c=>c.ExamSubjectId);
-            var items_child = await search_child.ToListAsync();
+            //var items_child = await search_child.ToListAsync();
 
             var result = new Dictionary<string, object>
             {
@@ -73,8 +73,8 @@ namespace PCME.Api.Controllers
                 { "islock",items.IsLock},
                 { "ispay",items.IsPay},
                 { "gotovaldatetime",examsubjectOpenInfo.GoToValDateTime},
-                { "signupcollectioncount",items_child.Count()},
-                { "signupcollection",items_child.Select(c=>new {
+                { "signupcollectioncount",search_child.Count()},
+                { "signupcollection",search_child.Select(c=>new {
                     id = c.Id,
                     idcard = c.Student.IDCard,
                     studentname = c.Student.Name,
@@ -84,12 +84,49 @@ namespace PCME.Api.Controllers
             };
             try
             {
-                return Ok(new { total = items_child.Count(), data = result });
+                return Ok(new { total = search_child.Count(), data = result });
             }
             catch (Exception)
             {
                 throw;
             }
+        }
+
+        [HttpPost]
+        [Route("book")]
+        [Authorize(Roles ="Unit,TrainingCenter")]
+        public async Task<IActionResult> Book(int signUpForUnitId)
+        {
+            var signUpForUnit = await signUpForUnitRepository.Query(c => c.Id == signUpForUnitId, include: s =>
+              s.Include(c => c.WorkUnit)
+              .Include(c => c.TrainingCenter)
+            ).FirstOrDefaultAsync();
+
+            var signUpCollection = context.SignUpCollections
+                .Include(s => s.ExamSubject)
+                .Include(s => s.Student)
+                .OrderBy(o => o.ExamSubjectId)
+                .Where(c => c.SignUpForUnitId == signUpForUnit.Id);
+
+            var result_linq = from signupcollection in signUpCollection
+                               join book in context.Books on signupcollection.ExamSubjectId equals book.ExamSubjectId into left1
+                               from book in left1.DefaultIfEmpty()
+                               group book by book into g
+                               select new { g.Key.Name,count = g.Count(),sum = g.Sum(c=>c.Pirce) };
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",signUpForUnit.Id},
+                { "code",signUpForUnit.Code},
+                { "workunitname",signUpForUnit.WorkUnit.Name},
+                { "trainingcentername",signUpForUnit.TrainingCenter.Name},
+                { "books",result_linq.Select(c=>new {
+                    name = c.Name,
+                    c.count,
+                    c.sum
+                })}
+            };
+            return Ok(new { total = result.Count(), data = result });
         }
         [Route("qrcode")]
         public IActionResult QRCode(string code)
@@ -136,10 +173,10 @@ namespace PCME.Api.Controllers
               .Include(c => c.TrainingCenter)
             ).FirstOrDefaultAsync();
 
-            var signUpCollection = await signUpCollectionRepository.Query(c => c.SignUpForUnitId == signUpForUnit.Id, include: s => s
+            var signUpCollection = signUpCollectionRepository.Query(c => c.SignUpForUnitId == signUpForUnit.Id, include: s => s
                   .Include(c => c.ExamSubject)
                   .Include(c => c.Student)
-            ).ToListAsync();
+            );//.ToListAsync();
 
             var result = new Dictionary<string, object>
             {

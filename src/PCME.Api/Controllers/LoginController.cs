@@ -30,7 +30,7 @@ namespace PCME.Api.Controllers
             company.Add("telnumber", "0533-2791836");
             company.Add("servicedepartment", "研发部");
             company.Add("servicemen", "技术支持");
-            company.Add("servicetelnumber", "18653311771");
+            company.Add("servicetelnumber", "0533-8795203");
             company.Add("serviceqq", "3447063");
             company.Add("serviceemail", "3447063@qq.com");
             company.Add("servicehomepage", "http://www.zbpe.gov.cn");
