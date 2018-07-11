@@ -178,7 +178,7 @@ namespace PCME.Api.Controllers
                     { "OpenType.Id",c.OpenTypeId},
                     { "OpenType.Name",c.OpenTypeName}
                 });
-            var total = search.Count();
+            var total = search2.Count();
             return Ok(new { total, data = result });
         }
 
