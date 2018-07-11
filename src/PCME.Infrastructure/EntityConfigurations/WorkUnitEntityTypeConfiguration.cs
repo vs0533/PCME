@@ -16,7 +16,7 @@ namespace PCME.Infrastructure.EntityConfigurations
             builder
                 .HasOne(o => o.Parent)
                 .WithMany(o => o.Childs)
-                .OnDelete(DeleteBehavior.SetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasForeignKey(d=>d.PID);
             
 

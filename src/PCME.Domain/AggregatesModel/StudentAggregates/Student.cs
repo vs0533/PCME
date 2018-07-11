@@ -124,7 +124,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         }
 
         public void UpdateWorkUnit(int workUnitId) {
-            WorkUnitId = WorkUnitId;
+            WorkUnitId = workUnitId;
         }
 
         public void ChangeStudentStatus(int statusId) {

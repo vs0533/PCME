@@ -12,14 +12,31 @@ namespace PCME.Domain.AggregatesModel.ChangeStudentUnitAggregates
         public int StudentId { get; private set; }
         public int AuditStatusId { get; private set; }
         public DateTime CreateTime { get; private set; }
-        public DateTime AuditStatusTime { get; private set; }
+        public DateTime? AuditStatusTime { get; private set; }
+        public ChangeStudentUnit()
+        {
 
-        public ChangeStudentUnit(int oldUnitId, int newUnitId, int studentId, int auditStatusId)
+        }
+
+        public ChangeStudentUnit(int oldUnitId, int newUnitId, int studentId, int auditStatusId,DateTime createtime)
         {
             OldUnitId = oldUnitId;
             NewUnitId = newUnitId;
             StudentId = studentId;
             AuditStatusId = auditStatusId;
+            CreateTime = createtime;
+        }
+        public void Update (int oldUnitId, int newUnitId, int studentId, int auditStatusId,DateTime dateTime)
+        {
+            OldUnitId = oldUnitId;
+            NewUnitId = newUnitId;
+            StudentId = studentId;
+            AuditStatusId = auditStatusId;
+            CreateTime = dateTime;
+        }
+        public void Audit(int auditstatusid, DateTime audittime) {
+            AuditStatusId = auditstatusid;
+            AuditStatusTime = audittime;
         }
     }
 }
