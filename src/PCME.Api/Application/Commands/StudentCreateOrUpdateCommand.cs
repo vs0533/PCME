@@ -18,7 +18,7 @@ namespace PCME.Api.Application.Commands
         [StringAndCharacter(ErrorMessage ="不能包含非法字符")]
         public string Name { get; private set; }
         [Required(ErrorMessage ="身份证号必须填写")]
-        [RegularExpression(@"\d{17}[\d|x]|\d{15}", ErrorMessage = "身份证号码格式错误")]
+        [RegularExpression(@"\d{17}[\d|X]", ErrorMessage = "身份证号码格式错误")]
         public string IDCard { get; private set; }
         public Sex Sex { get; private set; }
         [Required(ErrorMessage = "性别必须选择")]

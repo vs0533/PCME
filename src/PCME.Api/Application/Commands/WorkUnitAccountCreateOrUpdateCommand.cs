@@ -31,16 +31,14 @@ namespace PCME.Api.Application.Commands
         {
             Id = id;
         }
-        public WorkUnitAccountCreateOrUpdateCommand()
-        {
-
-        }
+        
         public void SetWorkUnitAccountType(int typeid)
         {
             WorkUnitAccountTypeId = typeid;
         }
-        public WorkUnitAccountCreateOrUpdateCommand(string accountName, int workAccountTypeId, string passWord, string holderName)
+        public WorkUnitAccountCreateOrUpdateCommand(int id,string accountName, int workAccountTypeId, string passWord, string holderName)
         {
+            Id = id;
             AccountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
             WorkUnitAccountTypeId = workAccountTypeId;
             PassWord = passWord ?? throw new ArgumentNullException(nameof(passWord));

@@ -136,27 +136,68 @@ namespace PCME.Api.Controllers
         {
             var id = data["id"].ToObject<int>();
             var workUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var accountId = int.Parse(User.FindFirstValue("AccountId"));
             var delAccount = await context.WorkUnitAccounts.FindAsync(id);
             //var delUnit = await workUnitRepository.FindAsync(id);
             if (delAccount is null)
             {
                 return Ok(new { message = "该条记录已经被删除" });
             }
-
+            if (delAccount.Id == accountId)
+            {
+                return Ok(new { message = "当前登陆帐号不能被删除" });
+            }
             if (delAccount.WorkUnitId != workUnitId)
             {
                 return Ok(new { message = "非本单位账号不允许删除" });
             }
-
             if (delAccount.WorkUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
             {
-                return Ok(new { message = "只有具备【单位管理】权限的账号才可进行删除" });
+                return Ok(new { message = "当前登陆账号不是单位管理员账号 不允许删除！" });
             }
+
+            if (delAccount.WorkUnitAccountTypeId == WorkUnitAccountType.Manager.Id)
+            {
+                return Ok(new { message = "单位管理员账号不允许删除" });
+            }
+            
 
             //workUnitRepository.Delete(delUnit);
             context.WorkUnitAccounts.Remove(delAccount);
             await context.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("downworkunitaccounts")]
+        [Authorize(Roles = "Unit")]
+        public IActionResult DownWorkUnitAccount(int workunitid) {
+            var logworkunitid = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var accounts = context.WorkUnitAccounts.Where(c => c.WorkUnitId == workunitid).Include(s=>s.WorkUnitAccountType);
+            var result = accounts.Select(c => new Dictionary<string, object>
+            {
+                {"id",c.Id},
+                {"AccountName",c.AccountName},
+                {"AccountTypeName",c.WorkUnitAccountType.Name},
+                {"PassWord",c.PassWord}
+            });
+            return Ok(new { total = accounts.Count(), data = result});
+        }
+        [HttpPost]
+        [Route("resetPassword")]
+        [Authorize(Roles = "Unit")]
+        public async Task<IActionResult> ResetPassword([FromBody]JObject data)
+        {
+            int id = (int)data["id"];
+            var account = await context.WorkUnitAccounts.FindAsync(id);
+            if (account == null)
+            {
+                return Ok(new { success = false, message = "重置失败，重置帐号不存在" });
+            }
+            account.ReSetPassWord("123456");
+            context.WorkUnitAccounts.Update(account);
+            context.SaveChanges();
+            return Ok(new { success = true, message = "重置成功" });
         }
     }
 }

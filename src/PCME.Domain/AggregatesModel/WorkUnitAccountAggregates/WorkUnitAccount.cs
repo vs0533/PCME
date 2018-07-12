@@ -39,5 +39,8 @@ namespace PCME.Domain.AggregatesModel.WorkUnitAccountAggregates
             PassWord = passWord ?? throw new ArgumentNullException(nameof(passWord));
             HolderName = holderName;
         }
+        public void ReSetPassWord(string password) {
+            PassWord = password;
+        }
     }
 }
