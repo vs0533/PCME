@@ -16,6 +16,7 @@ using PCME.Domain.AggregatesModel.PaperAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.ScientificPayoffsAggregates;
 using PCME.Domain.AggregatesModel.SignUpAggregates;
+using PCME.Domain.AggregatesModel.SignUpStudentAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
@@ -79,6 +80,8 @@ namespace PCME.Infrastructure
         #endregion
 
         public DbSet<ChangeStudentUnit> ChangeStudentUnit { get; set; }
+        public DbSet<SignUpStudent> SignUpStudent { get; set; }
+        public DbSet<SignUpStudentCollection> SignUpStudentCollection { get; set; }
 
 
         //private readonly IMediator _mediator;
@@ -121,6 +124,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new AwardPaperLevelEntityTypeConfiguration());
             builder.ApplyConfiguration(new AwardSPLevelEntityTypeConfiguration());
             builder.ApplyConfiguration(new PublishTypeEntityTypeConfiguration());
+            builder.ApplyConfiguration(new SignUpStudentEntityTypeConfiguration());
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

@@ -36,6 +36,8 @@
     <Compile Remove="Migrations\20180707031024_create_examsubjectopeninfo.cs" />
     <Compile Remove="Migrations\20180709082323_remove_workunit_student_ondelete.cs" />
     <Compile Remove="Migrations\20180711091728_addchangestudentunit.cs" />
+    <Compile Remove="Migrations\20180718093149_addsignupstudent.cs" />
+    <Compile Remove="Migrations\20180718093448_addsignupstudent.cs" />
   </ItemGroup>
 
   <ItemGroup>

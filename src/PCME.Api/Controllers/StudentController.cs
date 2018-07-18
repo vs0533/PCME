@@ -15,6 +15,7 @@ using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.StudentAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
 
@@ -28,11 +29,13 @@ namespace PCME.Api.Controllers
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<Student> studentRepository;
         private readonly IRepository<WorkUnit> workUnitRepository;
+        private readonly IRepository<WorkUnitAccount> workUnitAccountRepository;
         public StudentController(IUnitOfWork<ApplicationDbContext> unitOfWork, IMediator _mediator)
         {
             this.unitOfWork = unitOfWork;
             studentRepository = unitOfWork.GetRepository<Student>();
             workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
+            workUnitAccountRepository = unitOfWork.GetRepository<WorkUnitAccount>();
             this._mediator = _mediator;
             
         }
@@ -58,10 +61,25 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("read")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var loginAccountId = int.Parse(User.FindFirstValue("AccountId"));
+
+            var account = workUnitAccountRepository.Find(loginAccountId);
+            StudentType studentType = StudentType.Professional;
+            switch (account.WorkUnitAccountTypeId)
+            {
+                case 4:
+                    studentType = StudentType.CivilServant;
+                    break;
+                default:
+                    studentType = StudentType.Professional;
+                    break;
+            }
+
+
             var search = studentRepository.Query(f => f.WorkUnitId == loginUnitId,
                 include: s => s
                  .Include(c => c.StudentType)
@@ -69,7 +87,7 @@ namespace PCME.Api.Controllers
                  .Include(c => c.StudentStatus))
                  .Include(c => c.WorkUnit)
                  .FilterAnd(filter.ToObject<Filter>())
-                 .FilterOr(query.ToObject<Filter>());
+                 .FilterOr(query.ToObject<Filter>()).Where(c=>c.StudentTypeId == studentType.Id);
 
             var item = search.Skip(start).Take(limit);
 
@@ -102,7 +120,7 @@ namespace PCME.Api.Controllers
 
         [HttpPost]
         [Route("saveorupdate")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> Post([FromBody]StudentCreateOrUpdateCommand command, string opertype)
         {
             var loginWorkUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
@@ -152,7 +170,7 @@ namespace PCME.Api.Controllers
         }
         [HttpPost]
         [Route("remove")]
-        [Authorize(Roles = "单位管理员,继续教育培训")]
+        [Authorize(Roles = "Unit")]
         public async Task<IActionResult> Remove([FromBody]JObject data)
         {
             var id = data["id"].ToObject<int>();
