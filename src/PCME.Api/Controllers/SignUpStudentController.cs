@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using PCME.Api.Application.Commands;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
@@ -125,43 +126,6 @@ namespace PCME.Api.Controllers
         }
 
         [HttpPost]
-        [Route("read")]
-        [Authorize(Roles = "Student")]
-        public IActionResult Read(int studentsignupid, int start, int limit, string filter, string query, string navigates)
-        {
-            var studentid = int.Parse(User.FindFirstValue("AccountId"));
-            
-            var search = from signupstudent in context.SignUpStudent.Include(s => s.Collection)
-                        join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
-                        join student in context.Students on signupstudent.StudentId equals student.Id
-                        where signupstudent.StudentId == studentid
-                        select new { signupstudent, trainingcenter, student };
-            if (studentsignupid > 0)
-            {
-                search = search.Where(c => c.signupstudent.Id == studentsignupid);
-            }
-            var items = search.Skip(start).Take(limit);
-            var result = items.Select(c => new Dictionary<string, object>
-            {
-                {"id",c.signupstudent.Id},
-                {"Collection",c.signupstudent.Collection.Join(
-                    context.ExamSubjects,
-                    l=>l.ExamSubjectId,
-                    r=>r.Id,
-                    (l,r)=>new { l,r}
-                    ).Select(s=>new Dictionary<string,object>{
-                    {"examsubjectid",s.l.ExamSubjectId},
-                    {"examsubjectname",s.r.Name}
-                })},
-                {"trainingcenter.Id",c.trainingcenter.Id},
-                {"trainingcenter.Name",c.trainingcenter.Name},
-                {"student.Id",c.student.Id},
-                {"student.Name",c.student.Name},
-                {"student.IDCard",c.student.IDCard}
-            });
-            return Ok(new { total = search.Count(), data = result});
-        }
-        [HttpPost]
         [Route("readcollection")]
         [Authorize(Roles = "Student")]
         public IActionResult ReadCollection(int studentsignupid, int start, int limit, string filter, string query, string navigates)
@@ -206,7 +170,7 @@ namespace PCME.Api.Controllers
         {
             var studentid = int.Parse(User.FindFirstValue("AccountId"));
             command.Id = 0;
-            command.Code = DateTime.Now.ToString("yyyyMMdd") + studentid + command.TrainingCenterId  + DateTime.Now.ToString("HHssmm");
+            command.Code = "P"+DateTime.Now.ToString("yyyyMMdd") + studentid + command.TrainingCenterId  + DateTime.Now.ToString("HHssmm");
             command.StudentId = studentid;
             var isExists = context.SignUpStudentCollection.Include(s => s.SignUpStudent).Where(c =>
               c.SignUpStudent.StudentId == studentid && command.CollectionDTO.Any(a => a.ExamSubjectId == c.ExamSubjectId)
@@ -269,6 +233,38 @@ namespace PCME.Api.Controllers
 
             var result = await mediator.Send(command);
             return Ok(new { success=true});
+        }
+
+        [HttpPost]
+        [Route("remove")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> Remove([FromBody]JObject studentsignupid)
+        {
+            var studentid = int.Parse(User.FindFirstValue("AccountId"));
+            List<dynamic> badRequest = new List<dynamic>();
+            int removeid = (int)(studentsignupid["studentsignupid"]);
+            var removeobj = await context.SignUpStudent.Include(s => s.Collection).FirstOrDefaultAsync(c => c.Id == removeid);
+            if (removeobj == null)
+            {
+                badRequest.Add(new
+                {
+                    message = string.Format("未找到报名表，请刷新该报名表确认是否已被删除")
+                });
+            }
+            if (removeobj.IsPay)
+            {
+                badRequest.Add(new
+                {
+                    message = string.Format("报名表【{0}】已经扫描缴费，不允许删除。", removeobj.Code)
+                });
+            }
+            if (badRequest.Any())
+            {
+                return BadRequest(badRequest);
+            }
+            context.SignUpStudent.Remove(removeobj);
+            await context.SaveChangesAsync();
+            return Ok(new { success = true,message="删除成功"});
         }
     }
 }

@@ -128,6 +128,42 @@ namespace PCME.Api.Controllers
             };
             return Ok(new { total = result.Count(), data = result });
         }
+
+        [HttpPost]
+        [Route("bookStudent")]
+        [Authorize(Roles = "Student,TrainingCenter")]
+        public async Task<IActionResult> BookStudent(int signUpforstudentid)
+        {
+            var signupforstudent = await (from signupstudent in context.SignUpStudent
+                                   join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
+                                   join student in context.Students on signupstudent.StudentId equals student.Id
+                                   where signupstudent.Id == signUpforstudentid
+                                   select new { signupstudent, trainingcenter, student }).FirstOrDefaultAsync();
+
+            var collection = from signupstudentcollection in context.SignUpStudentCollection.Include(s => s.SignUpStudent)
+                             join examsubject in context.ExamSubjects on signupstudentcollection.ExamSubjectId equals examsubject.Id
+                             join book in context.Books on examsubject.Id equals book.ExamSubjectId into books
+                             from book in books.DefaultIfEmpty()
+                             where signupstudentcollection.SignUpStudentId == signUpforstudentid
+                             select new { signupstudentcollection, examsubject,book };
+
+            
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",signupforstudent.signupstudent.Id},
+                { "code",signupforstudent.signupstudent.Code},
+                { "studentname",signupforstudent.student.Name},
+                {"studentidcard",signupforstudent.student.IDCard},
+                { "trainingcentername",signupforstudent.trainingcenter.Name},
+                {"sum",collection.Sum(c=>c.book.Pirce)},
+                { "books",collection.Select(c=>new {
+                    name = c.book == null ? "" : c.book.Name,
+                    Pirce = c.book == null ? 0 : c.book.Pirce
+                })}
+            };
+            return Ok(new { total = result.Count(), data = result });
+        }
         [Route("qrcode")]
         public IActionResult QRCode(string code)
         {
@@ -196,6 +232,54 @@ namespace PCME.Api.Controllers
                 })}
             };
             return Ok(new { total = 1, data = result });
+        }
+
+        /// <summary>
+        /// 培训点扫描报名(个人)
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("readsignupdetailsbyqr_student")]
+        [Authorize(Roles = "TrainingCenter")]
+        public async Task<IActionResult> ReadSignUpForStudentAndSignUpCollectionByQR(string code)
+        {
+            var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+
+            var search = from signupstudent in context.SignUpStudent
+                         join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
+                         join student in context.Students on signupstudent.StudentId equals student.Id
+                         where signupstudent.Code == code && signupstudent.TrainingCenterId == loginTrainingCenterId
+                         select new { signupstudent, trainingcenter, student };
+
+            var items = await search.FirstOrDefaultAsync();
+            
+            var collection = context.SignUpStudentCollection.Where(c => c.SignUpStudentId == items.signupstudent.Id)
+                .Join(context.ExamSubjects, l => l.ExamSubjectId, r => r.Id, (l, r) => new { l, r });
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",items.signupstudent.Id},
+                { "code",items.signupstudent.Code},
+                { "studentname",items.student.Name},
+                { "studentidcard",items.student.IDCard},
+                { "trainingcentername",items.trainingcenter.Name},
+                { "ispay",items.signupstudent.IsPay},
+                { "signupcollectioncount",collection.Count()},
+                { "signupcollection",collection.Select(c=>new {
+                    id = c.l.Id,
+                    examsubjectname = c.r.Name,
+                    signupstudentid = c.l.SignUpStudentId
+                })}
+            };
+            try
+            {
+                return Ok(new { total = collection.Count(), data = result });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
 
         /// <summary>
@@ -269,14 +353,14 @@ namespace PCME.Api.Controllers
             {
                 return Ok("该报名表是空的，并不能进行报名");
             }
-            Dictionary<string, string> exists = new Dictionary<string, string>();
+            List<dynamic> exists = new List<dynamic>();
             List<SignUp> signUps = new List<SignUp>();
             foreach (var item in signUpCollection)
             {
                 var isExists = signUpRepository.Query(c => c.StudentId == item.StudentId && c.ExamSubjectId == item.ExamSubjectId).Any();
                 if (isExists)//如果报名表详情中人员和科目存在正式报名表中了 则添加到存在列表中用于返回客户端显示
                 {
-                    exists.Add(item.Student.Name, item.ExamSubject.Name);
+                    exists.Add(new { studentname = item.Student.Name,examsubjectname= item.ExamSubject.Name });
                 }
                 else//否则添加到正式报名表中 并增加人员生成准考证权限
                 {
@@ -287,7 +371,7 @@ namespace PCME.Api.Controllers
             }
             if (exists.Any())
             {
-                var existsliststr = string.Join("<br >", exists.Select(c => string.Format("姓名:{0} - 科目:{1}", c.Key, c.Value)));
+                var existsliststr = string.Join("<br >", exists.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
                 return Ok(string.Format("报名表中包含已经报名成功的人员<br>{0}", existsliststr));
             }
             //if (!signUps.Any())
@@ -299,6 +383,91 @@ namespace PCME.Api.Controllers
             await signUpRepository.InsertAsync(signUps);
             signUpCollectionRepository.Update(signUpCollection);
             await unitOfWork.SaveChangesAsync();
+            return Ok("报名成功");
+        }
+
+        /// <summary>
+        /// 正式报名(个人)
+        /// </summary>
+        /// <param name="signupforunitid"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("signupofficial_student")]
+        [Authorize(Roles = "TrainingCenter")]
+        public async Task<IActionResult> SignUp_Student(int signupforstudentid)
+        {
+            var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var signUpForStudent = await (from signupstudent in context.SignUpStudent
+                                    join student in context.Students on signupstudent.StudentId equals student.Id
+                                    where signupstudent.Id == signupforstudentid
+                                    select new { signupstudent, student }).FirstOrDefaultAsync();
+            
+            ///取得科目开设信息
+            var examsubjectOpenInfo = context.ExamSubjectOpenInfo.FirstOrDefault(c => c.TrainingCenterId == loginTrainingCenterId);
+            if (examsubjectOpenInfo == null)
+            {
+                return Ok("未取得任何开设科目信息，报名失败");
+            }
+            if (DateTime.Now > examsubjectOpenInfo.SignUpFinishTime.AddDays(examsubjectOpenInfo.SignUpFinishOffset))
+            {
+                return Ok("当前时间大于报名截止时间了，报名失败");
+            }
+
+            if (signUpForStudent == null)
+            {
+                return Ok("未找到报名表");
+            }
+            if (signUpForStudent.signupstudent.IsPay)
+            {
+                return Ok("报名表已经扫描过了");
+            }
+            if (signUpForStudent.signupstudent.TrainingCenterId != loginTrainingCenterId)
+            {
+                return Ok("该报名表不属于该培训点，不能进行表报名");
+            }
+
+            var signUpStudentCollection = await (from signupstudentcollection in context.SignUpStudentCollection
+                                           join examsubject in context.ExamSubjects on signupstudentcollection.ExamSubjectId equals examsubject.Id
+                                           where signupstudentcollection.SignUpStudentId == signUpForStudent.signupstudent.Id
+                                                 select new { signupstudentcollection,examsubject}).ToListAsync();
+
+                                         
+                
+
+            if (!signUpStudentCollection.Any())
+            {
+                return Ok("该报名表是空的，并不能进行报名");
+            }
+            //Dictionary<string, string> exists = new Dictionary<string, string>();
+            List<dynamic> exists = new List<dynamic>();
+            List<SignUp> signUps = new List<SignUp>();
+            foreach (var item in signUpStudentCollection)
+            {
+                var isExists = await context.SignUp.Where(c => c.StudentId == signUpForStudent.signupstudent.StudentId && c.ExamSubjectId == item.signupstudentcollection.ExamSubjectId).AnyAsync();
+                if (isExists)//如果报名表详情中人员和科目存在正式报名表中了 则添加到存在列表中用于返回客户端显示
+                {
+                    exists.Add(new { studentname = signUpForStudent.student.Name, examsubjectname= item.examsubject.Name });
+                }
+                else//否则添加到正式报名表中 并增加人员生成准考证权限
+                {
+                    SignUp signUp = new SignUp(signUpForStudent.signupstudent.StudentId, item.examsubject.Id, null, loginTrainingCenterId, false, DateTime.Now);
+                    signUps.Add(signUp);
+                    signUpForStudent.student.AddaTicketCtr();
+                }
+            }
+            if (exists.Any())
+            {
+                var existsliststr = string.Join("<br >", exists.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
+                return Ok(string.Format("报名表中包含已经报名成功的人员<br>{0}", existsliststr));
+            }
+            //if (!signUps.Any())
+            //{
+            //    return Ok("发生错误，本次表报名失败");
+            //}
+            signUpForStudent.signupstudent.PayToSuccess();
+            context.SignUpStudent.Update(signUpForStudent.signupstudent);
+            await context.SignUp.AddRangeAsync(signUps);
+            await context.SaveChangesAsync();
             return Ok("报名成功");
         }
 

@@ -16,6 +16,13 @@ namespace PCME.Domain.AggregatesModel.SignUpStudentAggregates
         public IReadOnlyCollection<SignUpStudentCollection> Collection => _signUpStudentCollection;
         public bool IsPay{ get; private set; }
 
+        /// <summary>
+        /// 支付置为成功
+        /// </summary>
+        public void PayToSuccess()
+        {
+            IsPay = true;
+        }
         public SignUpStudent()
         {
             _signUpStudentCollection = new List<SignUpStudentCollection>();
