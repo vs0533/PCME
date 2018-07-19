@@ -127,19 +127,21 @@ namespace PCME.Api.Controllers
         [HttpPost]
         [Route("read")]
         [Authorize(Roles = "Student")]
-        public IActionResult Read(int studentsignupid)
+        public IActionResult Read(int studentsignupid, int start, int limit, string filter, string query, string navigates)
         {
             var studentid = int.Parse(User.FindFirstValue("AccountId"));
-            var query = from signupstudent in context.SignUpStudent.Include(s => s.Collection)
+            
+            var search = from signupstudent in context.SignUpStudent.Include(s => s.Collection)
                         join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
                         join student in context.Students on signupstudent.StudentId equals student.Id
                         where signupstudent.StudentId == studentid
                         select new { signupstudent, trainingcenter, student };
             if (studentsignupid > 0)
             {
-                query = query.Where(c => c.signupstudent.Id == studentsignupid);
+                search = search.Where(c => c.signupstudent.Id == studentsignupid);
             }
-            var result = query.Select(c => new Dictionary<string, object>
+            var items = search.Skip(start).Take(limit);
+            var result = items.Select(c => new Dictionary<string, object>
             {
                 {"id",c.signupstudent.Id},
                 {"Collection",c.signupstudent.Collection.Join(
@@ -157,27 +159,32 @@ namespace PCME.Api.Controllers
                 {"student.Name",c.student.Name},
                 {"student.IDCard",c.student.IDCard}
             });
-            return Ok(new { total = result.Count(), data = result.FirstOrDefault() });
+            return Ok(new { total = search.Count(), data = result});
         }
         [HttpPost]
         [Route("readcollection")]
         [Authorize(Roles = "Student")]
-        public IActionResult ReadCollection(int studentsignupid)
+        public IActionResult ReadCollection(int studentsignupid, int start, int limit, string filter, string query, string navigates)
         {
             var studentid = int.Parse(User.FindFirstValue("AccountId"));
-            var query = from signupstudentcollection in context.SignUpStudentCollection
+            var search = from signupstudentcollection in context.SignUpStudentCollection
                         join signupstudent in context.SignUpStudent on signupstudentcollection.SignUpStudentId equals signupstudent.Id
                         join examsubject in context.ExamSubjects on signupstudentcollection.ExamSubjectId equals examsubject.Id
                         join student in context.Students on signupstudent.StudentId equals student.Id
                         join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
                         where signupstudent.StudentId == studentid
+                        orderby signupstudent.CreateTime descending
                         select new { signupstudentcollection, signupstudent, examsubject, student, trainingcenter };
+
+            search = search.FilterAnd(filter.ToObject<Filter>())
+                .FilterOr(query.ToObject<Filter>());
+
             if (studentsignupid > 0)
             {
-                query = query.Where(c => c.signupstudent.Id == studentsignupid);
+                search = search.Where(c => c.signupstudent.Id == studentsignupid);
             }
-            var item = query.ToList();
-            var result = query.Select(c => new Dictionary<string, object>
+            var items = search.Skip(start).Take(limit);
+            var result = items.Select(c => new Dictionary<string, object>
             {
                 {"id",c.signupstudentcollection.Id},
                 {"signupstudent.Code",c.signupstudent.Code},
@@ -190,11 +197,8 @@ namespace PCME.Api.Controllers
                 {"student.Name",c.student.Name},
                 {"student.IDCard",c.student.IDCard}
             });
-            return Ok(new { total = result.Count(), data = result.FirstOrDefault() });
+            return Ok(new { total = search.Count(), data = result });
         }
-
-
-
         [HttpPost]
         [Route("savesignupstudent")]
         [Authorize(Roles = "Student")]
@@ -202,7 +206,7 @@ namespace PCME.Api.Controllers
         {
             var studentid = int.Parse(User.FindFirstValue("AccountId"));
             command.Id = 0;
-            command.Code = DateTime.Now.ToString("yyyyMMddHHssmm") + command.TrainingCenterId + studentid;
+            command.Code = DateTime.Now.ToString("yyyyMMdd") + studentid + command.TrainingCenterId  + DateTime.Now.ToString("HHssmm");
             command.StudentId = studentid;
             var isExists = context.SignUpStudentCollection.Include(s => s.SignUpStudent).Where(c =>
               c.SignUpStudent.StudentId == studentid && command.CollectionDTO.Any(a => a.ExamSubjectId == c.ExamSubjectId)
@@ -264,7 +268,7 @@ namespace PCME.Api.Controllers
             }
 
             var result = await mediator.Send(command);
-            return Ok(result);
+            return Ok(new { success=true});
         }
     }
 }

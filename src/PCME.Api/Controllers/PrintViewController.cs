@@ -302,5 +302,58 @@ namespace PCME.Api.Controllers
             return Ok("报名成功");
         }
 
+
+        /// <summary>
+        /// 个人显示报名表
+        /// </summary>
+        /// <param name="signUpForUnitId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("signupstudent")]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SignUpForStudentAndCollectionView(int signupforstudentid)
+        {
+            var search = from signupstudent in context.SignUpStudent
+                         join trainingcenter in context.TrainingCenter on signupstudent.TrainingCenterId equals trainingcenter.Id
+                         join student in context.Students on signupstudent.StudentId equals student.Id
+                         where signupstudent.Id == signupforstudentid
+                         select new { signupstudent, trainingcenter, student };
+
+            var items = await search.FirstOrDefaultAsync();
+
+            ///取得科目开设信息
+            var examsubjectOpenInfo = context.ExamSubjectOpenInfo.FirstOrDefault(c => c.TrainingCenterId == items.trainingcenter.Id);
+
+            var collection = context.SignUpStudentCollection.Where(c => c.SignUpStudentId == items.signupstudent.Id)
+                .Join(context.ExamSubjects, l => l.ExamSubjectId, r => r.Id, (l, r) => new { l, r });
+            
+            //var items_child = await search_child.ToListAsync();
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",items.signupstudent.Id},
+                { "code",items.signupstudent.Code},
+                { "studentname",items.student.Name},
+                { "studentidcard",items.student.IDCard},
+                { "trainingcentername",items.trainingcenter.Name},
+                { "ispay",items.signupstudent.IsPay},
+                { "gotovaldatetime",examsubjectOpenInfo.GoToValDateTime},
+                { "signupcollectioncount",collection.Count()},
+                { "signupcollection",collection.Select(c=>new {
+                    id = c.l.Id,
+                    examsubjectname = c.r.Name,
+                    signupstudentid = c.l.SignUpStudentId
+                })}
+            };
+            try
+            {
+                return Ok(new { total = collection.Count(), data = result });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
     }
 }
