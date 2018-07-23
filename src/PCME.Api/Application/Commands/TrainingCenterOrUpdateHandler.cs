@@ -31,6 +31,7 @@ namespace PCME.Api.Application.Commands
                     ,request.Name
                     ,request.Address
                     ,request.OpenTypeId
+                    ,request.Tel
                     );
                 await trainingCenterRepository.InsertAsync(tc);
                 await unitOfWork.SaveEntitiesAsync();
@@ -44,6 +45,7 @@ namespace PCME.Api.Application.Commands
                     , request.Name
                     , request.Address
                     ,request.OpenTypeId
+                    ,request.Tel
                     );
                 trainingCenterRepository.Update(idIsExisted);
                 await unitOfWork.SaveEntitiesAsync();

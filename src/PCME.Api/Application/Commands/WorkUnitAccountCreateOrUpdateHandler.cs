@@ -37,7 +37,7 @@ namespace PCME.Api.Application.Commands
             {
                 WorkUnitAccount account = new WorkUnitAccount(request.AccountName, request.WorkUnitAccountTypeId
                     ,request.PassWord,request.HolderName);
-                account.SetWorkUnitId(request.WorkUnitId);
+                account.SetWorkUnitId(request.WorkUnitId ?? 0);
                 await workUnitAccountRepository.InsertAsync(account);
                 await unitOfWork.SaveChangesAsync();
                 return GetShow(account.Id);

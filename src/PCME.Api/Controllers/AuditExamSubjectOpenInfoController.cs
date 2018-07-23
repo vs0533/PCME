@@ -62,7 +62,8 @@ namespace PCME.Api.Controllers
 				    {"signupfinishtime",c.SignUpFinishTime},
 				    {"signupfinishoffset",c.SignUpFinishOffset},
 				    {"displayexamtime",c.DisplayExamTime},
-                    { "pirce",c.Pirce}
+                    { "pirce",c.Pirce},
+                    {"gotovaldatetime",c.GoToValDateTime},
         });
 			var total = search.Count();
 			return Ok(new { total, data = result });
@@ -109,7 +110,8 @@ namespace PCME.Api.Controllers
 					{"signupfinishtime",result.SignUpFinishTime},
 					{"signupfinishoffset",result.SignUpFinishOffset},
 					{"displayexamtime",result.DisplayExamTime},
-                    {"pirce",result.Pirce}
+                    {"pirce",result.Pirce},
+                    {"gotovaldatetime",result.GoToValDateTime},
                 };
                 return Ok(new { success = true, data });
             }

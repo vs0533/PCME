@@ -45,6 +45,9 @@ namespace PCME.Api.Controllers
             }
             var item = query.Select(d => new
             {
+                fieldahead = "workunit",
+                fieldName = "Id",
+                fieldtitle = "单位ID",
                 d.Id,
                 text = d.Name,
                 d.PID,
@@ -109,7 +112,11 @@ namespace PCME.Api.Controllers
             {
                 command.SetWorkUnitAccountType(account.WorkUnitAccountTypeId);
             }
-            command.SetUnitId(account.WorkUnitId);//设置账号所属单位
+            if (command.WorkUnitId == 0)//如果没有导航限定 则设置当前登陆账号所属单位
+            {
+                command.SetUnitId(account.WorkUnitId);//设置账号所属单位
+            }
+            
 
             if (opertype == "new")
             {
@@ -137,8 +144,13 @@ namespace PCME.Api.Controllers
             var id = data["id"].ToObject<int>();
             var workUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
             var accountId = int.Parse(User.FindFirstValue("AccountId"));
+            var curworkunit = await context.WorkUnitAccounts.FindAsync(accountId);
             var delAccount = await context.WorkUnitAccounts.FindAsync(id);
             //var delUnit = await workUnitRepository.FindAsync(id);
+            if (curworkunit is null)
+            {
+                return Ok(new { message = "请登录" });
+            }
             if (delAccount is null)
             {
                 return Ok(new { message = "该条记录已经被删除" });
@@ -147,18 +159,14 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "当前登陆帐号不能被删除" });
             }
-            if (delAccount.WorkUnitId != workUnitId)
+            if (curworkunit.WorkUnitId == delAccount.WorkUnitId && curworkunit.WorkUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
             {
-                return Ok(new { message = "非本单位账号不允许删除" });
-            }
-            if (delAccount.WorkUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
-            {
-                return Ok(new { message = "当前登陆账号不是单位管理员账号 不允许删除！" });
+                return Ok(new { message = "删除本单位账号需要使用单位管理员！" });
             }
 
-            if (delAccount.WorkUnitAccountTypeId == WorkUnitAccountType.Manager.Id)
+            if (delAccount.WorkUnitAccountTypeId != curworkunit.WorkUnitAccountTypeId && curworkunit.WorkUnitAccountTypeId != WorkUnitAccountType.Manager.Id)
             {
-                return Ok(new { message = "单位管理员账号不允许删除" });
+                return Ok(new { message = "当前登陆账号非【"+ WorkUnitAccountType.From(delAccount.WorkUnitAccountTypeId)+"】类型，不允许删除" });
             }
             
 
@@ -198,6 +206,47 @@ namespace PCME.Api.Controllers
             context.WorkUnitAccounts.Update(account);
             context.SaveChanges();
             return Ok(new { success = true, message = "重置成功" });
+        }
+
+        [HttpPost]
+        [Route("changepwd")]
+        [Authorize(Roles = "Unit")]
+        public async Task<IActionResult> ChangePwd(string oldpwd, string newpwd)
+        {
+            //var req = JsonConvert.DeserializeObject(str);
+            var workunitaccountId = int.Parse(User.FindFirstValue("AccountId"));
+            var workUnitAccount = await context.WorkUnitAccounts.FindAsync(workunitaccountId); //await studentRepository.Query(predicate: c => c.Id == studentId).FirstOrDefaultAsync();
+            if (workUnitAccount == null)
+            {
+                return BadRequest(new { success = false, message = "请登录" });
+            }
+            if (workUnitAccount.PassWord != oldpwd)
+            {
+                return BadRequest(new { success = false, message = "旧密码不正确" });
+            }
+            workUnitAccount.ReSetPassWord(newpwd);
+            await context.SaveChangesAsync();
+            return Ok(new { success = true, message = "修改成功" });
+        }
+        [HttpPost]
+        [Route("changepwdadmin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ChangePwdAdmin(string oldpwd, string newpwd)
+        {
+            //var req = JsonConvert.DeserializeObject(str);
+            var workunitaccountId = int.Parse(User.FindFirstValue("AccountId"));
+            var workUnitAccount = await context.WorkUnitAccounts.Where(c=>c.Id == workunitaccountId && c.WorkUnitId == 1).FirstOrDefaultAsync(); //await studentRepository.Query(predicate: c => c.Id == studentId).FirstOrDefaultAsync();
+            if (workUnitAccount == null)
+            {
+                return BadRequest(new { success = false, message = "请登录" });
+            }
+            if (workUnitAccount.PassWord != oldpwd)
+            {
+                return BadRequest(new { success = false, message = "旧密码不正确" });
+            }
+            workUnitAccount.ReSetPassWord(newpwd);
+            await context.SaveChangesAsync();
+            return Ok(new { success = true, message = "修改成功" });
         }
     }
 }

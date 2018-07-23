@@ -27,9 +27,11 @@ namespace PCME.Api.Controllers
         private readonly IRepository<TrainingCenter> trainingCenterRepository;
         private readonly IRepository<ExaminationRoom> examinationRoomRepository;
         private readonly IRepository<SignUpForUnit> signUpForUnitRepository;
-        public TrainingCenterController(IUnitOfWork<ApplicationDbContext> unitOfWork,IMediator _mediator)
+        private readonly ApplicationDbContext context;
+        public TrainingCenterController(ApplicationDbContext context,IUnitOfWork<ApplicationDbContext> unitOfWork,IMediator _mediator)
         {
             this.unitOfWork = unitOfWork;
+            this.context = context;
             trainingCenterRepository = unitOfWork.GetRepository<TrainingCenter>();
             this._mediator = _mediator;
             examinationRoomRepository = unitOfWork.GetRepository<ExaminationRoom>();
@@ -123,7 +125,8 @@ namespace PCME.Api.Controllers
                 { "logpassword",c.LogPassWord},
                 { "address",c.Address},
 				{ "OpenType.Id",c.OpenTypeId},
-                { "OpenType.Name",c.OpenType.Name}
+                { "OpenType.Name",c.OpenType.Name},
+                {"tel",c.Tel}
             });
             var total = search.Count();
             return Ok(new { total, data = result });
@@ -162,7 +165,8 @@ namespace PCME.Api.Controllers
                     { "logpassword",result.LogPassWord},
                     { "address",result.Address},
 					{ "OpenType.Id",result.OpenTypeId},
-					{ "OpenType.Name",result.OpenType.Name}
+					{ "OpenType.Name",result.OpenType.Name},
+                    {"tel",result.Tel}
                 };
                 return Ok(new { success = true, data });
             }
@@ -199,6 +203,27 @@ namespace PCME.Api.Controllers
             trainingCenterRepository.Delete(delTrainingCenter);
             await unitOfWork.SaveEntitiesAsync();
             return NoContent();
+        }
+
+        [HttpPost]
+        [Route("changepwd")]
+        [Authorize(Roles = "TrainingCenter")]
+        public async Task<IActionResult> ChangePwd(string oldpwd, string newpwd)
+        {
+            //var req = JsonConvert.DeserializeObject(str);
+            var trainingcenterid = int.Parse(User.FindFirstValue("AccountId"));
+            var trainingCenter = await context.TrainingCenter.FindAsync(trainingcenterid); //await context.WorkUnitAccounts.FindAsync(workunitaccountId); //await studentRepository.Query(predicate: c => c.Id == studentId).FirstOrDefaultAsync();
+            if (trainingCenter == null)
+            {
+                return BadRequest(new { success = false, message = "请登录" });
+            }
+            if (trainingCenter.LogPassWord != oldpwd)
+            {
+                return BadRequest(new { success = false, message = "旧密码不正确" });
+            }
+            trainingCenter.ReSetPwd(newpwd);
+            await context.SaveChangesAsync();
+            return Ok(new { success = true, message = "修改成功" });
         }
     }
 }

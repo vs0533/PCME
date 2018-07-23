@@ -118,13 +118,20 @@ namespace PCME.Api.Controllers
             string sql = @"WITH temp  
                             AS  
                             (  
-                            SELECT * FROM WorkUnit WHERE id = @id 
+                            SELECT * FROM WorkUnit WHERE id = 1
                             UNION ALL  
                             SELECT m.* FROM WorkUnit  AS m  
                             INNER JOIN temp AS child ON m.PID = child.Id  
                             )  
-                            SELECT * FROM temp";
-            var search = workUnitRepository.FromSql(sql, sqlparameId)
+                            SELECT Id,
+                            ISNULL(Address,'') AS Address,
+                            Code,
+                            ISNULL(Email,'') AS Email,
+                            Level,
+                            ISNULL(LinkMan,'') AS LinkMan,
+                            ISNULL(LinkPhone,'') AS LinkPhone,Name,PID,Version,WorkUnitNatureId FROM temp";
+
+            var search = _dbContext.WorkUnits.FromSql(sql, sqlparameId) // workUnitRepository.FromSql(sql, sqlparameId)
                 .FilterAnd(filter.ToObject<Filter>())
                 .FilterOr(query.ToObject<Filter>());
             var item = search.Skip(start).Take(limit);

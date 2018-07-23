@@ -846,7 +846,7 @@ namespace PCME.Api.Infrastructure
                         {
                             var account = pxdAccount.FirstOrDefault(c => c.UnitID == item.Id);
                             int opentype = item.Type == 2 ? OpenType.CivilServant.Id : OpenType.Professional.Id;
-                            TrainingCenter tc = new TrainingCenter(account?.LogName, account?.LogPassWord, item.PxdName, item.PxdAddress, opentype);
+                            TrainingCenter tc = new TrainingCenter(account?.LogName, account?.LogPassWord, item.PxdName, item.PxdAddress, opentype,"无");
                             trainingCenters.Add(tc);
                         }
                         context.AddRange(trainingCenters);

@@ -80,7 +80,9 @@ namespace PCME.Api.Controllers
                     studentname = c.Student.Name,
                     examsubjectname = c.ExamSubject.Name,
                     signupforunitid = c.SignUpForUnitId
-                })}
+                })},
+                {"address",items.TrainingCenter.Address},
+                {"tel",items.TrainingCenter.Tel}
             };
             try
             {
@@ -124,7 +126,9 @@ namespace PCME.Api.Controllers
                     name = c.Name,
                     c.count,
                     c.sum
-                })}
+                })},
+                {"tel",signUpForUnit.TrainingCenter.Tel},
+                {"address",signUpForUnit.TrainingCenter.Address }
             };
             return Ok(new { total = result.Count(), data = result });
         }
@@ -160,7 +164,9 @@ namespace PCME.Api.Controllers
                 { "books",collection.Select(c=>new {
                     name = c.book == null ? "" : c.book.Name,
                     Pirce = c.book == null ? 0 : c.book.Pirce
-                })}
+                })},
+                {"tel",signupforstudent.trainingcenter.Tel},
+                {"address",signupforstudent.trainingcenter.Address}
             };
             return Ok(new { total = result.Count(), data = result });
         }
@@ -512,7 +518,9 @@ namespace PCME.Api.Controllers
                     id = c.l.Id,
                     examsubjectname = c.r.Name,
                     signupstudentid = c.l.SignUpStudentId
-                })}
+                })},
+                {"address",items.trainingcenter.Address},
+                {"tel",items.trainingcenter.Tel}
             };
             try
             {

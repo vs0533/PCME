@@ -9,7 +9,7 @@ namespace PCME.Api.Infrastructure.Validation
 {
     public class StringAndCharacterAttribute:ValidationAttribute
     {
-        private static Regex regex = new Regex(@"^[A-Za-z0-9|_\u4e00-\u9fa5]+$");
+        private static Regex regex = new Regex(@"^[A-Za-z0-9|_\u4e00-\u9fa5|·]+$");
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)

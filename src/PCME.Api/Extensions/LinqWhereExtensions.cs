@@ -87,6 +87,7 @@ namespace PCME.Api.Extensions
                     //Expression property = Expression.Property(parameter, item.Property);
                     //Expression value = Expression.Constant(item.Value);
                     //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
+
                     exp = exp == null ? contains : Expression.Or(exp, contains);
                 }
                 catch

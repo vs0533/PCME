@@ -30,6 +30,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 			string workUnitId,
 			string workUnitName,
 			string displayName,
+            string parentWorkUnitName,
 			string[] valtype, string accountType)
 		{
 			var claims = new List<Claim>()
@@ -41,6 +42,10 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 				new Claim("DisplayName",displayName),
 				new Claim("AccountType",accountType)
 			};
+            if (!string.IsNullOrEmpty(parentWorkUnitName))
+            {
+                claims.Add(new Claim("ParentWorkUnitName", parentWorkUnitName));
+            }
 			foreach (var item in valtype)
 			{
 				claims.Add(new Claim(JwtClaimTypes.Role, item));
@@ -64,7 +69,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 		private async Task<WorkUnitAccount> GetUnitAccountByAccountName(string username)
 		{
 			var workUnitAccount = await dbContext.WorkUnitAccounts
-				.Include(s => s.WorkUnit)
+				.Include(s => s.WorkUnit).ThenInclude(s=>s.Parent)
 				.FirstOrDefaultAsync(c => c.AccountName == username);
 			return workUnitAccount;
 		}
@@ -95,7 +100,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                         {
                             var studentUnit = await (from c in dbContext.WorkUnits
                                                      where c.Id == student.WorkUnitId
-                                                     select c).FirstOrDefaultAsync();
+                                                     select c).Include(s=>s.Parent).FirstOrDefaultAsync();
                             if (student == null)
                             {
                                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "用户名不存在");
@@ -119,6 +124,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
                                                         student.WorkUnitId.ToString(),
                                                         studentUnit.Name,
                                                         student.Name,
+                                                        studentUnit.Parent == null ? "无" : studentUnit.Parent.Name,
                                                         new string[] { valtype, StudentType.Professional.Name },
                                                         StudentType.Professional.Id.ToString()
                                                         )
@@ -157,6 +163,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 													account.WorkUnit.Id.ToString(),
 													account.WorkUnit.Name,
 													account.WorkUnit.Name,
+                                                    account.WorkUnit.Parent == null ? "" :account.WorkUnit.Parent.Name,
 													new string[] { valtype, WorkUnitAccountType.From(account.WorkUnitAccountTypeId).Name },
 													account.WorkUnitAccountTypeId.ToString()
 													)
@@ -194,6 +201,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 													admin.WorkUnit.Id.ToString(),
 													admin.WorkUnit.Name,
 													admin.WorkUnit.Name,
+                                                    "无",
 													new string[] { valtype, WorkUnitAccountType.From(admin.WorkUnitAccountTypeId).Name },
 													admin.WorkUnitAccountTypeId.ToString()
 													)
@@ -229,6 +237,7 @@ namespace PCME.Api.Infrastructure.ResourceOwnerPasswordValidator
 										            training.Id.ToString(),
                                                     "",
                                                     training.Name,
+                                                    "无",
 													new string[] { valtype },
 													""
 													)

@@ -16,28 +16,36 @@ namespace PCME.Domain.AggregatesModel.TrainingCenterAggregates
         public int OpenTypeId { get; private set; }
 		public OpenType OpenType { get; private set; }
 
+        public string Tel { get; private set; }
 
-		public TrainingCenter()
+
+        public TrainingCenter()
         {
 
         }
 
-        public TrainingCenter(string logname,string logpassword,string name,string address,int openTypeId)
+        public TrainingCenter(string logname,string logpassword,string name,string address,int openTypeId,string tel)
         {
             Name = name;
             LogPassWord = logpassword;
             LogName = logname;
             Address = address;
 			OpenTypeId = openTypeId;
+            Tel = tel;
         }
 
-		public void Update(string logname, string logpassword, string name, string address,int openTypeId)
+		public void Update(string logname, string logpassword, string name, string address,int openTypeId,string tel)
         {
             Name = name;
             LogPassWord = logpassword;
             LogName = logname;
             Address = address;
 			OpenTypeId = openTypeId;
+            Tel = tel;
+        }
+        public void ReSetPwd(string pwd)
+        {
+            LogPassWord = pwd;
         }
     }
 }

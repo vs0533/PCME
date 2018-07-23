@@ -22,7 +22,8 @@ namespace PCME.Api.Application.Commands
         [Required]
         [JsonProperty("workunitaccount.PassWord")]
         public string PassWord { get; private set; }
-        public int WorkUnitId { get; private set; }
+        [JsonProperty("workunit.Id")]
+        public int? WorkUnitId { get; private set; }
         public void SetUnitId(int id)
         {
             WorkUnitId = id;
@@ -36,13 +37,14 @@ namespace PCME.Api.Application.Commands
         {
             WorkUnitAccountTypeId = typeid;
         }
-        public WorkUnitAccountCreateOrUpdateCommand(int id,string accountName, int workAccountTypeId, string passWord, string holderName)
+        public WorkUnitAccountCreateOrUpdateCommand(int id,string accountName, int workAccountTypeId, string passWord, string holderName,int? workunitid)
         {
             Id = id;
             AccountName = accountName ?? throw new ArgumentNullException(nameof(accountName));
             WorkUnitAccountTypeId = workAccountTypeId;
             PassWord = passWord ?? throw new ArgumentNullException(nameof(passWord));
             HolderName = holderName;
+            WorkUnitId = workunitid ?? 0;
         }
         
     }

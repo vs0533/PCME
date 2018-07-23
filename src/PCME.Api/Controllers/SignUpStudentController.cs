@@ -72,7 +72,7 @@ namespace PCME.Api.Controllers
                                               .FilterOr(query.ToObject<Filter>());
             var search2 = from c in search.ToList()
                           group c by c.TrainingCenter into g
-                          select new { g.Key.Id, g.Key.Name, g.Key.Address, OpenTypeId = g.Key.OpenType.Name, OpenTypeName = g.Key.OpenType.Name };
+                          select new { g.Key.Id, g.Key.Name, g.Key.Address, OpenTypeId = g.Key.OpenType.Name, OpenTypeName = g.Key.OpenType.Name,Tel = g.Key.Tel };
 
 
             var item = search2.Skip(start).Take(limit);
@@ -82,7 +82,8 @@ namespace PCME.Api.Controllers
                     { "name",c.Name},
                     { "address",c.Address},
                     { "OpenType.Id",c.OpenTypeId},
-                    { "OpenType.Name",c.OpenTypeName}
+                    { "OpenType.Name",c.OpenTypeName},
+                    {"tel",c.Tel}
                 });
             var total = search2.Count();
             return Ok(new { total, data = result });
@@ -102,6 +103,7 @@ namespace PCME.Api.Controllers
                                                       .Include(s => s.AuditStatus)
                                                       .Include(s => s.ExamSubject)
                                                       .Include(s => s.TrainingCenter)
+                                                      .OrderBy(o=>o.ExamSubject.Code.Substring(0, 2)).ThenBy(t=>t.ExamSubject.Code)
                                               .FilterAnd(filter.ToObject<Filter>())
                                               .FilterOr(query.ToObject<Filter>());
 
@@ -119,7 +121,8 @@ namespace PCME.Api.Controllers
                     {"signuptime",c.SignUpTime},
                     {"signupfinishtime",c.SignUpFinishTime},
                     {"signupfinishoffset",c.SignUpFinishOffset},
-                    {"displayexamtime",c.DisplayExamTime}
+                    {"displayexamtime",c.DisplayExamTime},
+                    {"Pirce",c.Pirce}
                 });
             var total = search.Count();
             return Ok(new { total, data = result });

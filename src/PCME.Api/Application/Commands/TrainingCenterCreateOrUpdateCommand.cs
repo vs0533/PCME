@@ -27,9 +27,11 @@ namespace PCME.Api.Application.Commands
 		[Required(ErrorMessage = "培训点类型必须填写")]
 		[JsonProperty("OpenType.Id")]
         public int OpenTypeId { get; private set; }
+        [Required(ErrorMessage = "培训点联系方式必须填写")]
+        public string Tel { get; private set; }
 
 
-        public TrainingCenterCreateOrUpdateCommand(int id,string logname, string logpassword, string name, string address,int openTypeId)
+        public TrainingCenterCreateOrUpdateCommand(int id,string logname, string logpassword, string name, string address,int openTypeId,string tel)
         {
             Id = id;         
             LogName = logname;
@@ -37,6 +39,7 @@ namespace PCME.Api.Application.Commands
             Name = name;
             Address = address;
 			OpenTypeId = openTypeId;
+            Tel = tel;
         }
 
     }
