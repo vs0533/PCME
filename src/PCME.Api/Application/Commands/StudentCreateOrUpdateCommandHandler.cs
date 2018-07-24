@@ -47,6 +47,7 @@ namespace PCME.Api.Application.Commands
                         , 0, 0
                         , request.WorkUnitId
                         , request.StudentStatusId
+                        ,request.JoinEdu
                     );
                 await studentRepository.InsertAsync(sd);
                 await unitOfWork.SaveEntitiesAsync();
@@ -67,6 +68,7 @@ namespace PCME.Api.Application.Commands
                         , request.Address
                         , request.StudentStatusId
                         , request.Email
+                        ,request.JoinEdu
                     );
                 if ((!string.IsNullOrEmpty(request.Favicon)) && !idIsExisted.EmailIsValid)
                 {

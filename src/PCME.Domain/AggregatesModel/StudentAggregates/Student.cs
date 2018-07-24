@@ -49,6 +49,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         /// 允许考试次数-生成准考证时会扣减 -1
         /// </summary>
         public int TicketCtr { get; private set; }
+        public bool JoinEdu { get; private set; }
         public void ChangePwd(string newpwd) {
             Password = newpwd;
         }
@@ -60,21 +61,21 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
         public Student(string name, string idcard, string password, int studentTypeId, int professionaltitleid, int workUnitId)
             : this(name, idcard, password, Sex.Unknown.Id, studentTypeId, null, string.Empty
                  , string.Empty, null, string.Empty, string.Empty, false,
-                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id)
+                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id,false)
         {
 
         }
-        public Student(string name, string idcard, string password, int sex, int studentTypeId, int professionaltitleid, int workUnitId)
+        public Student(string name, string idcard, string password, int sex, int studentTypeId, int professionaltitleid, int workUnitId,bool joinEdu)
             : this(name, idcard, password, sex, studentTypeId, null, string.Empty
                  , string.Empty, null, string.Empty, string.Empty, false,
-                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id)
+                 string.Empty, false, string.Empty, Decimal.Zero,Decimal.Zero, workUnitId,StudentStatus.Normal.Id,joinEdu)
         {
         }
         public Student(string name, string idcard, string password, int sex, int studentTypeId,
             DateTime? birthDay, string graduationSchool, string specialty,
             DateTime? workdate, string officeName, string photo, bool photoIsValid,
             string email, bool emailIsValid, string address, decimal balanceActual,decimal balanceVirtual,
-            int workUnitId,int studentStatus
+            int workUnitId,int studentStatus,bool joinEdu
             )
         {
             StudentTypeId = StudentType.From(studentTypeId).Id;
@@ -96,12 +97,13 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             BalanceVirtual = balanceVirtual;
             WorkUnitId = workUnitId;
             StudentStatusId = studentStatus;
+            JoinEdu = joinEdu;
         }
 
         public void Update(string name, string password, int sex, int studentTypeId,
             DateTime? birthDay, string graduationSchool, string specialty,
             DateTime? workdate, string officeName,
-            string address, int studentStatus,string email
+            string address, int studentStatus,string email,bool joinEdu
             )
         {
             StudentTypeId = StudentType.From(studentTypeId).Id;
@@ -117,6 +119,7 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
             //EmailIsValid = EmailIsValid;
             Address = address;
             StudentStatusId = studentStatus;
+            JoinEdu = joinEdu;
         }
         public void UpdatePhoto(string photo,bool photoIsValid) {
             Photo = photo;

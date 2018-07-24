@@ -233,7 +233,7 @@ namespace PCME.Api.Controllers
                                                       .Include(s => s.AuditStatus)
                                                       .Include(s => s.ExamSubject)
                                                       .Include(s => s.TrainingCenter)
-                                                      .OrderBy(o => o.ExamSubject.Code.Substring(0, 2)).ThenBy(t => t.ExamSubject.Code)
+                                                      .OrderByDescending(o => o.ExamSubject.Code.Substring(0, 2)).ThenBy(t => t.ExamSubject.Code)
                                               .FilterAnd(filter.ToObject<Filter>())
                                               .FilterOr(query.ToObject<Filter>());
 
@@ -245,6 +245,7 @@ namespace PCME.Api.Controllers
                     {"AuditStatus.Id",c.AuditStatusId},
                     {"AuditStatus.Name",c.AuditStatus.Name},
                     {"ExamSubject.Id",c.ExamSubjectId},
+                    {"ExamSubject.Code",c.ExamSubject.Code},
                     {"ExamSubject.Name",c.ExamSubject.Name},
                     {"TrainingCenter.Name",c.TrainingCenter.Name},
                     {"TrainingCenter.Id",c.TrainingCenterId},

@@ -13,7 +13,8 @@ namespace PCME.Infrastructure.EntityConfigurations
         {
             builder.Property(d => d.TicketCtr)
                 .HasDefaultValue(0);
-            
+
+            builder.Property(p => p.JoinEdu).HasDefaultValue(false);
         }
     }
 }

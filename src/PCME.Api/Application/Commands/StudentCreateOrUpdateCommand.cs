@@ -59,12 +59,13 @@ namespace PCME.Api.Application.Commands
         [Required(ErrorMessage = "学员状态必须选择")]
         [JsonProperty("StudentStatus.Id")]
         public int StudentStatusId { get; private set; }
+        public bool JoinEdu { get; private set; }
         public void SetPhoto(string photo) {
             Photo = photo;
         }
         public StudentCreateOrUpdateCommand(int id, string name, string iDCard, int sexId, int studentTypeId,
             string password, DateTime? birthDay, string graduationSchool, string specialty,
-            DateTime? workDate, string officeName,  string email, string address, int workUnitId, int studentStatusId, string favicon)
+            DateTime? workDate, string officeName,  string email, string address, int workUnitId, int studentStatusId, string favicon,bool joinEdu)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -82,6 +83,7 @@ namespace PCME.Api.Application.Commands
             WorkUnitId = workUnitId;
             StudentStatusId = studentStatusId;
             Favicon = favicon;
+            JoinEdu = joinEdu;
         }
 
         public void SetWorkUnitId(int workUnitId) {

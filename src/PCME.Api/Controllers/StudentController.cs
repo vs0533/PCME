@@ -111,7 +111,8 @@ namespace PCME.Api.Controllers
                 { "WorkUnit.Name",c.WorkUnit.Name},
                 { "address",c.Address},
                 { "email",c.Email},
-                { "birthday",c.BirthDay}
+                { "birthday",c.BirthDay},
+                {"joinedu",c.JoinEdu }
             });
             var total = search.Count();
             return Ok(new { total, data = result });
@@ -161,7 +162,8 @@ namespace PCME.Api.Controllers
                     { "WorkUnit.Name",result.WorkUnit.Name},
                     { "address",result.Address},
                     { "email",result.Email},
-                    { "birthday",result.BirthDay}
+                    { "birthday",result.BirthDay},
+                    {"joinedu",result.JoinEdu}
                 };
                 return Ok(new { success = true, data });
             }

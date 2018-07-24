@@ -682,7 +682,7 @@ namespace PCME.Api.Infrastructure
                                 , item.Password.Trim()
                                 , sex, typeId, item.Birthday, item.GraduateSchool, item.GraduateSpecialty, item.WorkDate
                                 , officestr, pho?.PhotoUrl, photoisVal
-                                , item.Email, false, item.Address, mA, mV, pid, StudentStatus.Normal.Id
+                                , item.Email, false, item.Address, mA, mV, pid, StudentStatus.Normal.Id,false
                                 );
 
                             lock (thisLock)

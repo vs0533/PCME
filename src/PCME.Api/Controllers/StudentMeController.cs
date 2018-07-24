@@ -79,7 +79,8 @@ namespace PCME.Api.Controllers
                 { "address",c.Address},
                 { "email",c.Email},
                 { "birthday",c.BirthDay},
-                { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",(c.Photo ?? "")))}
+                { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",(c.Photo ?? "")))},
+                {"joinedu",c.JoinEdu}
             });
             var total = search.Count();
             return Ok(new { total, data = result });
@@ -133,7 +134,9 @@ namespace PCME.Api.Controllers
                     { "address",result.Address},
                     { "email",result.Email},
                     { "birthday",result.BirthDay},
-                    { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",result.Photo))}
+                    { "favicon",ImageHelper.ImgToBase64String(Path.Combine(hostingEnv.WebRootPath,"Files",result.Photo))},
+                    {"joinedu",result.JoinEdu}
+                    
                 };
                 return Ok(new { success = true, data });
             }
