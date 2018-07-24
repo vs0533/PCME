@@ -118,7 +118,7 @@ namespace PCME.Api.Controllers
             string sql = @"WITH temp  
                             AS  
                             (  
-                            SELECT * FROM WorkUnit WHERE id = 1
+                            SELECT * FROM WorkUnit WHERE id = @id
                             UNION ALL  
                             SELECT m.* FROM WorkUnit  AS m  
                             INNER JOIN temp AS child ON m.PID = child.Id  

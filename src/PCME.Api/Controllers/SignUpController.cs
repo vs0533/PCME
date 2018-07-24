@@ -81,7 +81,7 @@ namespace PCME.Api.Controllers
             
 
             var search = studentRepository.Query(f =>
-                f.WorkUnitId == loginUnitId && f.StudentStatusId == StudentStatus.Normal.Id && f.StudentTypeId == type.Id,
+                (f.WorkUnitId == loginUnitId && f.StudentStatusId == StudentStatus.Normal.Id && (f.StudentTypeId == type.Id || f.JoinEdu == true)),
                 include: s => s
                  .Include(c => c.StudentType)
                  .Include(c => c.Sex)
