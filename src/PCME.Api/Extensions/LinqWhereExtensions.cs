@@ -46,20 +46,10 @@ namespace PCME.Api.Extensions
 
             ParameterExpression parameter = Expression.Parameter(typeof(TSource), "s");
             Expression exp = null;
-            //var plist = parameter.Type.GetRuntimeProperties().ToDictionary(z => z.Name);
             foreach (var item in filter)
             {
-                try
-                {
-                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Operator, item.Property, item.Value);
-                    //Expression property = Expression.Property(parameter, item.Property);
-                    //Expression value = Expression.Constant(item.Value);
-                    //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
-                    exp = exp == null ? contains : Expression.And(exp, contains);
-                }
-                catch (Exception ex)
-                {
-                }
+                var contains = GetMemberExpression(parameter, typeof(TSource), item.Operator, item.Property, item.Value);
+                exp = exp == null ? contains : Expression.And(exp, contains);
             }
             if (exp != null)
             {
@@ -78,21 +68,10 @@ namespace PCME.Api.Extensions
 
             ParameterExpression parameter = Expression.Parameter(typeof(TSource), "s");
             Expression exp = null;
-            //var plist = parameter.Type.GetRuntimeProperties().ToDictionary(z => z.Name);
             foreach (var item in filter)
             {
-                try
-                {
-                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
-                    //Expression property = Expression.Property(parameter, item.Property);
-                    //Expression value = Expression.Constant(item.Value);
-                    //Expression contains = Expression.Call(property, "Contains", null, new Expression[] { value });
-
-                    exp = exp == null ? contains : Expression.Or(exp, contains);
-                }
-                catch
-                {
-                }
+                var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
+                exp = exp == null ? contains : Expression.Or(exp, contains);
             }
             if (exp != null)
             {
@@ -117,22 +96,6 @@ namespace PCME.Api.Extensions
                 return contains;
             }
             baseTypeName = t.GetProperty(split[0]).PropertyType.BaseType.Name;
-            //if (baseTypeName == "Enumeration")
-            //{
-            //    exp_property = Expression.Property(left, split[0] + "Id");
-
-            //    var p_enumeration = t.GetProperty(split[0]);
-            //    var p = p_enumeration.PropertyType;
-            //    var instance = t.Assembly.CreateInstance(p.FullName);
-            //    var method = p.GetMethod("FromName");
-            //    dynamic obj = method.Invoke(instance, new object[] { value });
-            //    var result = obj.Id;
-
-            //    exp_value = Expression.Constant(result);
-
-            //    Expression contains = Expression.Equal(exp_property, exp_value);
-            //    return contains;
-            //}
             if (baseTypeName == "Entity" || baseTypeName == "Enumeration")
             {
                 var p = t.GetProperty(split[0]);
@@ -172,22 +135,6 @@ namespace PCME.Api.Extensions
                 return contains;
             }
             baseTypeName = t.GetProperty(split[0]).PropertyType.BaseType.Name;
-            //if (baseTypeName == "Enumeration")
-            //{
-            //    exp_property = Expression.Property(left, split[0] + "Id");
-
-            //    var p_enumeration = t.GetProperty(split[0]);
-            //    var p = p_enumeration.PropertyType;
-            //    var instance = t.Assembly.CreateInstance(p.FullName);
-            //    var method = p.GetMethod("FromName");
-            //    dynamic obj = method.Invoke(instance, new object[] { value });
-            //    var result = obj.Id;
-
-            //    exp_value = Expression.Constant(result);
-
-            //    Expression contains = Expression.Equal(exp_property, exp_value);
-            //    return contains;
-            //}
             if (baseTypeName == "Entity" || baseTypeName == "Enumeration")
             {
                 var p = t.GetProperty(split[0]);

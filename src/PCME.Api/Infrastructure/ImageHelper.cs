@@ -33,7 +33,7 @@ namespace PCME.Api.Infrastructure
                 }
                 return base64;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }
@@ -60,7 +60,7 @@ namespace PCME.Api.Infrastructure
                     ms.Close();
                 }
             }
-            catch (Exception ex)
+            catch
             {
 
             }

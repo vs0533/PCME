@@ -1,20 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using PCME.Api.Application.Commands;
+using PCME.Api.Application.ParameBinder;
+using PCME.Api.Extensions;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PCME.Api.Extensions;
-using PCME.Api.Application.ParameBinder;
-using System.Data.SqlClient;
-using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
-using Microsoft.EntityFrameworkCore;
-using PCME.Api.Application.Commands;
-using MediatR;
-using Newtonsoft.Json.Linq;
 
 namespace PCME.Api.Controllers
 {

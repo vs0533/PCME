@@ -251,7 +251,7 @@ namespace PCME.Api.Controllers
             {
                 await _dbContext.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 
                 throw;

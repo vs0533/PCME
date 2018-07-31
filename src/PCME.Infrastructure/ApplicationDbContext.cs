@@ -8,6 +8,7 @@ using PCME.Domain.AggregatesModel.BookAggregates;
 using PCME.Domain.AggregatesModel.ChangeStudentUnitAggregates;
 using PCME.Domain.AggregatesModel.CreditExamAggregates;
 using PCME.Domain.AggregatesModel.CreditTrainAggregates;
+using PCME.Domain.AggregatesModel.ExaminationRoomAccountAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
@@ -83,6 +84,8 @@ namespace PCME.Infrastructure
         public DbSet<SignUpStudent> SignUpStudent { get; set; }
         public DbSet<SignUpStudentCollection> SignUpStudentCollection { get; set; }
 
+        public DbSet<ExaminationRoomAccount> ExaminationRoomAccount { get; set; }
+
 
         //private readonly IMediator _mediator;
 
@@ -125,6 +128,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new AwardSPLevelEntityTypeConfiguration());
             builder.ApplyConfiguration(new PublishTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new SignUpStudentEntityTypeConfiguration());
+            builder.ApplyConfiguration(new ExaminationRoomAccountEntityTypeConfiguration());
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
