@@ -105,6 +105,13 @@ namespace PCME.Api
                     },
                         ServiceLifetime.Scoped  //Showing explicitly that the DbContext is shared across the HTTP request scope (graph of objects started in the HTTP request)
                     )
+                    .AddDbContext<VideoDbContext>(options =>
+                    {
+                        options.UseSqlServer(Configuration["ConnectionString_Video"]);
+                    })
+                    .AddDbContext<TestDBContext>(options=> {
+                        options.UseSqlServer(Configuration["ConnectionString_Test"]);
+                    })
                     .AddDbContext<MOPDBContext>()
                     .AddUnitOfWork<ApplicationDbContext>().AddUnitOfWork<MOPDBContext>();
 

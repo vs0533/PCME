@@ -10,6 +10,7 @@ using PCME.Domain.AggregatesModel.PaperAggregates;
 using PCME.Domain.AggregatesModel.ProfessionalTitleAggregates;
 using PCME.Domain.AggregatesModel.ScientificPayoffsAggregates;
 using PCME.Domain.AggregatesModel.StudentAggregates;
+using PCME.Domain.AggregatesModel.TestAggregates;
 using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
@@ -146,7 +147,7 @@ namespace PCME.Api.Infrastructure
         #endregion
 
 
-        public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
+        public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext,TestDBContext testcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
         {
             var policy = CreatePolicy(nameof(ApplicationContextSeed));
 
@@ -231,6 +232,11 @@ namespace PCME.Api.Infrastructure
                     {
                         context.AwardSPLevels.AddRange(AwardSPLevel.List());
                         await context.SaveChangesAsync();
+                    }
+                    if (!testcontext.TestType.Any())
+                    {
+                        testcontext.TestType.AddRange(TestType.List());
+                        await testcontext.SaveChangesAsync();
                     }
                     #endregion
                     #region 字典表初始化数据
@@ -912,6 +918,8 @@ namespace PCME.Api.Infrastructure
                     #region 导入论文总数
                     //见setup/sql
                     #endregion
+
+                    
                 }
             });
 
