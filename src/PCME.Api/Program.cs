@@ -14,6 +14,7 @@ using PCME.CustomWebHost;
 using Microsoft.Extensions.Options;
 using PCME.Api.Infrastructure.AutoMapperMapping;
 using PCME.MOPDB;
+using PCME.KSDB;
 
 namespace PCME.Api
 {
@@ -29,12 +30,14 @@ namespace PCME.Api
                             //    var env = services.GetService<IHostingEnvironment>();
                             //    var settings = services.GetService<IOptions<ApplicationSettings>>();
                             //    var mopdbcontext = services.GetService<MOPDBContext>();
+                            //    var ksdbcontext = services.GetService<KSDBContext>();
+                            //    var testcontext = services.GetService<TestDBContext>();
                             //    //var logger = services.GetService<ILogger<OrderingContextSeed>>();
 
                             //    try
                             //    {
                             //        new ApplicationContextSeed()
-                            //            .SeedAsync(context, mopdbcontext, env, settings)
+                            //            .SeedAsync(context, mopdbcontext, testcontext, ksdbcontext, env, settings)
                             //            .Wait();
                             //    }
                             //    catch (Exception ex)

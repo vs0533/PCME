@@ -14,7 +14,7 @@ namespace PCME.Domain.AggregatesModel.TestAggregates
     {
         public string Title { get; private set; }
         public string CategoryCode { get; private set; }
-        public readonly List<TestPaper> testPaper;
+        private readonly List<TestPaper> testPaper;
         public IReadOnlyCollection<TestPaper> TestPaper => testPaper;
 
         public TestConfig()

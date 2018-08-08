@@ -18,6 +18,10 @@ namespace PCME.Infrastructure.EntityConfigurations
                 .HasDefaultValue(1)
                 .ValueGeneratedNever()
                 .IsRequired();
+
+            builder.Property(o => o.Name)
+                .HasMaxLength(200)
+                .IsRequired();
         }
     }
 }

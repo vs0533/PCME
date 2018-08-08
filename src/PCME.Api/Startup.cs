@@ -16,6 +16,7 @@ using PCME.Api.Infrastructure.AutofacModules;
 using PCME.Api.Infrastructure.Filters;
 using PCME.Api.Infrastructure.ResourceOwnerPasswordValidator;
 using PCME.Infrastructure;
+using PCME.KSDB;
 using PCME.MOPDB;
 using System;
 using System.Collections.Generic;
@@ -113,6 +114,7 @@ namespace PCME.Api
                         options.UseSqlServer(Configuration["ConnectionString_Test"]);
                     })
                     .AddDbContext<MOPDBContext>()
+                    .AddDbContext<KSDBContext>()
                     .AddUnitOfWork<ApplicationDbContext>().AddUnitOfWork<MOPDBContext>();
 
             services.Configure<ApplicationSettings>(Configuration);

@@ -15,6 +15,8 @@ using PCME.Domain.AggregatesModel.TrainingCenterAggregates;
 using PCME.Domain.AggregatesModel.UnitAggregates;
 using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
 using PCME.Infrastructure;
+using PCME.KSDB;
+//using PCME.KSDB;
 using PCME.MOPDB;
 using Polly;
 using System;
@@ -147,7 +149,7 @@ namespace PCME.Api.Infrastructure
         #endregion
 
 
-        public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext,TestDBContext testcontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
+        public async Task SeedAsync(ApplicationDbContext context, MOPDBContext mopcontext,TestDBContext testcontext,KSDBContext kscontext, IHostingEnvironment env, IOptions<ApplicationSettings> settings)
         {
             var policy = CreatePolicy(nameof(ApplicationContextSeed));
 
@@ -919,7 +921,41 @@ namespace PCME.Api.Infrastructure
                     //见setup/sql
                     #endregion
 
-                    
+                    #region 导入题库
+                    if (!testcontext.TestLibrary.Any())
+                    {
+                        IReadOnlyCollection<Test> testItem = await kscontext.Test.ToListAsync();
+                        List<TestLibrary> testLibrary = new List<TestLibrary>();
+                        foreach (var item in testItem)
+                        {
+                            TestType type = TestType.ShortAnswerQuestion;
+                            switch (item.Type)
+                            {
+                                case 1:
+                                    type = TestType.GapFilling;
+                                    break;
+                                case 2:
+                                    type = TestType.SingleChoice;
+                                    break;
+                                case 3:
+                                    type = TestType.MultipleChoice;
+                                    break;
+                                case 4:
+                                    type = TestType.TrueOrFalse;
+                                    break;
+                                case 5:
+                                    type = TestType.ShortAnswerQuestion;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            TestLibrary library = new TestLibrary(item.Topic, item.SelectItem, item.Answer, item.SubjectId, type.Id, false);
+                            testLibrary.Add(library);
+                        }
+                        await testcontext.TestLibrary.AddRangeAsync(testLibrary);
+                        await testcontext.SaveChangesAsync();
+                    }
+                    #endregion
                 }
             });
 

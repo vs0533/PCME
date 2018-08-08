@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +8,31 @@ namespace PCME.Api.Extensions
 {
     public static class LinqSelectExtensions
     {
+
+        #region 功能方法
+        /// <summary>
+        /// 在linq to entity中使用SqlServer.NEWID函数
+        /// </summary>
+        [DbFunction("SqlServer", "NEWID")]
+        public static Guid NewId()
+        {
+            return Guid.NewGuid();
+        }
+        #endregion
+
+        #region 扩展方法
+        /// <summary>
+        /// 随机排序扩展方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static IQueryable<T> OrderByNewId<T>(this IEnumerable<T> source)
+        {
+            return source.AsQueryable().OrderBy(d => NewId());
+        }
+        #endregion
+
         public static IEnumerable<SelectTryResult<TSource, TResult>> SelectTry<TSource, TResult>(this IEnumerable<TSource> enumerable, Func<TSource, TResult> selector)
         {
             foreach (TSource element in enumerable)

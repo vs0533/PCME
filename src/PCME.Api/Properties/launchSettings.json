@@ -19,7 +19,7 @@
     "PCME.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "api/1",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
