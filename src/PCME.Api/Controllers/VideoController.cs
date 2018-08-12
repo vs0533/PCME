@@ -40,7 +40,8 @@ namespace PCME.Api.Controllers
                 {"id",c.video.Id},
                 {"name",c.video.Name},
                 {"image",c.video.Image},
-                {"collection",c.videocollection}
+                {"collection",c.videocollection},
+                {"examsubjectid",c.video.ExamSubjectId}
             });
 
             return Ok(new { data = result });

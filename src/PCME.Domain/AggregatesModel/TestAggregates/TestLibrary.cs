@@ -23,6 +23,8 @@ namespace PCME.Domain.AggregatesModel.TestAggregates
         public int orderby { get; set; }
         [NotMapped]
         public float score { get; set; }
+        [NotMapped]
+        public string answer { get; set; }
 
         public TestLibrary()
         {
