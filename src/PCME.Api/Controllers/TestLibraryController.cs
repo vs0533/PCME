@@ -67,8 +67,10 @@ namespace PCME.Api.Controllers
 
         [Route("save")]
         [HttpPost]
-        public IActionResult Save([FromBody]string s) {
-            return Ok(new { success = true,data=s });
+        public IActionResult Save([FromBody]JObject obj) {
+            var score = obj["score"];
+            var examsubjectid = obj["examsubject"];
+            return Ok(new { success = true,data=score,examsubjectid });
         }
     }
 }
