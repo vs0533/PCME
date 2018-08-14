@@ -45,6 +45,8 @@
     <Compile Remove="Migrations\TestDB\20180808075906_init.cs" />
     <Compile Remove="Migrations\TestDB\20180808080509_init.cs" />
     <Compile Remove="Migrations\TestDB\20180808081307_init.cs" />
+    <Compile Remove="Migrations\TestDB\20180808081513_init.cs" />
+    <Compile Remove="Migrations\TestDB\20180814031002_addhomeworkresult.cs" />
   </ItemGroup>
 
   <ItemGroup>

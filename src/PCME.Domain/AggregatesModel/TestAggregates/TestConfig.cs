@@ -14,6 +14,14 @@ namespace PCME.Domain.AggregatesModel.TestAggregates
     {
         public string Title { get; private set; }
         public string CategoryCode { get; private set; }
+        /// <summary>
+        /// 次数
+        /// </summary>
+        public int Ctr { get; private set; }
+        /// <summary>
+        /// 考试分钟
+        /// </summary>
+        public int Minute { get; private set; }
         private readonly List<TestPaper> testPaper;
         public IReadOnlyCollection<TestPaper> TestPaper => testPaper;
 
@@ -22,11 +30,13 @@ namespace PCME.Domain.AggregatesModel.TestAggregates
             testPaper = new List<TestPaper>();
         }
 
-        public TestConfig(string title, string categorycode)
+        public TestConfig(string title, string categorycode,int ctr,int minute)
         {
             testPaper = new List<TestPaper>();
             Title = title ?? throw new ArgumentNullException(nameof(title));
             CategoryCode = categorycode;
+            Ctr = ctr;
+            Minute = minute;
         }
 
         public void AddTestPaper(int testTypeId, int displayCount, float score, int orderBy)

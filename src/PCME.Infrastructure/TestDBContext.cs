@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using PCME.Domain.AggregatesModel.HomeWorkAggregates;
 using PCME.Domain.AggregatesModel.TestAggregates;
 using PCME.Infrastructure.EntityConfigurations;
 using System;
@@ -14,6 +15,8 @@ namespace PCME.Infrastructure
         public DbSet<TestConfig> TestConfig { get; set; }
         public DbSet<TestPaper> TestPaper { get; set; }
         public DbSet<TestType> TestType { get; set; }
+
+        public DbSet<HomeWorkResult> HomeWorkResult { get; set; }
         public TestDBContext(DbContextOptions<TestDBContext> options):base(options)
         {
 
@@ -25,16 +28,16 @@ namespace PCME.Infrastructure
             modelBuilder.ApplyConfiguration(new TestTypeEntityTypeConfiguration());
             //base.OnModelCreating(modelBuilder);
         }
-        //public class TestDBContextFactory : IDesignTimeDbContextFactory<TestDBContext>
-        //{
-        //    public TestDBContext CreateDbContext(string[] args)
-        //    {
-        //        var optionsBuilder = new DbContextOptionsBuilder<TestDBContext>()
-        //            .UseSqlServer(@"Server=.;database=PCME_TEST;uid=sa;pwd=Abc@28122661");
+        public class TestDBContextFactory : IDesignTimeDbContextFactory<TestDBContext>
+        {
+            public TestDBContext CreateDbContext(string[] args)
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<TestDBContext>()
+                    .UseSqlServer(@"Server=.;database=PCME_TEST;uid=sa;pwd=Abc@28122661");
 
-        //        return new TestDBContext(optionsBuilder.Options);
-        //        //return new ApplicationDbContext(optionsBuilder.Options,new NoMediator());
-        //    }
-        //}
+                return new TestDBContext(optionsBuilder.Options);
+                //return new ApplicationDbContext(optionsBuilder.Options,new NoMediator());
+            }
+        }
     }
 }
