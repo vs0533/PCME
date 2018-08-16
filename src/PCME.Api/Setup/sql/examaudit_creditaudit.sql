@@ -112,6 +112,27 @@ SELECT
 	MOPDB.DBO.TrainAudit LEFT JOIN MOPDB.DBO.Person ON Person.personID = TrainAudit.personID
 	LEFT JOIN PCME.DBO.Students ON Students.IDCard = Person.IDCard
 
+	/*根据报名生成考试券*/
+DECLARE tempCursor CURSOR
+FOR
+    (SELECT Id,CreateTime,'报名创建',
+		replace(lower(Convert(varchar(100),NEWID())),'-',''),
+		StudentId,TrainingCenterId
+      FROM PCME.DBO.SignUp
+    )
+    ORDER BY id;								--创建游标tempCursor，并定义游标所指向的集合   
+OPEN tempCursor;								--打开游标 
+DECLARE @id INT,@createtime datetime,@remark nvarchar(10),@num nvarchar(40),@studentid int, @trainingcenterid int; 
+FETCH NEXT FROM tempCursor INTO @id,@createtime,@remark,@num,@studentid,@trainingcenterid		--游标读取下一个数据  
+WHILE @@fetch_status = 0                        --游标读取下一个数据的状态，0表示读取成功  
+    BEGIN  
+        PRINT (convert(varchar(50),@id)+':'+convert(varchar(50),@createtime))							--打印id
+		INSERT INTO PCME.DBO.ExamRoomPlanTicket values(@createtime,NULL,0,@num,@remark,@studentid,@trainingcenterid)
+		--SELECT * FROM HrmResource WHERE id = @id;
+        FETCH NEXT FROM tempCursor INTO @id,@createtime,@remark,@num,@studentid,@trainingcenterid;    --继续用游标读取下一个数据  
+    END  
+CLOSE tempCursor;								--关闭游标
+DEALLOCATE tempCursor;
 
 /* 一些清空表数据
 TRUNCATE TABLE dbo.ProfessionalInfos

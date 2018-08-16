@@ -12,6 +12,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 namespace PCME.Api.Controllers
 {
+    /// <summary>
+    /// 准考证生成页面
+    /// </summary>
     [Produces("application/json")]
     [Route("api/StudentSignUp")]
     public class StudentSignUpController:Controller
@@ -39,8 +42,8 @@ namespace PCME.Api.Controllers
             var signUp = from signup in context.SignUp
                          join trainingcenter in context.TrainingCenter on signup.TrainingCenterId equals trainingcenter.Id into left1
                          from trainingcenter in left1.DefaultIfEmpty()
-                         join examsubject in context.ExamSubjects on signup.ExamSubjectId equals examsubject.Id into left2
-                         from examsubject in left2.DefaultIfEmpty()
+                         join examsubject in context.ExamSubjects on signup.ExamSubjectId equals examsubject.Id// into left2
+                         //from examsubject in left2.DefaultIfEmpty()
                          where signup.TicketIsCreate == false && signup.StudentId == studentId
                          select new { signup, trainingcenter, examsubject };
 
@@ -48,7 +51,7 @@ namespace PCME.Api.Controllers
                 .FilterAnd(filter.ToObject<Filter>())
                 .FilterOr(query.ToObject<Filter>());
 
-            var item = signUp.Skip(start).Take(limit);
+            var item = signUp.ToList(); //signUp.Skip(start).Take(limit);
             var result = item.Select(c => new Dictionary<string, object>
             {
                 { "id",c.signup.Id},
@@ -99,5 +102,7 @@ namespace PCME.Api.Controllers
             });
             return Ok(new { total = 0, data = result });
         }
+
+        
     }
 }

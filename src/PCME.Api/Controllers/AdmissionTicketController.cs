@@ -41,8 +41,10 @@ namespace PCME.Api.Controllers
                                   from signup in left4.DefaultIfEmpty()
                                   join examinationroomplan in context.ExaminationRoomPlans on admissionticket.ExaminationRoomPlanId equals examinationroomplan.Id into left5
                                   from examinationroomplan in left5.DefaultIfEmpty()
+                                  join examroomplanticket in context.ExamRoomPlanTicket on admissionticket.ExamRoomPlanTicketId equals examroomplanticket.Id into left6
+                                  from examroomplanticket in left6.DefaultIfEmpty()
                                   where admissionticket.StudentId == studentId
-                                  select new { examinationroomplan, admissionticket, examsubject, examinationroom, trainingcenter, signup };
+                                  select new { examroomplanticket, examinationroomplan, admissionticket, examsubject, examinationroom, trainingcenter, signup };
 
             admissionTicket = admissionTicket
                 .FilterAnd(filter.ToObject<Filter>())
@@ -65,7 +67,9 @@ namespace PCME.Api.Controllers
                 { "admissionticket.CreateTime",c.admissionticket.CreateTime},
                 { "signup.CreateTime",c.signup.CreateTime},
                 { "examinationroomplan.ExamStartTime",c.examinationroomplan.ExamStartTime},
-                { "examinationroomplan.ExamEndTime",c.examinationroomplan.ExamEndTime}
+                { "examinationroomplan.ExamEndTime",c.examinationroomplan.ExamEndTime},
+                {"examroomplanticket.Id",c.examroomplanticket.Id},
+                {"examroomplanticket.Num",c.examroomplanticket.Num}
             });
             var total = admissionTicket.Count();
             return Ok(new { total, data = result });
@@ -93,7 +97,7 @@ namespace PCME.Api.Controllers
 
             string num = command.ExamSubjectId + plan.Num + (plancount + 1).ToString().PadLeft(3, '0');
             AdmissionTicket ticket = new AdmissionTicket(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
-                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId);
+                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId,command.ExamRoomPlanTicketId);
 
             var numisExists = context.AdmissionTickets.Where(c => c.Num == num).Any();
             if (numisExists)
@@ -113,13 +117,21 @@ namespace PCME.Api.Controllers
             context.SignUp.Update(signup);
 
             //扣减选场权限次数1
-            var student = context.Students.Where(c => c.Id == studentId).FirstOrDefault();
-            if (student.TicketCtr <1)
-            {
-                return Ok(new { success = false, message = "您的选场权限次数小于1，生成失败" });
+            //var student = context.Students.Where(c => c.Id == studentId).FirstOrDefault();
+            //if (student.TicketCtr <1)
+            //{
+            //    return Ok(new { success = false, message = "您的选场权限次数小于1，生成失败" });
+            //}
+            //student.SubtractTicketCtr();
+            //context.Students.Update(student);
+            var roomplanticket = context.ExamRoomPlanTicket.Where(c => c.Id == command.ExamRoomPlanTicketId).FirstOrDefault();
+            if (roomplanticket == null) {
+                return Ok(new { success = false, message = "没有找到考试券，生成失败" });
+            } else if(roomplanticket.IsExpense){
+                return Ok(new { success = false, message = "考试券已经被消费，生成失败" });
             }
-            student.SubtractTicketCtr();
-            context.Students.Update(student);
+            roomplanticket.DoExpense();
+            context.ExamRoomPlanTicket.Update(roomplanticket);
 
             //添加准考证生成日志
             AdmissionTicketLogs logs = new AdmissionTicketLogs(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId

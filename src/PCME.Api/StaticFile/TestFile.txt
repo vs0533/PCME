@@ -6,7 +6,7 @@ ZBJPZX01	lsx555136@ZBJPZX	市直·继续教育·淄博市人事培训中心
 WSRCPX01	yzg6063@WSRCPX	市直·继续教育·淄博市卫生人才中心
 
 370321197910080392 123456
-370321197703213023 
+370321197703213023         19025
 
 [JsonProperty(NullValueHandling=NullValueHandling.Ignore)]
 学分证书申请上的记分周期 ---结果为年
@@ -18,3 +18,5 @@ WSRCPX01	yzg6063@WSRCPX	市直·继续教育·淄博市卫生人才中心
 
 
 370303198810200027
+
+select replace(lower(Convert(varchar(100),NEWID())),'-','')

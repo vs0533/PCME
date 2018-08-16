@@ -23,6 +23,8 @@ namespace PCME.Api.Application.Commands
         public DateTime? PostPaperTime { get; private set; }
         public DateTime CreateTime { get; private set; }
         public int ExaminationRoomPlanId { get; private set; }
+        [JsonProperty("examroomplanticket.Id")]
+        public int ExamRoomPlanTicketId { get; private set; }
 
         public void SetId(int id) {
             Id = id;

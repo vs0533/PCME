@@ -27,7 +27,7 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlantTicketAggregates
 
         public ExamRoomPlanTicket(string num,int studentId, int trainingCenterId,string reMark="报名创建")
         {
-            Num = num.PadRight(4,'0') + DateTime.Now.ToString("yyMMddhhssmm");
+            Num = num;//.PadRight(4,'0') + DateTime.Now.ToString("yyMMddhhssmm");
             StudentId = studentId;
             TrainingCenterId = trainingCenterId;
             IsExpense = false;
@@ -36,7 +36,7 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlantTicketAggregates
         }
 
         public void DoExpense(string reMark="选场消费") {
-            IsExpense = false;
+            IsExpense = true;
             ExpenseTime = DateTime.Now;
         }
     }

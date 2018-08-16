@@ -377,10 +377,10 @@ namespace PCME.Api.Controllers
                     SignUp signUp = new SignUp(item.StudentId, item.ExamSubjectId, signUpForUnit.Id, loginTrainingCenterId, false, DateTime.Now);
                     signUps.Add(signUp);
                     //item.Student.AddaTicketCtr();
-                    string idcard = item.Student.IDCard;
-                    string num = idcard.Substring(idcard.Length - 4, idcard.Length);
-                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(num, item.StudentId, loginTrainingCenterId);
-                    
+                    //string idcard = item.Student.IDCard;
+                    //string num = idcard.Substring(idcard.Length - 4, 4);
+                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-",""), item.StudentId, loginTrainingCenterId);
+                    examRoomPlanTickeds.Add(ticket);
                 }
             }
             if (exists.Any())
@@ -470,9 +470,8 @@ namespace PCME.Api.Controllers
                     signUps.Add(signUp);
                     //signUpForStudent.student.AddaTicketCtr();
                     
-                    string idcard = signUpForStudent.student.IDCard;
-                    string num = idcard.Substring(idcard.Length - 4, idcard.Length);
-                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(num, signUpForStudent.signupstudent.StudentId, loginTrainingCenterId);
+                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-", ""), signUpForStudent.signupstudent.StudentId, loginTrainingCenterId);
+                    examRoomPlanTickeds.Add(ticket);
                 }
             }
             if (exists.Any())
