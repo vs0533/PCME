@@ -123,7 +123,6 @@ namespace PCME.Api.Controllers
                 return Ok(new { success = true, data });
             }
             return BadRequest();
-
         }
 
 		[HttpPost]

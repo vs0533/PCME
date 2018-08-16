@@ -11,6 +11,7 @@ namespace PCME.Api.Application.Commands
 {
     public class ExaminationRoomPlanCreateOrUpdateCommand:IRequest<Dictionary<string,object>>
     {
+        [JsonProperty("id")]
         public int Id { get; private set; }
         [JsonProperty("examinationrooms.Id")]
         public int ExaminationRoomId { get; private set; }
@@ -41,13 +42,17 @@ namespace PCME.Api.Application.Commands
         public DateTime ExamStartTime { get; private set; }
         //public AuditStatus AuditStatus { get; private set; }
         [JsonProperty("auditstatus.Id")]
-        public int AuditStatusId { get; private set; }
+        public int? AuditStatusId { get; private set; }
         [JsonProperty("planstatus.Id")]
-        public int PlanStatusId { get; private set; }
+        public int? PlanStatusId { get; private set; }
         public int TrainingCenterId { get; private set; }
 
         public void SetId(int id) {
             Id = id;
+        }
+        public ExaminationRoomPlanCreateOrUpdateCommand()
+        {
+
         }
 
         public void TrainingCenterToAddSetInfo(string num,int auditStatusId,int planStatusId,int trainingCenterId) {

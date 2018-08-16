@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using PCME.Domain.AggregatesModel.ExaminationRoomPlantTicketAggregates;
 using PCME.Domain.AggregatesModel.SignUpAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
@@ -29,6 +30,7 @@ namespace PCME.Api.Controllers
         private readonly IRepository<SignUpForUnit> signUpForUnitRepository;
         private readonly IRepository<SignUpCollection> signUpCollectionRepository;
         private readonly IRepository<SignUp> signUpRepository;
+        private readonly IRepository<ExamRoomPlanTicket> examRoomPlanTicketRepository;
         private readonly ApplicationDbContext context;
         public PrintViewController(IUnitOfWork<ApplicationDbContext> unitOfWork, ApplicationDbContext context)
         {
@@ -36,6 +38,7 @@ namespace PCME.Api.Controllers
             signUpForUnitRepository = unitOfWork.GetRepository<SignUpForUnit>();
             signUpCollectionRepository = unitOfWork.GetRepository<SignUpCollection>();
             signUpRepository = unitOfWork.GetRepository<SignUp>();
+            examRoomPlanTicketRepository = unitOfWork.GetRepository<ExamRoomPlanTicket>();
             this.context = context;
         }
         /// <summary>
@@ -361,6 +364,7 @@ namespace PCME.Api.Controllers
             }
             List<dynamic> exists = new List<dynamic>();
             List<SignUp> signUps = new List<SignUp>();
+            List<ExamRoomPlanTicket> examRoomPlanTickeds = new List<ExamRoomPlanTicket>();
             foreach (var item in signUpCollection)
             {
                 var isExists = signUpRepository.Query(c => c.StudentId == item.StudentId && c.ExamSubjectId == item.ExamSubjectId).Any();
@@ -372,7 +376,11 @@ namespace PCME.Api.Controllers
                 {
                     SignUp signUp = new SignUp(item.StudentId, item.ExamSubjectId, signUpForUnit.Id, loginTrainingCenterId, false, DateTime.Now);
                     signUps.Add(signUp);
-                    item.Student.AddaTicketCtr();
+                    //item.Student.AddaTicketCtr();
+                    string idcard = item.Student.IDCard;
+                    string num = idcard.Substring(idcard.Length - 4, idcard.Length);
+                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(num, item.StudentId, loginTrainingCenterId);
+                    
                 }
             }
             if (exists.Any())
@@ -387,7 +395,8 @@ namespace PCME.Api.Controllers
             signUpForUnit.PayToSuccess();
             signUpForUnitRepository.Update(signUpForUnit);
             await signUpRepository.InsertAsync(signUps);
-            signUpCollectionRepository.Update(signUpCollection);
+            //signUpCollectionRepository.Update(signUpCollection);
+            await examRoomPlanTicketRepository.InsertAsync(examRoomPlanTickeds);
             await unitOfWork.SaveChangesAsync();
             return Ok("报名成功");
         }
@@ -447,6 +456,7 @@ namespace PCME.Api.Controllers
             //Dictionary<string, string> exists = new Dictionary<string, string>();
             List<dynamic> exists = new List<dynamic>();
             List<SignUp> signUps = new List<SignUp>();
+            List<ExamRoomPlanTicket> examRoomPlanTickeds = new List<ExamRoomPlanTicket>();
             foreach (var item in signUpStudentCollection)
             {
                 var isExists = await context.SignUp.Where(c => c.StudentId == signUpForStudent.signupstudent.StudentId && c.ExamSubjectId == item.signupstudentcollection.ExamSubjectId).AnyAsync();
@@ -458,7 +468,11 @@ namespace PCME.Api.Controllers
                 {
                     SignUp signUp = new SignUp(signUpForStudent.signupstudent.StudentId, item.examsubject.Id, null, loginTrainingCenterId, false, DateTime.Now);
                     signUps.Add(signUp);
-                    signUpForStudent.student.AddaTicketCtr();
+                    //signUpForStudent.student.AddaTicketCtr();
+                    
+                    string idcard = signUpForStudent.student.IDCard;
+                    string num = idcard.Substring(idcard.Length - 4, idcard.Length);
+                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(num, signUpForStudent.signupstudent.StudentId, loginTrainingCenterId);
                 }
             }
             if (exists.Any())
@@ -473,6 +487,7 @@ namespace PCME.Api.Controllers
             signUpForStudent.signupstudent.PayToSuccess();
             context.SignUpStudent.Update(signUpForStudent.signupstudent);
             await context.SignUp.AddRangeAsync(signUps);
+            await context.ExamRoomPlanTicket.AddRangeAsync(examRoomPlanTickeds);
             await context.SaveChangesAsync();
             return Ok("报名成功");
         }

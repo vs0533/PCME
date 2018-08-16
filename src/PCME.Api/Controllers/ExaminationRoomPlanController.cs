@@ -82,6 +82,7 @@ namespace PCME.Api.Controllers
             string roomnum = await (from c in context.ExaminationRooms
                                     where c.Id == command.ExaminationRoomId
                                     select c.Num).FirstOrDefaultAsync();
+
             roomnum = roomnum.PadLeft(2, '0');
             string num = roomnum + command.Num;
 
@@ -126,9 +127,10 @@ namespace PCME.Api.Controllers
             if (ModelState.IsValid)
             {
                 Dictionary<string, object> result = await _mediator.Send(command);
-                return Ok(new { success = true, data=result });
+                return Ok(new { success = true, data = result });
             }
             return BadRequest();
+            //return Ok(command);
         }
 
         [HttpPost]

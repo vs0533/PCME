@@ -43,7 +43,7 @@ namespace PCME.Api.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult StoreRead(int start, int limit, string filter, string query, string navigates)
         {
-            var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var adminId = int.Parse(User.FindFirstValue("AccountId"));
 
             var examinationRoomPlan = from examinationroomplans in context.ExaminationRoomPlans
                                       join examinationrooms in context.ExaminationRooms on examinationroomplans.ExaminationRoomId equals examinationrooms.Id into left2
@@ -52,8 +52,10 @@ namespace PCME.Api.Controllers
                                       from auditstatus in left3.DefaultIfEmpty()
                                       join planstatus in context.PlanStatus on examinationroomplans.PlanStatusId equals planstatus.Id into left4
                                       from planstatus in left4.DefaultIfEmpty()
-                                      where examinationroomplans.TrainingCenterId == loginTrainingCenterId
-                                      select new { examinationroomplans,examinationrooms,auditstatus,planstatus};
+                                      join trainingcenter in context.TrainingCenter on examinationroomplans.TrainingCenterId equals trainingcenter.Id into left5
+                                      from trainingcenter in left5.DefaultIfEmpty()
+                                      //where examinationroomplans.TrainingCenterId == loginTrainingCenterId
+                                      select new { examinationroomplans,examinationrooms,auditstatus,planstatus,trainingcenter};
            
            examinationRoomPlan = examinationRoomPlan
                 .FilterAnd(filter.ToObject<Filter>())
@@ -74,7 +76,9 @@ namespace PCME.Api.Controllers
                 { "auditstatus.Id",c.auditstatus.Id},
                 { "auditstatus.Name",c.auditstatus.Name},
                 { "planstatus.Id",c.planstatus.Id},
-                { "planstatus.Name",c.planstatus.Name}
+                { "planstatus.Name",c.planstatus.Name},
+                {"trainingcenter.Id",c.trainingcenter.Id},
+                {"trainingcenter.Name",c.trainingcenter.Name}
             });
             
             var total = examinationRoomPlan.Count();
@@ -93,24 +97,24 @@ namespace PCME.Api.Controllers
         {
             //var logintrainingcenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
 
-            string roomnum = await (from c in context.ExaminationRooms
-                                    where c.Id == command.ExaminationRoomId
-                                    select c.Num).FirstOrDefaultAsync();
-            roomnum = roomnum.PadLeft(2, '0');
-            string num = roomnum + command.Num;
+            //string roomnum = await (from c in context.ExaminationRooms
+            //                        where c.Id == command.ExaminationRoomId
+            //                        select c.Num).FirstOrDefaultAsync();
+            //roomnum = roomnum.PadLeft(2, '0');
+            //string num = roomnum + command.Num;
 
-            if (opertype == "new")
-            {
-                command.SetId(0);
-                Regex regex = new Regex(@"^0?[0-9]{6}$");
-                bool valnum = regex.IsMatch(command.Num);
-                if (!valnum)
-                {
-                    ModelState.AddModelError("examinationroomplans.Num", "编号必须是6位数字字符分别由两位年+两位日序号+两位场次序号 如:180101代表18年第一天的第一场考试");
-                }
-            }
+            //if (opertype == "new")
+            //{
+            //    command.SetId(0);
+            //    Regex regex = new Regex(@"^0?[0-9]{6}$");
+            //    bool valnum = regex.IsMatch(command.Num);
+            //    if (!valnum)
+            //    {
+            //        ModelState.AddModelError("examinationroomplans.Num", "编号必须是6位数字字符分别由两位年+两位日序号+两位场次序号 如:180101代表18年第一天的第一场考试");
+            //    }
+            //}
             ModelState.Remove("opertype");
-            command.AdminToSetInfo(command.AuditStatusId, command.PlanStatusId);
+            command.AdminToSetInfo((int)command.AuditStatusId, (int)command.PlanStatusId);
 
             //var isaudit = await context.ExaminationRoomPlans.Where(c => c.Id == command.Id && c.AuditStatusId == AuditStatus.Pass.Id).AnyAsync();
             //if (isaudit)
@@ -119,11 +123,11 @@ namespace PCME.Api.Controllers
             //    return BadRequest();
             //}
 
-            var numExists = await context.ExaminationRoomPlans.Where(c => c.Num == num && c.Id != command.Id).AnyAsync();
-            if (numExists)
-            {
-                ModelState.AddModelError("examinationroomplans.Num", "相同编号的场次已经存在");
-            }
+            //var numExists = await context.ExaminationRoomPlans.Where(c => c.Num == num && c.Id != command.Id).AnyAsync();
+            //if (numExists)
+            //{
+            //    ModelState.AddModelError("examinationroomplans.Num", "相同编号的场次已经存在");
+            //}
             if (command.SelectFinishTime <= command.SelectTime)
             {
                 ModelState.AddModelError("examinationroomplans.SelectFinishTime", "结束选场时间不能早于等于开始选厂时间");

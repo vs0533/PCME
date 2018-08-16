@@ -16,8 +16,7 @@ namespace PCME.Exam.Api.Controllers
     public class LoginController : Controller
     {
         [Route("[action]")]
-        //[AllowAnonymous]
-        [EnableCors("AllowSpecificOrigin")]
+        [AllowAnonymous]
         public IActionResult GetSystemInfo()
         {
             Dictionary<string, object> cfg = new Dictionary<string, object>();
@@ -53,6 +52,7 @@ namespace PCME.Exam.Api.Controllers
             cfg.Add("company", company);
             return Ok(cfg);
         }
+        [Route("getuserinfo")]
         public IActionResult GetUserInfo()
         {
             var result = GetDict(User.Claims);

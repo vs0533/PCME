@@ -11,6 +11,7 @@ using PCME.Domain.AggregatesModel.CreditTrainAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAccountAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
+using PCME.Domain.AggregatesModel.ExaminationRoomPlantTicketAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
 using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Domain.AggregatesModel.PaperAggregates;
@@ -85,6 +86,7 @@ namespace PCME.Infrastructure
         public DbSet<SignUpStudentCollection> SignUpStudentCollection { get; set; }
 
         public DbSet<ExaminationRoomAccount> ExaminationRoomAccount { get; set; }
+        public DbSet<ExamRoomPlanTicket> ExamRoomPlanTicket { get; set; }
 
 
         //private readonly IMediator _mediator;

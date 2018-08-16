@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:30899/",
+      "applicationUrl": "http://localhost:2490/",
       "sslPort": 0
     }
   },
@@ -16,7 +16,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "PCME.Identity": {
+    "PCME.Authorization": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",

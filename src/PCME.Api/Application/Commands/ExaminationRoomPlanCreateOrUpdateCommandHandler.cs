@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.SeedWork;
 using PCME.Infrastructure;
@@ -34,8 +35,8 @@ namespace PCME.Api.Application.Commands
                        , request.SignInTime
                        , request.ExamEndTime
                        , request.ExamStartTime
-                       , request.AuditStatusId
-                       , request.PlanStatusId
+                       , request.AuditStatusId == null ? AuditStatus.Wait.Id : (int)request.AuditStatusId
+                        , request.PlanStatusId == null ? PlanStatus.Default.Id : (int)request.PlanStatusId
                     );
 
                 examinationRoomPlanRepository.Update(isexists);
@@ -53,9 +54,9 @@ namespace PCME.Api.Application.Commands
                         ,request.SignInTime
                         ,request.ExamEndTime
                         ,request.ExamStartTime
-                        ,request.AuditStatusId
-                        ,request.PlanStatusId
-                        ,request.TrainingCenterId
+                       , request.AuditStatusId == null ? AuditStatus.Wait.Id : (int)request.AuditStatusId
+                        , request.PlanStatusId == null ? PlanStatus.Default.Id : (int)request.PlanStatusId
+                        , request.TrainingCenterId
                     );
 
                 await examinationRoomPlanRepository.InsertAsync(plan);
@@ -72,8 +73,10 @@ namespace PCME.Api.Application.Commands
                                       from auditstatus in left3.DefaultIfEmpty()
                                       join planstatus in context.PlanStatus on examinationroomplans.PlanStatusId equals planstatus.Id into left4
                                       from planstatus in left4.DefaultIfEmpty()
+                                      join trainingcenter in context.TrainingCenter on examinationroomplans.TrainingCenterId equals trainingcenter.Id into left5
+                                      from trainingcenter in left5.DefaultIfEmpty()
                                       where examinationroomplans.Id == roomPlan.Id
-                                      select new { examinationroomplans, examinationrooms, auditstatus, planstatus };
+                                      select new { examinationroomplans, examinationrooms, auditstatus, planstatus,trainingcenter };
             var item = examinationRoomPlan.FirstOrDefault();
             var result = new Dictionary<string, object> {
                 { "id",item.examinationroomplans.Id},
@@ -89,7 +92,9 @@ namespace PCME.Api.Application.Commands
                 { "auditstatus.Id",item.auditstatus.Id},
                 { "auditstatus.Name",item.auditstatus.Name},
                 { "planstatus.Id",item.planstatus.Id},
-                { "planstatus.Name",item.planstatus.Name}
+                { "planstatus.Name",item.planstatus.Name},
+                {"trainingcenter.Id",item.trainingcenter.Id},
+                {"trainingcenter.Name",item.trainingcenter.Name}
             };
             return result;
         }
