@@ -47,6 +47,8 @@ namespace PCME.Api.Controllers
             {
                 {"id",c.video.Id},
                 {"name",c.video.Name},
+                {"height",c.video.Height},
+                {"width",c.video.Width},
                 {"image",c.video.Image},
                 {"collection",c.videocollection},
                 {"examsubjectid",c.video.ExamSubjectId},
