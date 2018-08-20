@@ -26,6 +26,9 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
         {
 
         }
+        public void SignIn() {
+            SignInTime = DateTime.Now;
+        }
 
         public AdmissionTicket(string num, int studentId, int examinationRoomId, int signUpId, 
             int examSubjectId, DateTime? signInTime, DateTime? loginTime, DateTime? postPaperTime,

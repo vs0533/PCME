@@ -41,7 +41,8 @@ namespace PCME.Exam.Api.Controllers
                                    workunitname = workunits.Name,
                                    examsubjectname = examsubjects.Name,
                                    examsubjectid = examsubjects.Id,
-                                   admissiontickets.Num
+                                   admissiontickets.Num,
+                                   imagesrc=students.Photo
                                }).FirstOrDefault();
             //var student = context.Students.Where(c => c.IDCard == idcard).FirstOrDefault();
             if (studenttinfo == null)
