@@ -43,6 +43,7 @@ namespace PCME.Api.Controllers
 
 
             var query = from c in testContext.TestLibrary
+                        where c.CategoryCode == examSubject.Code
                         select c;
 
             List<TestLibrary> testlibrary = new List<TestLibrary>();
