@@ -27,7 +27,7 @@ namespace PCME.Exam.Api.Controllers
             var roomAccountId = int.Parse(User.FindFirstValue("AccountId"));
             var roomaccount = context.ExaminationRoomAccount.Find(roomAccountId);
 
-            var studenttinfo = from admissiontickets in context.AdmissionTickets
+            var studenttinfo = (from admissiontickets in context.AdmissionTickets
                                join students in context.Students on admissiontickets.StudentId equals students.Id
                                join workunits in context.WorkUnits on students.WorkUnitId equals workunits.Id
                                join examsubjects in context.ExamSubjects on admissiontickets.ExamSubjectId equals examsubjects.Id
@@ -42,7 +42,7 @@ namespace PCME.Exam.Api.Controllers
                                    examsubjectname = examsubjects.Name,
                                    examsubjectid = examsubjects.Id,
                                    admissiontickets.Num
-                               };
+                               }).FirstOrDefault();
             //var student = context.Students.Where(c => c.IDCard == idcard).FirstOrDefault();
             if (studenttinfo == null)
             {
