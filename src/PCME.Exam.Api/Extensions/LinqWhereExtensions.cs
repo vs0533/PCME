@@ -1,4 +1,4 @@
-﻿using PCME.Api.Application.ParameBinder;
+﻿using PCME.Exam.Api.Application.ParameBinder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace PCME.Api.Extensions
+namespace PCME.Exam.Api.Extensions
 {
     public static class LinqWhereExtensions
     {
@@ -48,14 +48,8 @@ namespace PCME.Api.Extensions
             Expression exp = null;
             foreach (var item in filter)
             {
-                try
-                {
-                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Operator, item.Property, item.Value);
-                    exp = exp == null ? contains : Expression.And(exp, contains);
-                }
-                catch (Exception)
-                {
-                }
+                var contains = GetMemberExpression(parameter, typeof(TSource), item.Operator, item.Property, item.Value);
+                exp = exp == null ? contains : Expression.And(exp, contains);
             }
             if (exp != null)
             {
@@ -76,14 +70,8 @@ namespace PCME.Api.Extensions
             Expression exp = null;
             foreach (var item in filter)
             {
-                try
-                {
-                    var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
-                    exp = exp == null ? contains : Expression.Or(exp, contains);
-                }
-                catch (Exception)
-                {
-                }
+                var contains = GetMemberExpression(parameter, typeof(TSource), item.Property, item.Value);
+                exp = exp == null ? contains : Expression.Or(exp, contains);
             }
             if (exp != null)
             {
