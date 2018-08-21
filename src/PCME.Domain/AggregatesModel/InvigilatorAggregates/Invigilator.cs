@@ -5,6 +5,9 @@ using System.Text;
 
 namespace PCME.Domain.AggregatesModel.InvigilatorAggregates
 {
+    /// <summary>
+    /// 弃用
+    /// </summary>
     public class Invigilator:Entity,IAggregateRoot
     {
         public string Name { get; private set; }

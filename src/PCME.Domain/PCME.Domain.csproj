@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="AggregatesModel\AuditStatusAggregates\" />
-    <Folder Include="AggregatesModel\InvigilateAggregates\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="AggregatesModel\TrainingCenterAggregates\TrainingCenterType.cs" />

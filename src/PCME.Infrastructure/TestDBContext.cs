@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using PCME.Domain.AggregatesModel.ExamResultAggregates;
 using PCME.Domain.AggregatesModel.HomeWorkAggregates;
+using PCME.Domain.AggregatesModel.InvigilateAggregates;
 using PCME.Domain.AggregatesModel.TestAggregates;
 using PCME.Infrastructure.EntityConfigurations;
 using System;
@@ -15,6 +17,10 @@ namespace PCME.Infrastructure
         public DbSet<TestConfig> TestConfig { get; set; }
         public DbSet<TestPaper> TestPaper { get; set; }
         public DbSet<TestType> TestType { get; set; }
+
+        public DbSet<InvigilateForRoomPlant> InvigilateForRoomPlant { get; set; }
+        public DbSet<InvigilateForStudent> InvigilateForStudent { get; set; }
+        public DbSet<ExamResult> ExamResult { get; set; }
 
         public DbSet<HomeWorkResult> HomeWorkResult { get; set; }
         public TestDBContext(DbContextOptions<TestDBContext> options):base(options)
