@@ -73,10 +73,16 @@ namespace PCME.Exam.Api.Controllers
             var total = examinationRoomPlan.Count();
             return Ok(new { total, data = result });
         }
+        /// <summary>
+        /// 场次开考
+        /// </summary>
+        /// <param name="roomplanid"></param>
+        /// <param name="signintime"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("startexam")]
         [Authorize(Roles = "RoomAccount")]
-        public IActionResult StartExaminationRoomPlan(int roomplanid) {
+        public IActionResult StartExaminationRoomPlan(int roomplanid,DateTime signintime) {
             var roomAccountId = int.Parse(User.FindFirstValue("AccountId"));
             var roomaccount = context.ExaminationRoomAccount.Find(roomAccountId);
 
@@ -93,15 +99,42 @@ namespace PCME.Exam.Api.Controllers
             {
                 return Ok(new { success = false, message = "场次状态为"+PlanStatus.From(roomplan.PlanStatusId).Name+"，开考失败。" });
             }
+
             if (roomplan.PlanStatusId == PlanStatus.SignInStart.Id)
             {
                 return Ok(new { success = false, message = "已经开考！不要重复设置。" });
-
             }
-            roomplan.StartExam(DateTime.Now);
+            var startcount = context.ExaminationRoomPlans.Where(c => c.ExaminationRoomId == roomaccount.ExaminationRoomId && c.PlanStatusId == PlanStatus.SignInStart.Id).Count();
+            if (startcount >= 2)
+            {
+                return Ok(new { success = false, message = "同时只能设置两个场次开考" });
+            }
+
+
+
+            roomplan.StartExam(signintime);
             context.ExaminationRoomPlans.Update(roomplan);
             context.SaveChanges();
             return Ok(new { success = true, message = "开考成功" });
+        }
+        [HttpPost]
+        [Route("readinvigilate")]
+        [Authorize(Roles ="RoomAccount")]
+        public IActionResult ReadInvigilate(int roomplanid) {
+            var studentitem = from admissiontickets in context.AdmissionTickets
+                              join students in context.Students on admissiontickets.StudentId equals students.Id
+                              where admissiontickets.ExaminationRoomPlanId == roomplanid
+                              select new { admissiontickets, students };
+            var result = studentitem.Select(c => new Dictionary<string, object> {
+                {"admissiontickets.Id",c.admissiontickets.Id},
+                {"admissiontickets.Num",c.admissiontickets.Num},
+                {"admissiontickets.SignInTime",c.admissiontickets.SignInTime},
+                {"admissiontickets.LoginTime",c.admissiontickets.LoginTime},
+                {"students.IDCard",c.students.IDCard},
+                {"students.Name",c.students.Name}
+            });
+
+            return Ok(new { total = result.Count(), data = result });
         }
     }
 }
