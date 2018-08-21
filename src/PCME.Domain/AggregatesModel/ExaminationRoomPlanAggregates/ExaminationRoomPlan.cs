@@ -59,5 +59,9 @@ namespace PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates
             PlanStatusId = PlanStatus.SignInStart.Id;
             SignInTime = signInTime;
         }
+        public void EndExam()
+        {
+            PlanStatusId = PlanStatus.Over.Id;
+        }
     }
 }

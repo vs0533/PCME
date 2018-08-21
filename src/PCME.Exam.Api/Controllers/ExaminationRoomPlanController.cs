@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PCME.Domain.AggregatesModel.InvigilateAggregates;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PCME.Exam.Api.Controllers
 {
@@ -200,9 +201,37 @@ namespace PCME.Exam.Api.Controllers
         [HttpPost]
         [Route("endexam")]
         [Authorize(Roles = "RoomAccount")]
-        public async Task<IActionResult> EndExam(string remark, string techer,int roomplantid)
+        public async Task<IActionResult> EndExam(string remark, string techer, int roomplantid, int skctr, int wjctr, int qkctr)
         {
-            return Ok(new { remark, techer, roomplantid });
+            var roomplant = await context.ExaminationRoomPlans.FindAsync(roomplantid);
+            if (roomplant.PlanStatusId == PlanStatus.Over.Id)
+            {
+                return Ok(new { success = false, message = "该场次已经结束考试，不用重复提交" });
+            }
+            if (roomplant.PlanStatusId != PlanStatus.SignInStart.Id)
+            {
+                return Ok(new { success = false, message = "未签到的场次不允许结束考试" });
+            }
+            //if (DateTime.Now <= roomplant.ExamEndTime.AddMinutes(1))
+            //{
+            //    return Ok(new { success = false, message = "当前时间小于考试结束时间，不允许结束考试" });
+            //}
+            var invigilateForRoomPlant = await testContext.InvigilateForRoomPlant.Where(c => c.ExaminationRoomPlantId == roomplant.Id).FirstOrDefaultAsync();
+
+
+            roomplant.EndExam();
+            context.ExaminationRoomPlans.Update(roomplant);
+            await context.SaveChangesAsync();
+
+            if (invigilateForRoomPlant == null)
+            {
+                InvigilateForRoomPlant invigilate = new InvigilateForRoomPlant(
+                    roomplant.Id, remark, techer, DateTime.Now, wjctr, qkctr, skctr
+                    );
+                await testContext.AddAsync(invigilate);
+                await testContext.SaveChangesAsync();
+            }
+            return Ok(new { success = true, message = "场次结束成功" });
         }
     }
 }
