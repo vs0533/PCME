@@ -46,5 +46,11 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
             ExaminationRoomPlanId = examinationRoomPlanId;
             ExamRoomPlanTicketId = examroomplanticketid;
         }
+        public void AddLoginTime() {
+            if (LoginTime != null)
+            {
+                LoginTime = LoginTime.GetValueOrDefault().AddMinutes(5);
+            }
+        }
     }
 }

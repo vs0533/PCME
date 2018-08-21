@@ -14,6 +14,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PCME.Domain.AggregatesModel.InvigilateAggregates;
 
 namespace PCME.Exam.Api.Controllers
 {
@@ -22,9 +24,11 @@ namespace PCME.Exam.Api.Controllers
     public class ExaminationRoomPlanController : Controller
     {
         private readonly ApplicationDbContext context;
-        public ExaminationRoomPlanController(ApplicationDbContext context)
+        private readonly TestDBContext testContext;
+        public ExaminationRoomPlanController(ApplicationDbContext context, TestDBContext testContext)
         {
             this.context = context;
+            this.testContext = testContext;
         }
         [HttpPost]
         [Route("read")]
@@ -44,16 +48,16 @@ namespace PCME.Exam.Api.Controllers
                                       from auditstatus in left3.DefaultIfEmpty()
                                       join planstatus in context.PlanStatus on examinationroomplans.PlanStatusId equals planstatus.Id into left4
                                       from planstatus in left4.DefaultIfEmpty()
-                                      where rooms.Select(c=>c.Id).Contains(examinationrooms.Id) && auditstatus.Id == AuditStatus.Pass.Id
-                                      select new { examinationroomplans,examinationrooms,auditstatus,planstatus};
+                                      where rooms.Select(c => c.Id).Contains(examinationrooms.Id) && auditstatus.Id == AuditStatus.Pass.Id
+                                      select new { examinationroomplans, examinationrooms, auditstatus, planstatus };
 
 
             examinationRoomPlan = examinationRoomPlan
                 .FilterAnd(filter.ToObject<Filter>())
                 .FilterOr(query.ToObject<Filter>());
             var item = examinationRoomPlan.Skip(start).Take(limit);
-            var result = item.ToList().Select(c=> new Dictionary<string, object>
-            { 
+            var result = item.ToList().Select(c => new Dictionary<string, object>
+            {
                 { "id",c.examinationroomplans.Id},
                 { "examinationroomplans.Num",c.examinationroomplans.Num},
                 { "examinationroomplans.Galleryful",c.examinationroomplans.Galleryful},
@@ -69,7 +73,7 @@ namespace PCME.Exam.Api.Controllers
                 { "planstatus.Id",c.planstatus.Id},
                 { "planstatus.Name",c.planstatus.Name}
             });
-            
+
             var total = examinationRoomPlan.Count();
             return Ok(new { total, data = result });
         }
@@ -82,7 +86,8 @@ namespace PCME.Exam.Api.Controllers
         [HttpPost]
         [Route("startexam")]
         [Authorize(Roles = "RoomAccount")]
-        public IActionResult StartExaminationRoomPlan(int roomplanid,DateTime signintime) {
+        public IActionResult StartExaminationRoomPlan(int roomplanid, DateTime signintime)
+        {
             var roomAccountId = int.Parse(User.FindFirstValue("AccountId"));
             var roomaccount = context.ExaminationRoomAccount.Find(roomAccountId);
 
@@ -97,7 +102,7 @@ namespace PCME.Exam.Api.Controllers
             }
             if (roomplan.PlanStatusId == PlanStatus.Close.Id || roomplan.PlanStatusId == PlanStatus.Over.Id)
             {
-                return Ok(new { success = false, message = "场次状态为"+PlanStatus.From(roomplan.PlanStatusId).Name+"，开考失败。" });
+                return Ok(new { success = false, message = "场次状态为" + PlanStatus.From(roomplan.PlanStatusId).Name + "，开考失败。" });
             }
 
             if (roomplan.PlanStatusId == PlanStatus.SignInStart.Id)
@@ -119,22 +124,85 @@ namespace PCME.Exam.Api.Controllers
         }
         [HttpPost]
         [Route("readinvigilate")]
-        [Authorize(Roles ="RoomAccount")]
-        public IActionResult ReadInvigilate(int roomplanid) {
+        [Authorize(Roles = "RoomAccount")]
+        public async Task<IActionResult> ReadInvigilate(int roomplanid)
+        {
+
+            var invigilateForStudent = await testContext.InvigilateForStudent.Where(c => c.ExaminationRoomPlantId == roomplanid).ToListAsync();
+
             var studentitem = from admissiontickets in context.AdmissionTickets
                               join students in context.Students on admissiontickets.StudentId equals students.Id
+                              join invigilateforstudent in invigilateForStudent on admissiontickets.Num equals invigilateforstudent.TicketNum into left1
+                              from invigilateforstudent in left1.DefaultIfEmpty()
                               where admissiontickets.ExaminationRoomPlanId == roomplanid
-                              select new { admissiontickets, students };
+                              select new { admissiontickets, students, invigilateforstudent };
             var result = studentitem.Select(c => new Dictionary<string, object> {
                 {"admissiontickets.Id",c.admissiontickets.Id},
                 {"admissiontickets.Num",c.admissiontickets.Num},
                 {"admissiontickets.SignInTime",c.admissiontickets.SignInTime},
                 {"admissiontickets.LoginTime",c.admissiontickets.LoginTime},
                 {"students.IDCard",c.students.IDCard},
-                {"students.Name",c.students.Name}
+                {"students.Name",c.students.Name},
+                {"invigilateforstudent.Type",c.invigilateforstudent == null ? "" : c.invigilateforstudent.Type}
             });
 
             return Ok(new { total = result.Count(), data = result });
+        }
+        [HttpPost]
+        [Route("saveinvigilateforstudent")]
+        [Authorize(Roles = "RoomAccount")]
+        public async Task<IActionResult> SaveInvigilateForStudent(string type, string num)
+        {
+            var ticket = await context.AdmissionTickets.Where(c => c.Num == num).FirstOrDefaultAsync();
+            var roomplantid = ticket.ExaminationRoomPlanId;
+
+            var invigilateforstudent = await testContext.InvigilateForStudent.Where(c => c.ExaminationRoomPlantId == roomplantid && c.TicketNum == ticket.Num).FirstOrDefaultAsync();
+            if (invigilateforstudent == null)
+            {
+                InvigilateForStudent invigilate = new InvigilateForStudent(ticket.Num, type, roomplantid);
+                await testContext.InvigilateForStudent.AddAsync(invigilate);
+            }
+            else
+            {
+                invigilateforstudent.SetType(type);
+                testContext.InvigilateForStudent.Update(invigilateforstudent);
+            }
+            //if (type == "重")
+            //{
+            //    ticket.AddLoginTime();
+            //    context.AdmissionTickets.Update(ticket);
+            //}
+            await testContext.SaveChangesAsync();
+            return Ok(new { success = true, message = "操作成功" });
+        }
+        [HttpPost]
+        [Route("readendexaminfo")]
+        [Authorize(Roles = "RoomAccount")]
+        public async Task<IActionResult> ReadEndExamInfo(int roomplantid)
+        {
+            var roomplant = await context.ExaminationRoomPlans.FindAsync(roomplantid);
+
+            var invigilateForStudent = await testContext.InvigilateForStudent.Where(c => c.ExaminationRoomPlantId == roomplant.Id)
+                .ToListAsync();
+
+            var ticket = from admissiontickets in context.AdmissionTickets
+                         join invigilateforstudent in invigilateForStudent on admissiontickets.Num equals invigilateforstudent.TicketNum into left1
+                         from invigilateforstudent in left1.DefaultIfEmpty()
+                         where admissiontickets.ExaminationRoomPlanId == roomplant.Id
+                         select new { admissiontickets, invigilateforstudent };
+
+            var wjctr = ticket.Where(c => c.invigilateforstudent != null).Count();
+            var skctr = ticket.Where(c => c.admissiontickets.LoginTime != null).Count();
+            var qkctr = ticket.Where(c => c.admissiontickets.LoginTime == null).Count();
+
+            return Ok(new { success = true, wjctr, skctr, qkctr, roomplantid });
+        }
+        [HttpPost]
+        [Route("endexam")]
+        [Authorize(Roles = "RoomAccount")]
+        public async Task<IActionResult> EndExam(string remark, string techer,int roomplantid)
+        {
+            return Ok(new { remark, techer, roomplantid });
         }
     }
 }

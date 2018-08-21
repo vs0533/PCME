@@ -27,6 +27,9 @@ namespace PCME.Domain.AggregatesModel.InvigilateAggregates
             ExaminationRoomPlantId = examinationRoomPlantId;
             CreateTime = DateTime.Now;
         }
+        public void SetType(string type) {
+            Type = type;
+        }
         public void SetZB(){
             Type = "作";
         }
