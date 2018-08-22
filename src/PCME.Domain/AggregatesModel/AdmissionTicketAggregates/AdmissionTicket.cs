@@ -30,6 +30,10 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
             SignInTime = DateTime.Now;
         }
 
+        public void PostPaper() {
+            PostPaperTime = DateTime.Now;
+        }
+
         public AdmissionTicket(string num, int studentId, int examinationRoomId, int signUpId, 
             int examSubjectId, DateTime? signInTime, DateTime? loginTime, DateTime? postPaperTime,
             DateTime createTime, int examinationRoomPlanId,int examroomplanticketid)
@@ -45,6 +49,12 @@ namespace PCME.Domain.AggregatesModel.AdmissionTicketAggregates
             CreateTime = createTime;
             ExaminationRoomPlanId = examinationRoomPlanId;
             ExamRoomPlanTicketId = examroomplanticketid;
+        }
+        public void Login()
+        {
+            if (LoginTime == null) {
+                LoginTime = DateTime.Now;
+            }
         }
         public void AddLoginTime() {
             if (LoginTime != null)

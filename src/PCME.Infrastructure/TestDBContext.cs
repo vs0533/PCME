@@ -32,6 +32,8 @@ namespace PCME.Infrastructure
             modelBuilder.ApplyConfiguration(new TestLibraryEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new TestConfigEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new TestTypeEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ExamResultEntityTypeConfiguration());
+
             //base.OnModelCreating(modelBuilder);
         }
         public class TestDBContextFactory : IDesignTimeDbContextFactory<TestDBContext>

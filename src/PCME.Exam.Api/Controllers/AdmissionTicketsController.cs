@@ -14,9 +14,11 @@ namespace PCME.Exam.Api.Controllers
     public class AdmissionTicketsController:Controller
     {
         private readonly ApplicationDbContext context;
-        public AdmissionTicketsController(ApplicationDbContext context)
+        private readonly TestDBContext testContext;
+        public AdmissionTicketsController(ApplicationDbContext context, TestDBContext testContext)
         {
-            this.context = context; 
+            this.context = context;
+            this.testContext = testContext;
         }
         [HttpPost]
         [Route("signin")]
@@ -49,6 +51,37 @@ namespace PCME.Exam.Api.Controllers
             context.AdmissionTickets.Update(admissionticket);
             context.SaveChanges();
             return Ok(new { success = true, message = "签到成功" });
+        }
+
+        [HttpPost]
+        [Route("readticketinfo")]
+        [Authorize(Roles = "Exam")]
+        public IActionResult ReadTicketInfo(int ticketid)
+        {
+            var ticket = (from admissiontickets in context.AdmissionTickets
+                         join student in context.Students on admissiontickets.StudentId equals student.Id
+                         where admissiontickets.Id == ticketid
+                         select new {
+                             admissiontickets.Id,
+                             admissiontickets.Num,
+                             admissiontickets.LoginTime,
+                             admissiontickets.PostPaperTime,
+                             admissiontickets.StudentId,
+                             admissiontickets.ExamSubjectId,
+                             admissiontickets.ExaminationRoomPlanId,
+                             admissiontickets.ExaminationRoomId,
+                             student.IDCard
+                         }).FirstOrDefault();
+            //var examsubjectcode =  context.ExamSubjects.Find(ticket.ExamSubjectId).Code;
+            //var minute = testContext.TestConfig.Where(c => c.CategoryCode == examsubjectcode && c.Title == "考试").FirstOrDefault();
+            var endtime = context.ExaminationRoomPlans.Find(ticket.ExaminationRoomPlanId).ExamEndTime;
+            var starttime = DateTime.Now;
+
+            TimeSpan ts = endtime - starttime;
+            
+
+            return Ok(new { success= true,ticket, Milliseconds = ts.TotalMilliseconds  });
+                         
         }
     }
 }

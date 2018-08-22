@@ -56,6 +56,10 @@ namespace PCME.Exam.Api.Controllers
         public IActionResult GetUserInfo()
         {
             var result = GetDict(User.Claims);
+            //if (result.Where(c=>c.Key == "role" && c.Value == "Exam").Any())
+            //{
+            //    result.Add("examsubject", result["AccountId"].ToString());
+            //}
             //return Ok(from c in User.Claims select new { c.Type, c.Value });
             return Ok(result);
         }

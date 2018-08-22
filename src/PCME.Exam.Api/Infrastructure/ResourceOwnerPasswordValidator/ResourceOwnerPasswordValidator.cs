@@ -99,6 +99,56 @@ namespace PCME.Exam.Api.Infrastructure.ResourceOwnerPasswordValidator
                             }
                         }
                         break;
+                    case "Exam":
+                        var ticket = (from admissionticket in dbContext.AdmissionTickets
+                                      join student in dbContext.Students on admissionticket.StudentId equals student.Id
+                                      where admissionticket.Num == context.UserName
+                                      select new { admissionticket.Id, admissionticket.Num, admissionticket.SignInTime, admissionticket.LoginTime, student.IDCard, student.Name }).FirstOrDefault();
+                        if (ticket == null)
+                        {
+                            context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "准考证不存在");
+                        }
+                        else
+                        {
+                            if (ticket.SignInTime == null) {
+                                context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "您还没有签到不能进行考试");
+                                return;
+                            }
+                            
+                            if (!(ticket.IDCard == context.Password))
+                            {
+                                context.Result = new GrantValidationResult(TokenRequestErrors.InvalidClient, "身份证不正确");
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    context.Result = new GrantValidationResult(
+                                                subject: ticket.Num,
+                                                authenticationMethod: "custom",
+                                                claims: GetUserClaims(
+                                                    ticket.Id.ToString(),
+                                                    ticket.Num,
+                                                    "",
+                                                    "",
+                                                    ticket.Num,
+                                                   "",
+                                                    new string[] { valtype },
+                                                    ""
+                                                    )
+                                            );
+                                    var ticketupdate = await dbContext.AdmissionTickets.FindAsync(ticket.Id);
+                                    ticketupdate.Login();
+                                    dbContext.AdmissionTickets.Update(ticketupdate);
+                                    await dbContext.SaveChangesAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw new Exception(ex.Message);
+                                }
+                            }
+                        }
+                        break;
 				}
 			}
 			return;
