@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace PCME.Api.Controllers
 {
@@ -19,10 +20,11 @@ namespace PCME.Api.Controllers
     public class AdmissionTicketController : Controller
     {
         private readonly ApplicationDbContext context;
-        public AdmissionTicketController(ApplicationDbContext context)
+        private readonly TestDBContext testcontext;
+        public AdmissionTicketController(ApplicationDbContext context, TestDBContext testcontext)
         {
             this.context = context;
-
+            this.testcontext = testcontext;
         }
         [HttpPost]
         [Route("read")]
@@ -78,7 +80,8 @@ namespace PCME.Api.Controllers
         [HttpPost]
         [Route("saveorupdate")]
         [Authorize(Roles = "Student")]
-        public IActionResult Post([FromBody]AdmissionTicketCreateOrUpdateCommand command, string opertype) {
+        public IActionResult Post([FromBody]AdmissionTicketCreateOrUpdateCommand command, string opertype)
+        {
             var studentId = int.Parse(User.FindFirstValue("AccountId"));
             if (opertype == "new")
             {
@@ -97,7 +100,7 @@ namespace PCME.Api.Controllers
 
             string num = command.ExamSubjectId + plan.Num + (plancount + 1).ToString().PadLeft(3, '0');
             AdmissionTicket ticket = new AdmissionTicket(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
-                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId,command.ExamRoomPlanTicketId);
+                , null, null, null, DateTime.Now, command.ExaminationRoomPlanId, command.ExamRoomPlanTicketId);
 
             var numisExists = context.AdmissionTickets.Where(c => c.Num == num).Any();
             if (numisExists)
@@ -125,9 +128,12 @@ namespace PCME.Api.Controllers
             //student.SubtractTicketCtr();
             //context.Students.Update(student);
             var roomplanticket = context.ExamRoomPlanTicket.Where(c => c.Id == command.ExamRoomPlanTicketId).FirstOrDefault();
-            if (roomplanticket == null) {
+            if (roomplanticket == null)
+            {
                 return Ok(new { success = false, message = "没有找到考试券，生成失败" });
-            } else if(roomplanticket.IsExpense){
+            }
+            else if (roomplanticket.IsExpense)
+            {
                 return Ok(new { success = false, message = "考试券已经被消费，生成失败" });
             }
             roomplanticket.DoExpense();
@@ -140,6 +146,52 @@ namespace PCME.Api.Controllers
 
             context.SaveChanges();
             return Ok(new { success = true, message = "生成成功！" });
+        }
+
+        [HttpPost]
+        [Route("print")]
+        [Authorize(Roles = "Student")]
+        public IActionResult Print(int id)
+        {
+            var testconfig = testcontext.TestConfig.Where(c => c.Title == "考试").ToList();
+
+            var admissionTicket = (from admissionticket in context.AdmissionTickets
+                                   join examsubject in context.ExamSubjects on admissionticket.ExamSubjectId equals examsubject.Id into left1
+                                   from examsubject in left1.DefaultIfEmpty()
+                                   join examinationroom in context.ExaminationRooms on admissionticket.ExaminationRoomId equals examinationroom.Id into left2
+                                   from examinationroom in left2.DefaultIfEmpty()
+                                   join trainingcenter in context.TrainingCenter on examinationroom.TrainingCenterId equals trainingcenter.Id into left3
+                                   from trainingcenter in left3.DefaultIfEmpty()
+                                   join signup in context.SignUp on admissionticket.SignUpId equals signup.Id into left4
+                                   from signup in left4.DefaultIfEmpty()
+                                   join examinationroomplan in context.ExaminationRoomPlans on admissionticket.ExaminationRoomPlanId equals examinationroomplan.Id into left5
+                                   from examinationroomplan in left5.DefaultIfEmpty()
+                                   join examroomplanticket in context.ExamRoomPlanTicket on admissionticket.ExamRoomPlanTicketId equals examroomplanticket.Id into left6
+                                   from examroomplanticket in left6.DefaultIfEmpty()
+                                   join student in context.Students.Include(s => s.WorkUnit) on admissionticket.StudentId equals student.Id into left7
+                                   from student in left7.DefaultIfEmpty()
+                                   join professionalinfo in context.ProfessionalInfos.Include(s => s.ProfessionalTitle) on student.Id equals professionalinfo.StudentId into left8
+                                   from professionalinfo in left8.DefaultIfEmpty()
+                                   join testconf in testconfig on examsubject.Code equals testconf.CategoryCode into left9
+                                   from testconf in left9.DefaultIfEmpty()
+
+                                   where admissionticket.Id == id
+                                   select new
+                                   {
+                                       studentid = student.Id,
+                                       studentname = student.Name,
+                                       idcard = student.IDCard,
+                                       professionititle = professionalinfo == null ? "" : professionalinfo.ProfessionalTitle.Name,
+                                       workunitname = student.WorkUnit.Name,
+                                       admissionticketnum = admissionticket.Num,
+                                       address = trainingcenter.Address,
+                                       examsubject = examsubject.Name + "(" + examsubject.Code + ")",
+                                       examdate = examinationroomplan.ExamStartTime,
+                                       signintime = examinationroomplan.SignInTime,
+                                       longvalue = testconf == null ? 60 : testconf.Minute
+
+                                   }).FirstOrDefault();
+            return Ok(new { total = 1, data = admissionTicket });
         }
     }
 }
