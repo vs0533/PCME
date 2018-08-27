@@ -68,7 +68,8 @@ namespace PCME.Exam.Api
                             new Secret("secret".Sha256())
                         },
                         AllowedScopes = { "api2"},
-                        AccessTokenLifetime = 10800//过期时间秒 3小时
+                        AccessTokenLifetime = 10800//,//过期时间秒 3小时
+                        //AllowedCorsOrigins = { "http://localhost:8888", "http://60.210.113.42:8888", "http://pems.zbpe.gov.cn:8888" }
                     }
                 });
                 //.AddTestUsers(new List<TestUser> { new TestUser { SubjectId = "1", Username = "abc", Password = "111111" } });
@@ -77,7 +78,7 @@ namespace PCME.Exam.Api
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(options =>
                 {
-                    options.Authority = "http://http://60.210.113.42:8000";
+                    options.Authority = "http://60.210.113.42:8000";
                     //options.Authority = "http://localhost:8000";
                     options.RequireHttpsMetadata = false;
                     options.JwtValidationClockSkew = TimeSpan.FromSeconds(0);//过期偏移为零
