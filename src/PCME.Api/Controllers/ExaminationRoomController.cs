@@ -156,6 +156,11 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { message = "该教室下面存在场次不允许删除" });
             }
+            var account = await context.ExaminationRoomAccount.Where(c => c.ExaminationRoomId == del.Id).AnyAsync();
+            if (account)
+            {
+                return Ok(new { message = "该教室下面存在账号不允许删除" });
+            }
             #endregion
 
             examinationRoomRepository.Delete(del);

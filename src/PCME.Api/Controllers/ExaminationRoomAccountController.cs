@@ -34,7 +34,8 @@ namespace PCME.Api.Controllers
             var logtrainingcenterid = int.Parse(User.FindFirstValue("AccountId"));
             var search = from examinationroomaccount in context.ExaminationRoomAccount
                         join trainingcenter in context.TrainingCenter on examinationroomaccount.TrainingCenterId equals trainingcenter.Id
-                        join examinationroom in context.ExaminationRooms on examinationroomaccount.ExaminationRoomId equals examinationroom.Id
+                        join examinationroom in context.ExaminationRooms on examinationroomaccount.ExaminationRoomId equals examinationroom.Id into left1
+                        from examinationroom in left1.DefaultIfEmpty()
                         where examinationroomaccount.TrainingCenterId == logtrainingcenterid
                          orderby examinationroomaccount.CreateTime descending
                         select new { examinationroomaccount, trainingcenter, examinationroom };
@@ -44,13 +45,14 @@ namespace PCME.Api.Controllers
             var item = search.Skip(start).Take(limit);
             var result = item.Select(c => new Dictionary<string, object>
             {
+                {"id",c.examinationroomaccount.Id},
                 {"examinationroomaccount.Id",c.examinationroomaccount.Id},
                 {"examinationroomaccount.AccountName",c.examinationroomaccount.AccountName},
                 {"examinationroomaccount.Password",c.examinationroomaccount.Password},
                 {"trainingcenter.Id",c.trainingcenter.Id},
                 {"trainingcenter.Name",c.trainingcenter.Name},
-                {"examinationroom.Id",c.examinationroom.Id},
-                {"examinationroom.Name",c.examinationroom.Name}
+                {"examinationroom.Id",c.examinationroom == null ? 0 : c.examinationroom.Id},
+                {"examinationroom.Name",c.examinationroom == null ? "" : c.examinationroom.Name}
             });
             return Ok(result);
         }
