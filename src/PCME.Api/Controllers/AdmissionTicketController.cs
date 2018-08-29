@@ -89,16 +89,20 @@ namespace PCME.Api.Controllers
             }
             var plan = context.ExaminationRoomPlans.Where(c => c.Id == command.ExaminationRoomPlanId).FirstOrDefault();
             int plancount = context.AdmissionTickets.Where(c => c.ExaminationRoomPlanId == command.ExaminationRoomPlanId).Count();
+            var examsubject = context.ExamSubjects.Find(command.ExamSubjectId);
             if (plancount >= plan.Galleryful)
             {
                 return Ok(new { success = false, message = "超出场次设置的人数限制，生成失败" });
             }
-            if (plancount >= 999)
+            //if (plancount >= 999)
+            if(plancount >= 99)
             {
                 return Ok(new { success = false, message = "超出系统允许的场次人数限制，生成失败" });
             }
 
-            string num = command.ExamSubjectId + plan.Num + (plancount + 1).ToString().PadLeft(3, '0');
+            //string num = command.ExamSubjectId + plan.Num + (plancount + 1).ToString().PadLeft(3, '0');
+            string num = examsubject.Code.Trim() + plan.Num + (plancount + 1).ToString().PadLeft(2, '0');
+
             AdmissionTicket ticket = new AdmissionTicket(num, studentId, command.ExaminationRoomId, command.SignUpId, command.ExamSubjectId
                 , null, null, null, DateTime.Now, command.ExaminationRoomPlanId, command.ExamRoomPlanTicketId);
 
@@ -184,7 +188,7 @@ namespace PCME.Api.Controllers
                                        professionititle = professionalinfo == null ? "" : professionalinfo.ProfessionalTitle.Name,
                                        workunitname = student.WorkUnit.Name,
                                        admissionticketnum = admissionticket.Num,
-                                       address = trainingcenter.Address,
+                                       address = examinationroom.Description,//trainingcenter.Address,
                                        examsubject = examsubject.Name + "(" + examsubject.Code + ")",
                                        examdate = examinationroomplan.ExamStartTime,
                                        signintime = examinationroomplan.SignInTime,

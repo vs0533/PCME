@@ -74,8 +74,15 @@ namespace PCME.Exam.Api.Controllers
                          }).FirstOrDefault();
             //var examsubjectcode =  context.ExamSubjects.Find(ticket.ExamSubjectId).Code;
             //var minute = testContext.TestConfig.Where(c => c.CategoryCode == examsubjectcode && c.Title == "考试").FirstOrDefault();
-            var endtime = context.ExaminationRoomPlans.Find(ticket.ExaminationRoomPlanId).ExamEndTime;
+            var examationroomplant = context.ExaminationRoomPlans.Find(ticket.ExaminationRoomPlanId);
+            var plantendtime = examationroomplant.SignInTime.AddMinutes(60);
+            var logendtime = DateTime.Now.AddMinutes(60);
             var starttime = DateTime.Now;
+            var endtime = logendtime < plantendtime ? logendtime : plantendtime;
+            if (endtime < starttime)
+            {
+                endtime = DateTime.Now.AddMinutes(5);
+            }
 
             TimeSpan ts = endtime - starttime;
             
