@@ -142,6 +142,7 @@ namespace PCME.Exam.Api.Controllers
                 {"admissiontickets.Num",c.admissiontickets.Num},
                 {"admissiontickets.SignInTime",c.admissiontickets.SignInTime},
                 {"admissiontickets.LoginTime",c.admissiontickets.LoginTime},
+                {"admissiontickets.PostPaperTime",c.admissiontickets.PostPaperTime},
                 {"students.IDCard",c.students.IDCard},
                 {"students.Name",c.students.Name},
                 {"invigilateforstudent.Type",c.invigilateforstudent == null ? "" : c.invigilateforstudent.Type}
