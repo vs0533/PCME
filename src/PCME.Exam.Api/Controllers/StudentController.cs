@@ -42,7 +42,9 @@ namespace PCME.Exam.Api.Controllers
                                    examsubjectname = examsubjects.Name,
                                    examsubjectid = examsubjects.Id,
                                    admissiontickets.Num,
-                                   imagesrc=students.Photo
+                                   imagesrc=students.Photo,
+                                   roomplantid = admissiontickets.ExaminationRoomPlanId,
+                                   roomplantnum = examinationroomplans.Num
                                }).FirstOrDefault();
             //var student = context.Students.Where(c => c.IDCard == idcard).FirstOrDefault();
             if (studenttinfo == null)

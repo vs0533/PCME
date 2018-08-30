@@ -32,14 +32,17 @@ namespace PCME.Api.Controllers
         private readonly IUnitOfWork<ApplicationDbContext> unitOfWork;
         private readonly IRepository<Student> studentRepository;
         private readonly IRepository<WorkUnit> workUnitRepository;
-        public StudentMeController(IHostingEnvironment hostingEnv,IUnitOfWork<ApplicationDbContext> unitOfWork, IMediator _mediator)
+        private readonly TestDBContext testContext;
+        private readonly ApplicationDbContext context;
+        public StudentMeController(ApplicationDbContext context,TestDBContext testContext,IHostingEnvironment hostingEnv,IUnitOfWork<ApplicationDbContext> unitOfWork, IMediator _mediator)
         {
             this.unitOfWork = unitOfWork;
             studentRepository = unitOfWork.GetRepository<Student>();
             workUnitRepository = unitOfWork.GetRepository<WorkUnit>();
             this._mediator = _mediator;
             this.hostingEnv = hostingEnv;
-            
+            this.testContext = testContext;
+            this.context = context;
         }
         [HttpPost]
         [Route("read")]
@@ -143,6 +146,51 @@ namespace PCME.Api.Controllers
             return BadRequest();
 
         }
-        
+
+
+        [HttpPost]
+        [Route("readexamresult")]
+        [Authorize(Roles = "Student")]
+        public IActionResult ReadExamResult(int start, int limit, string filter, string query, string navigates)
+        {
+            var loginStudentId = int.Parse(User.FindFirstValue("AccountId"));
+            //取得考试成绩
+            var examresult = (from examresult_ in testContext.ExamResult
+                              where examresult_.StudentId == loginStudentId
+                              select examresult_).ToList();
+            //取得作业成绩
+            var homeworkresult1 = testContext.HomeWorkResult.Where(c => c.StudentId == loginStudentId).ToList();
+            //取得带科目ID的作业成绩
+            var homeworkresult2 = (from homeworkresult_ in homeworkresult1
+                                   join examsubject in context.ExamSubjects on homeworkresult_.CategoryCode equals examsubject.Code
+                                   group new { examsubject.Id, homeworkresult_.Score, homeworkresult_.StudentId } by new { examsubject.Id, homeworkresult_.StudentId, homeworkresult_.Score } into g
+                                   select new { g.Key.Id, g.Key.StudentId, homeworkscore= g.Sum(c => c.Score) });
+                                   //select new { g.k homeworkresult_.Id, homeworkresult_.CategoryCode, homeworkresult_.Score, examsubjectid = examsubject.Id }).ToList();
+            //联合成绩
+            var search = from examresult1 in examresult
+                         join examsubjects in context.ExamSubjects on examresult1.ExamSubjectId equals examsubjects.Id
+                         join homeworkresult in homeworkresult2 on examresult1.ExamSubjectId equals homeworkresult.Id into left2
+                         from homeworkresult in left2.DefaultIfEmpty()
+                         orderby examresult1.CreateTime descending
+                         select new { examresult1.Id, examresultscore=examresult1.Score, examresult1.TicketNum, examresult1.CreateTime, examsubjects.Name,homeworkresult.homeworkscore};
+            //search = search
+            //     .FilterAnd(filter.ToObject<Filter>())
+            //     .FilterOr(query.ToObject<Filter>());
+
+            var item = search.Skip(start).Take(limit);
+
+
+            var result = item.Select(c => new Dictionary<string, object> {
+                { "id",c.Id},
+                { "score",c.examresultscore},
+                { "examsubjectname",c.Name},
+                { "ticketnum",c.TicketNum},
+                { "createtime",c.CreateTime},
+                {"homeworkscore",c.homeworkscore}
+            });
+            var total = search.Count();
+            return Ok(new { total, data = result });
+        }
+
     }
 }
