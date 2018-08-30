@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,10 @@ namespace PCME.Exam.Api.Controllers
             var admissionticket = context.AdmissionTickets.Where(c => c.Num == ticket).FirstOrDefault();
 
             var roomplan = context.ExaminationRoomPlans.Where(c => c.Id == admissionticket.ExaminationRoomPlanId).FirstOrDefault();
+            if (roomplan.PlanStatusId != PlanStatus.SignInStart.Id)
+            {
+                return Ok(new { success = false, message = "场次状态非["+ PlanStatus.SignInStart.Name +"]状态的不允许签到，当前场次状态为:"+ PlanStatus.From(roomplan.PlanStatusId).Name+"" });
+            }
             if (DateTime.Now < roomplan.SignInTime.AddMinutes(-30) || DateTime.Now > roomplan.SignInTime.AddMinutes(20))
             {
                 return Ok(new { success = false, message = string.Format("未在签到时间内不允许签到，签到时间为{0}-{1}",roomplan.SignInTime.AddMinutes(-30), roomplan.SignInTime.AddMinutes(20)) });
