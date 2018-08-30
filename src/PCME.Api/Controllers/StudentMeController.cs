@@ -163,7 +163,7 @@ namespace PCME.Api.Controllers
             //取得带科目ID的作业成绩
             var homeworkresult2 = (from homeworkresult_ in homeworkresult1
                                    join examsubject in context.ExamSubjects on homeworkresult_.CategoryCode equals examsubject.Code
-                                   group new { examsubject.Id, homeworkresult_.Score, homeworkresult_.StudentId } by new { examsubject.Id, homeworkresult_.StudentId, homeworkresult_.Score } into g
+                                   group new { examsubject.Id, homeworkresult_.Score, homeworkresult_.StudentId } by new { examsubject.Id, homeworkresult_.StudentId } into g
                                    select new { g.Key.Id, g.Key.StudentId, homeworkscore= g.Sum(c => c.Score) });
                                    //select new { g.k homeworkresult_.Id, homeworkresult_.CategoryCode, homeworkresult_.Score, examsubjectid = examsubject.Id }).ToList();
             //联合成绩
@@ -186,7 +186,7 @@ namespace PCME.Api.Controllers
                 { "examsubjectname",c.Name},
                 { "ticketnum",c.TicketNum},
                 { "createtime",c.CreateTime},
-                {"homeworkscore",c.homeworkscore}
+                {"homeworkscore",Math.Round(c.homeworkscore,2)}
             });
             var total = search.Count();
             return Ok(new { total, data = result });

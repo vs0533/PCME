@@ -71,7 +71,8 @@ namespace PCME.Api.Controllers
                 { "examinationroomplan.ExamStartTime",c.examinationroomplan.ExamStartTime},
                 { "examinationroomplan.ExamEndTime",c.examinationroomplan.ExamEndTime},
                 {"examroomplanticket.Id",c.examroomplanticket.Id},
-                {"examroomplanticket.Num",c.examroomplanticket.Num}
+                {"examroomplanticket.Num",c.examroomplanticket.Num},
+                {"examinationroomplan.Id",c.examinationroomplan.Id}
             });
             var total = admissionTicket.Count();
             return Ok(new { total, data = result });

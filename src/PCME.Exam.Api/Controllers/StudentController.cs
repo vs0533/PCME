@@ -18,11 +18,11 @@ namespace PCME.Exam.Api.Controllers
         {
             this.context = context;
         }
-
+        //查询或者扫描后显示的签到窗口
         [HttpPost]
         [Route("readbyidcard")]
         [Authorize(Roles = "RoomAccount")]
-        public IActionResult ReadByIdcard(string idcard)
+        public IActionResult ReadByIdcard(string idcard,int roomplantid)
         {
             var roomAccountId = int.Parse(User.FindFirstValue("AccountId"));
             var roomaccount = context.ExaminationRoomAccount.Find(roomAccountId);
@@ -32,7 +32,7 @@ namespace PCME.Exam.Api.Controllers
                                join workunits in context.WorkUnits on students.WorkUnitId equals workunits.Id
                                join examsubjects in context.ExamSubjects on admissiontickets.ExamSubjectId equals examsubjects.Id
                                join examinationroomplans in context.ExaminationRoomPlans on admissiontickets.ExaminationRoomPlanId equals examinationroomplans.Id
-                               where students.IDCard == idcard && examinationroomplans.ExaminationRoomId == roomaccount.ExaminationRoomId
+                               where students.IDCard == idcard && admissiontickets.ExaminationRoomPlanId == roomplantid //examinationroomplans.ExaminationRoomId == roomaccount.ExaminationRoomId
                                select new
                                {
                                    students.Id,

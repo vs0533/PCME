@@ -70,6 +70,49 @@ namespace PCME.Exam.Api.Controllers
             return Ok(new { success = true, message = "签到成功" });
         }
 
+        /// <summary>
+        /// 考生签到-同一考场全签
+        /// </summary>
+        /// <param name="ticket"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("signin2")]
+        [Authorize(Roles = "RoomAccount")]
+        public IActionResult SignIn2(string idcard, int roomplantid)
+        {
+
+            var roomaccountid = int.Parse(User.FindFirstValue("AccountId"));
+            var roomaccount = context.ExaminationRoomAccount.Find(roomaccountid);
+            if (roomaccount == null)
+            {
+                return Ok(new { success = false, message = "超时，请重新登录" });
+            }
+            var student = context.Students.Where(c => c.IDCard == idcard).FirstOrDefault();
+            var admissionticket = context.AdmissionTickets.Where(c => c.StudentId == student.Id && c.ExaminationRoomPlanId == roomplantid).ToList();
+
+            var roomplan = context.ExaminationRoomPlans.Where(c => c.Id == roomplantid).FirstOrDefault();
+            if (!admissionticket.Any())
+            {
+                return Ok(new { success = false, message = "未找到该人员与当前签到场次【"+roomplan.Num+"】匹配的准考证号" });
+            }
+
+            if (roomplan.PlanStatusId != PlanStatus.SignInStart.Id)
+            {
+                return Ok(new { success = false, message = "场次状态非[" + PlanStatus.SignInStart.Name + "]状态的不允许签到，当前场次状态为:" + PlanStatus.From(roomplan.PlanStatusId).Name + "" });
+            }
+            if (DateTime.Now < roomplan.SignInTime.AddMinutes(-30) || DateTime.Now > roomplan.SignInTime.AddMinutes(20))
+            {
+                return Ok(new { success = false, message = string.Format("未在签到时间内不允许签到，签到时间为{0}-{1}", roomplan.SignInTime.AddMinutes(-30), roomplan.SignInTime.AddMinutes(20)) });
+            }
+            foreach (var item in admissionticket)
+            {
+                item.SignIn();
+            }
+            context.AdmissionTickets.UpdateRange(admissionticket);
+            context.SaveChanges();
+            return Ok(new { success = true, message = "签到成功" });
+        }
+
         [HttpPost]
         [Route("readticketinfo")]
         [Authorize(Roles = "Exam")]
