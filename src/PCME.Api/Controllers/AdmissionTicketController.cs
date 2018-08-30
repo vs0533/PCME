@@ -117,11 +117,11 @@ namespace PCME.Api.Controllers
             {
                 return Ok(new { success = false, message = "存在相同的准考证号，生成失败" });
             }
-            var examsubjectisExists = context.AdmissionTickets.Where(c => c.ExamSubjectId == ticket.ExamSubjectId && c.StudentId == ticket.StudentId).Any();
-            if (examsubjectisExists)
-            {
-                return Ok(new { success = false, message = "存在相同【科目】的准考证号，生成失败" });
-            }
+            //var examsubjectisExists = context.AdmissionTickets.Where(c => c.ExamSubjectId == ticket.ExamSubjectId && c.StudentId == ticket.StudentId).Any();
+            //if (examsubjectisExists)
+            //{
+            //    return Ok(new { success = false, message = "存在相同【科目】的准考证号，生成失败" });
+            //}
 
             //更改报名标记 保存准考证
             var signup = context.SignUp.Where(c => c.Id == command.SignUpId).FirstOrDefault();

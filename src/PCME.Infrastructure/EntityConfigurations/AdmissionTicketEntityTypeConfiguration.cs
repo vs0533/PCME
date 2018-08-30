@@ -12,7 +12,7 @@ namespace PCME.Infrastructure.EntityConfigurations
         public void Configure(EntityTypeBuilder<AdmissionTicket> builder)
         {
             builder.HasIndex(t => t.Num).IsUnique();
-            builder.HasIndex(t => new { t.ExamSubjectId, t.StudentId }).IsUnique();
+            //builder.HasIndex(t => new { t.ExamSubjectId, t.StudentId }).IsUnique();
         }
     }
 }
