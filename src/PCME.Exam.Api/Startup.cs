@@ -78,8 +78,8 @@ namespace PCME.Exam.Api
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication(options =>
                 {
-                    //options.Authority = "http://60.210.113.42:8000";
-                    options.Authority = "http://localhost:8000";
+                    options.Authority = "http://60.210.113.42:8000";
+                    //options.Authority = "http://localhost:8000";
                     options.RequireHttpsMetadata = false;
                     options.JwtValidationClockSkew = TimeSpan.FromSeconds(0);//过期偏移为零
                     options.ApiName = "api2";
