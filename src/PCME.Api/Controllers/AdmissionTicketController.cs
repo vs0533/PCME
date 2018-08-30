@@ -89,6 +89,11 @@ namespace PCME.Api.Controllers
             }
             var plan = context.ExaminationRoomPlans.Where(c => c.Id == command.ExaminationRoomPlanId).FirstOrDefault();
             int plancount = context.AdmissionTickets.Where(c => c.ExaminationRoomPlanId == command.ExaminationRoomPlanId).Count();
+            var student_admissionTickets = context.AdmissionTickets.Where(c => c.StudentId == studentId && c.ExaminationRoomPlanId == command.ExaminationRoomPlanId);
+            if (student_admissionTickets.Any())
+            {
+                return Ok(new { success = false, message = "您已经有一个准考证选择了这个场次，不允许再选择该场次" });
+            }
             var examsubject = context.ExamSubjects.Find(command.ExamSubjectId);
             if (plancount >= plan.Galleryful)
             {
@@ -114,7 +119,7 @@ namespace PCME.Api.Controllers
             var examsubjectisExists = context.AdmissionTickets.Where(c => c.ExamSubjectId == ticket.ExamSubjectId && c.StudentId == ticket.StudentId).Any();
             if (examsubjectisExists)
             {
-                return Ok(new { success = false, message = "存在相同科目的准考证号，生成失败" });
+                return Ok(new { success = false, message = "存在相同【科目】的准考证号，生成失败" });
             }
 
             //更改报名标记 保存准考证
