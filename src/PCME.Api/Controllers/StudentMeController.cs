@@ -159,20 +159,20 @@ namespace PCME.Api.Controllers
                               where examresult_.StudentId == loginStudentId
                               select examresult_).ToList();
             //取得作业成绩
-            var homeworkresult1 = testContext.HomeWorkResult.Where(c => c.StudentId == loginStudentId).ToList();
+            //var homeworkresult1 = testContext.HomeWorkResult.Where(c => c.StudentId == loginStudentId).ToList();
             //取得带科目ID的作业成绩
-            var homeworkresult2 = (from homeworkresult_ in homeworkresult1
-                                   join examsubject in context.ExamSubjects on homeworkresult_.CategoryCode equals examsubject.Code
-                                   group new { examsubject.Id, homeworkresult_.Score, homeworkresult_.StudentId } by new { examsubject.Id, homeworkresult_.StudentId } into g
-                                   select new { g.Key.Id, g.Key.StudentId, homeworkscore= g.Sum(c => c.Score) });
+            //var homeworkresult2 = (from homeworkresult_ in homeworkresult1
+            //                       join examsubject in context.ExamSubjects on homeworkresult_.CategoryCode equals examsubject.Code
+            //                       group new { examsubject.Id, homeworkresult_.Score, homeworkresult_.StudentId } by new { examsubject.Id, homeworkresult_.StudentId } into g
+            //                       select new { g.Key.Id, g.Key.StudentId, homeworkscore= g.Sum(c => c.Score) });
                                    //select new { g.k homeworkresult_.Id, homeworkresult_.CategoryCode, homeworkresult_.Score, examsubjectid = examsubject.Id }).ToList();
             //联合成绩
             var search = from examresult1 in examresult
                          join examsubjects in context.ExamSubjects on examresult1.ExamSubjectId equals examsubjects.Id
-                         join homeworkresult in homeworkresult2 on examresult1.ExamSubjectId equals homeworkresult.Id into left2
-                         from homeworkresult in left2.DefaultIfEmpty()
+                         //join homeworkresult in homeworkresult2 on examresult1.ExamSubjectId equals homeworkresult.Id into left2
+                         //from homeworkresult in left2.DefaultIfEmpty()
                          orderby examresult1.CreateTime descending
-                         select new { examresult1.Id, examresultscore=examresult1.Score, examresult1.TicketNum, examresult1.CreateTime, examsubjects.Name,homeworkresult.homeworkscore};
+                         select new { examresult1.Id, examresultscore=examresult1.Score, examresult1.TicketNum, examresult1.CreateTime, examsubjects.Name};
             //search = search
             //     .FilterAnd(filter.ToObject<Filter>())
             //     .FilterOr(query.ToObject<Filter>());
@@ -185,8 +185,8 @@ namespace PCME.Api.Controllers
                 { "score",c.examresultscore},
                 { "examsubjectname",c.Name},
                 { "ticketnum",c.TicketNum},
-                { "createtime",c.CreateTime},
-                {"homeworkscore",Math.Round(c.homeworkscore,2)}
+                { "createtime",c.CreateTime}//,
+                //{"homeworkscore",Math.Round(c.homeworkscore,2)}
             });
             var total = search.Count();
             return Ok(new { total, data = result });
