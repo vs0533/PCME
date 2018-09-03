@@ -363,6 +363,7 @@ namespace PCME.Api.Controllers
                 return Ok("该报名表是空的，并不能进行报名");
             }
             List<dynamic> exists = new List<dynamic>();
+            List<dynamic> exists_credits = new List<dynamic>();
             List<SignUp> signUps = new List<SignUp>();
             List<ExamRoomPlanTicket> examRoomPlanTickeds = new List<ExamRoomPlanTicket>();
             foreach (var item in signUpCollection)
@@ -374,19 +375,31 @@ namespace PCME.Api.Controllers
                 }
                 else//否则添加到正式报名表中 并增加人员生成准考证权限
                 {
-                    SignUp signUp = new SignUp(item.StudentId, item.ExamSubjectId, signUpForUnit.Id, loginTrainingCenterId, false, DateTime.Now);
-                    signUps.Add(signUp);
-                    //item.Student.AddaTicketCtr();
-                    //string idcard = item.Student.IDCard;
-                    //string num = idcard.Substring(idcard.Length - 4, 4);
-                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-",""), item.StudentId, loginTrainingCenterId);
-                    examRoomPlanTickeds.Add(ticket);
+                    var creditexam_exists = context.CreditExams.Where(c => c.StudentId == item.StudentId && c.SubjectId == item.ExamSubjectId).Any();
+                    if (creditexam_exists)
+                    {
+                        exists_credits.Add(new { studentname = item.Student.Name, examsubjectname = item.ExamSubject.Name });
+                    }
+                    else {
+                        SignUp signUp = new SignUp(item.StudentId, item.ExamSubjectId, signUpForUnit.Id, loginTrainingCenterId, false, DateTime.Now);
+                        signUps.Add(signUp);
+                        //item.Student.AddaTicketCtr();
+                        //string idcard = item.Student.IDCard;
+                        //string num = idcard.Substring(idcard.Length - 4, 4);
+                        ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-", ""), item.StudentId, loginTrainingCenterId);
+                        examRoomPlanTickeds.Add(ticket);
+                    }
                 }
             }
             if (exists.Any())
             {
                 var existsliststr = string.Join("<br >", exists.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
-                return Ok(string.Format("报名表中包含已经报名成功的人员<br>{0}", existsliststr));
+                return Ok(string.Format("报名失败，现有的报名表中包含已经报名成功的人员<br>{0}", existsliststr));
+            }
+            if (exists_credits.Any())
+            {
+                var existsliststr = string.Join("<br >", exists_credits.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
+                return Ok(string.Format("报名失败，报名表中包含科目已经合格的人员<br>{0}", existsliststr));
             }
             //if (!signUps.Any())
             //{
@@ -455,6 +468,7 @@ namespace PCME.Api.Controllers
             }
             //Dictionary<string, string> exists = new Dictionary<string, string>();
             List<dynamic> exists = new List<dynamic>();
+            List<dynamic> exists_credits = new List<dynamic>();
             List<SignUp> signUps = new List<SignUp>();
             List<ExamRoomPlanTicket> examRoomPlanTickeds = new List<ExamRoomPlanTicket>();
             foreach (var item in signUpStudentCollection)
@@ -466,18 +480,31 @@ namespace PCME.Api.Controllers
                 }
                 else//否则添加到正式报名表中 并增加人员生成准考证权限
                 {
-                    SignUp signUp = new SignUp(signUpForStudent.signupstudent.StudentId, item.examsubject.Id, null, loginTrainingCenterId, false, DateTime.Now);
-                    signUps.Add(signUp);
-                    //signUpForStudent.student.AddaTicketCtr();
-                    
-                    ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-", ""), signUpForStudent.signupstudent.StudentId, loginTrainingCenterId);
-                    examRoomPlanTickeds.Add(ticket);
+                    var creditexam_exists = context.CreditExams.Where(c => c.StudentId == signUpForStudent.signupstudent.StudentId && c.SubjectId == item.signupstudentcollection.ExamSubjectId).Any();
+                    if (creditexam_exists)
+                    {
+                        exists_credits.Add(new { studentname = signUpForStudent.student.Name, examsubjectname = item.examsubject.Name });
+                    }
+                    else
+                    {
+                        SignUp signUp = new SignUp(signUpForStudent.signupstudent.StudentId, item.examsubject.Id, null, loginTrainingCenterId, false, DateTime.Now);
+                        signUps.Add(signUp);
+                        //signUpForStudent.student.AddaTicketCtr();
+
+                        ExamRoomPlanTicket ticket = new ExamRoomPlanTicket(Guid.NewGuid().ToString().Replace("-", ""), signUpForStudent.signupstudent.StudentId, loginTrainingCenterId);
+                        examRoomPlanTickeds.Add(ticket);
+                    }
                 }
             }
             if (exists.Any())
             {
                 var existsliststr = string.Join("<br >", exists.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
-                return Ok(string.Format("报名表中包含已经报名成功的人员<br>{0}", existsliststr));
+                return Ok(string.Format("报名失败，报名表中包含已经报名成功的人员<br>{0}", existsliststr));
+            }
+            if (exists_credits.Any())
+            {
+                var existsliststr = string.Join("<br >", exists_credits.Select(c => string.Format("姓名:{0} - 科目:{1}", c.studentname, c.examsubjectname)));
+                return Ok(string.Format("报名失败，报名表中包含科目已经合格的人员<br>{0}", existsliststr));
             }
             //if (!signUps.Any())
             //{
