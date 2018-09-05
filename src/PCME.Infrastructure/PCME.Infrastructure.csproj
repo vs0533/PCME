@@ -38,6 +38,7 @@
     <Compile Remove="Migrations\20180711091728_addchangestudentunit.cs" />
     <Compile Remove="Migrations\20180718093149_addsignupstudent.cs" />
     <Compile Remove="Migrations\20180718093448_addsignupstudent.cs" />
+    <Compile Remove="Migrations\20180905030159_add_printeddata.cs" />
     <Compile Remove="Migrations\TestDB\20180807090447_init.cs" />
     <Compile Remove="Migrations\TestDB\20180807090719_init.cs" />
     <Compile Remove="Migrations\TestDB\20180807091115_init.cs" />

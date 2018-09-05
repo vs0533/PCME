@@ -11,6 +11,10 @@ namespace PCME.Domain.AggregatesModel.CertificateAggregates
         public string Data { get; private set; }
         public CertificateCategory Category { get; private set; }
         public DateTime CreateTime { get; private set; }
+        public PrintedData()
+        {
+
+        }
 
         public PrintedData(int studentId, string data, CertificateCategory category, DateTime createTime)
         {

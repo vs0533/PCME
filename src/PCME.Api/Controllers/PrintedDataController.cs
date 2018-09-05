@@ -21,25 +21,29 @@ namespace PCME.Api.Controllers
         public IActionResult Save([FromBody]JObject jObject,int type)
         {
             int studentid = (int)jObject["studentid"];
-            var isexists = dbContext.PrintedData.Where(c => c.StudentId == studentid);
+            var isexists = dbContext.PrintedData.Where(c => c.StudentId == studentid && c.Category.Id == type);
             bool insert = true;
             if (!isexists.Any())
             {
                 insert = true;
             }
-            var time = isexists.OrderByDescending(c => c.CreateTime).FirstOrDefault().CreateTime;
-            if (DateTime.Now < time.AddDays(30) && DateTime.Now > time.AddDays(-30))
-            {
-                insert = false;
+            else {
+                var time = isexists.OrderByDescending(c => c.CreateTime).FirstOrDefault().CreateTime;
+                if (DateTime.Now < time.AddDays(30) && DateTime.Now > time.AddDays(-30))
+                {
+                    insert = false;
+                }
             }
+            
 
             if (insert)
             {
                 PrintedData printedData = new PrintedData(studentid, jObject.ToString(), CertificateCategory.From(type), DateTime.Now);
                 dbContext.PrintedData.Add(printedData);
                 dbContext.SaveChangesAsync();
+                return Ok(1);
             }
-            return Ok(1);
+            return Ok(-1);
         }
     }
 }
