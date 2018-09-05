@@ -5,6 +5,7 @@ using PCME.Domain.AggregatesModel.AdmissionTicketAggregates;
 using PCME.Domain.AggregatesModel.AdmissionTicketLogAggregates;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.BookAggregates;
+using PCME.Domain.AggregatesModel.CertificateAggregates;
 using PCME.Domain.AggregatesModel.ChangeStudentUnitAggregates;
 using PCME.Domain.AggregatesModel.CreditExamAggregates;
 using PCME.Domain.AggregatesModel.CreditTrainAggregates;
@@ -88,6 +89,8 @@ namespace PCME.Infrastructure
         public DbSet<ExaminationRoomAccount> ExaminationRoomAccount { get; set; }
         public DbSet<ExamRoomPlanTicket> ExamRoomPlanTicket { get; set; }
 
+        public DbSet<PrintedData> PrintedData { get; set; }
+ 
 
         //private readonly IMediator _mediator;
 
@@ -131,6 +134,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new PublishTypeEntityTypeConfiguration());
             builder.ApplyConfiguration(new SignUpStudentEntityTypeConfiguration());
             builder.ApplyConfiguration(new ExaminationRoomAccountEntityTypeConfiguration());
+            builder.ApplyConfiguration(new CertificateCategoryEntityTypeConfiguration());
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

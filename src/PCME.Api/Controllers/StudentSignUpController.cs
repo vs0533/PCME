@@ -38,13 +38,16 @@ namespace PCME.Api.Controllers
         [Authorize(Roles= "Student")]
         public IActionResult StoreRead(int start,int limit,string filter,string query,string navigates) {
             var studentId = int.Parse(User.FindFirstValue("AccountId"));
-
+            var passexamsubject = context.CreditExams.Where(c => c.StudentId == studentId).Select(c=>c.SubjectId).ToList();
             var signUp = from signup in context.SignUp
                          join trainingcenter in context.TrainingCenter on signup.TrainingCenterId equals trainingcenter.Id into left1
                          from trainingcenter in left1.DefaultIfEmpty()
                          join examsubject in context.ExamSubjects on signup.ExamSubjectId equals examsubject.Id// into left2
                          //from examsubject in left2.DefaultIfEmpty()
-                         where signup.TicketIsCreate == false && signup.StudentId == studentId
+                         where 
+                         //signup.TicketIsCreate == false && 
+                         passexamsubject.Contains(signup.ExamSubjectId) == false &&
+                         signup.StudentId == studentId
                          select new { signup, trainingcenter, examsubject };
 
             signUp = signUp
