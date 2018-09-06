@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
+using PCME.Domain.AggregatesModel.CertificateAggregates;
 using PCME.Domain.AggregatesModel.CreditExamAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Domain.AggregatesModel.ExamOpenInfoAggregates;
@@ -239,6 +240,10 @@ namespace PCME.Api.Infrastructure
                     {
                         testcontext.TestType.AddRange(TestType.List());
                         await testcontext.SaveChangesAsync();
+                    }
+                    if (!context.CertificateCategory.Any()) {
+                        context.CertificateCategory.AddRange(CertificateCategory.List());
+                        await context.SaveChangesAsync();
                     }
                     #endregion
                     #region 字典表初始化数据
