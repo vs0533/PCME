@@ -22,6 +22,9 @@ namespace PCME.Api.Controllers
         {
             this.dbContext = dbContext;
         }
+        [HttpPost]
+        [Route("save")]
+        [Authorize(Roles ="Student")]
         public IActionResult Save([FromBody]JObject jObject, int type)
         {
             int studentid = (int)jObject["studentid"];
@@ -92,6 +95,29 @@ namespace PCME.Api.Controllers
             });
             var total = search.Count();
             return Ok(new { total, data = result });
+        }
+        [HttpPost]
+        [Route("getbynum")]
+        [Authorize(Roles = "Admin,Unit")]
+        public IActionResult GetByNum(string num) {
+            var c = (from printedData in dbContext.PrintedData
+                         join certificatecategory in dbContext.CertificateCategory on printedData.CertificateCategoryId equals certificatecategory.Id
+                         where printedData.Num == num
+                         orderby printedData.Id descending
+                         select new { printedData, certificatecategory }).FirstOrDefault();
+
+
+            var result =new Dictionary<string, object>
+            {
+                {"id",c.printedData.Id},
+                {"printedData.Num",c.printedData.Num},
+                {"printedData.Data",c.printedData.Data},
+                {"printedData.CreateTime",c.printedData.CreateTime},
+                {"printedData.StudentId",c.printedData.StudentId},
+                {"certificatecategory.Id",c.certificatecategory.Id},
+                {"certificatecategory.Name",c.certificatecategory.Name}
+            };
+            return Ok(result);
         }
     }
 }
