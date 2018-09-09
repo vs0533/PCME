@@ -143,6 +143,10 @@ namespace PCME.Domain.AggregatesModel.StudentAggregates
                 TicketCtr = 0;
             }
         }
+        public void ChangeStudentType(int typeid)
+        {
+            StudentTypeId = typeid;
+        }
 
     }
 }

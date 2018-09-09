@@ -14,6 +14,8 @@ using System.Security.Claims;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using PCME.Domain.AggregatesModel.WorkUnitAccountAggregates;
+using PCME.Domain.AggregatesModel.StudentAggregates;
 
 namespace PCME.Api.Controllers
 {
@@ -73,6 +75,7 @@ namespace PCME.Api.Controllers
         public async Task<IActionResult> Post([FromBody]studentparment studentparment , string opertype)
         {
             var loginUnitId = int.Parse(User.FindFirstValue("WorkUnitId"));
+            var accountId = int.Parse(User.FindFirstValue("AccountId"));
             ChangeStudentUnitCreateOrUpdateCommand command = new ChangeStudentUnitCreateOrUpdateCommand();
             if (opertype == "new")
             {
@@ -87,7 +90,22 @@ namespace PCME.Api.Controllers
             }
             if (student.WorkUnitId == loginUnitId)
             {
-                ModelState.AddModelError("student.IDCard", "该人员已经在您的单位中了，不需要调动");
+                var account = context.WorkUnitAccounts.Include(d=>d.WorkUnitAccountType).FirstOrDefault(c => c.Id == accountId);
+                
+                switch (account.WorkUnitAccountTypeId)
+                {
+                    case 3:
+                        student.ChangeStudentType(StudentType.Professional.Id);
+                        break;
+                    case 4:
+                        student.ChangeStudentType(StudentType.CivilServant.Id);
+                        break;
+                    default:
+                        break;
+                }
+                context.Students.Update(student);
+                context.SaveChanges();
+                ModelState.AddModelError("student.IDCard", "该人员已经在您的单位中了，不需要调动,操作成功重置了人员的身份.");
             }
             var isExists = await context.ChangeStudentUnit.Where(c => 
             c.StudentId == student.Id && c.AuditStatusId == AuditStatus.Wait.Id
