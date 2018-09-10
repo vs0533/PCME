@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 
 namespace PCME.Api.Controllers
 {
@@ -51,7 +52,7 @@ namespace PCME.Api.Controllers
 
             var creditexam14_18 = (from creditexam_ in context.CreditExams
                                   join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
-                                  where creditexam_.StudentId == student.Id && creditexam_.CreateTime >= new DateTime(2013, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
+                                  where creditexam_.StudentId == student.Id && examsubjects.OpenTypeId == OpenType.Professional.Id && creditexam_.CreateTime >= new DateTime(2013, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
                                   select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
             var creditexam14_18_result = await creditexam14_18.Take(8).ToListAsync();
             var count = creditexam14_18.Count();

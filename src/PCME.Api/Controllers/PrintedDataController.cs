@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
+using PCME.Api.Infrastructure;
 using PCME.Domain.AggregatesModel.CertificateAggregates;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace PCME.Api.Controllers
@@ -22,6 +24,12 @@ namespace PCME.Api.Controllers
         {
             this.dbContext = dbContext;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jObject"></param>
+        /// <param name="type">1为继续教育合格证书 2为参加职称评审合格证书</param>
+        /// <returns></returns>
         [HttpPost]
         [Route("save")]
         [Authorize(Roles ="Student")]
@@ -29,9 +37,18 @@ namespace PCME.Api.Controllers
         {
             int studentid = (int)jObject["studentid"];
             int cf = (int)jObject["cf"];
-            if (cf != 0)
+            if (cf != 0 && type == 1)
             {
                 return Ok(new { success = false, message = "当前学分不合格，生成失败。" });
+            }
+            if (type == 2)
+            {
+                var jarray = JArray.FromObject(jObject["creditexam"]);
+                if (jarray.Count()<5)
+                {
+                    return Ok(new { success = false, message = "合格科目未达到5门，生成失败。" });
+                }
+
             }
             var isexists = dbContext.PrintedData.Where(c => c.StudentId == studentid && c.CertificateCategoryId == type);
             bool insert = true;
@@ -58,6 +75,7 @@ namespace PCME.Api.Controllers
             }
             return Ok(new { success=false,message="上一次证书生成时间小于系统设置的180天，生成失败。"});
         }
+        
         private string CreateNum(int count, int studentid,int type)
         {
             var ctr = count + 1;
@@ -66,7 +84,7 @@ namespace PCME.Api.Controllers
             {
                 throw new Exception("生成合格证ID时出错 原因：人员信息不存在");
             }
-            return string.Format("{0}{1}{2}", type.ToString(),student.IDCard, ctr.ToString().PadLeft(5, '0'));
+            return string.Format("{0}{1}{2}{3}", type.ToString(),student.IDCard,Utils.GenerateRandomCode(3),ctr.ToString().PadLeft(2, '0'));
         }
         [HttpPost]
         [Route("read")]
