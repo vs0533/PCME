@@ -1,4 +1,5 @@
-﻿USE PCME_TEST
+﻿
+USE PCME_TEST
 IF not exists(select 1 from sys.servers where name='PCME')
 begin
 EXEC sp_addlinkedserver   'PCME ', ' ', 'SQLOLEDB ', '10.128.200.166' 
@@ -33,12 +34,12 @@ DECLARE tempCursor CURSOR
 FOR
     (SELECT id,createtime,examsubjectid,score,studentid,ticketnum,isnull(homeworkscore,0),ISNULL(homeworkctr,0),invigilate,istoexamaudit FROM #temp2) ORDER BY id								--创建游标tempCursor，并定义游标所指向的集合   
 OPEN tempCursor;								--打开游标 
-DECLARE @id INT,@createtime datetime,@examsubjectid INT,@score float,@ticketnum nvarchar(20),@studentid float,@homeworkscore INT,@homeworkctr FLOAT,@istoexam BIT,@wj NVARCHAR(10); 
+DECLARE @id INT,@createtime datetime,@examsubjectid INT,@score float,@ticketnum nvarchar(20),@studentid float,@homeworkscore float,@homeworkctr FLOAT,@istoexam BIT,@wj NVARCHAR(10); 
 FETCH NEXT FROM tempCursor INTO @id,@createtime,@examsubjectid,@score,@studentid,@ticketnum,@homeworkscore,@homeworkctr,@wj,@istoexam		--游标读取下一个数据  
 WHILE @@fetch_status = 0                        --游标读取下一个数据的状态，0表示读取成功  
     BEGIN  
         DECLARE @sum FLOAT
-        SET @sum = @score+convert(int,@homeworkscore)
+        SET @sum = convert(int,(@score+@homeworkscore))    --@score+@homeworkscore--convert(int,@homeworkscore)
 		--PRINT (convert(varchar(50),@id)+':'+convert(varchar(50),@createtime)+':'+convert(varchar(50),@examsubjectid)
 		--+':'+convert(varchar(50),@studentid)+':'+convert(varchar(50),@ticketnum)
 		--+':'+convert(varchar(50),@homeworkscore)+':'+convert(varchar(50),@score)
@@ -88,3 +89,4 @@ END
 go
 --查看已注册的链接服务器
 --exec sp_linkedservers
+

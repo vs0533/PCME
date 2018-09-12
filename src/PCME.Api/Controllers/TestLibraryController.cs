@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using PCME.Api.Extensions;
+using PCME.Domain.AggregatesModel.ExamResultAggregates;
 using PCME.Domain.AggregatesModel.HomeWorkAggregates;
 using PCME.Domain.AggregatesModel.TestAggregates;
 using PCME.Infrastructure;
@@ -101,6 +102,41 @@ namespace PCME.Api.Controllers
             await testContext.SaveChangesAsync();
 
             return Ok(new { success = true,data=new { score,examsubjectid,ctr = curResult.Count()},message="交卷成功" });
+        }
+
+        [Route("savecs")]
+        [HttpPost]
+        [Authorize(Roles = "Student")]
+        public async Task<IActionResult> SaveCS([FromBody]JObject obj)
+        {
+            var ticketid = (int)obj["ticketid"];
+            var score = (float)obj["score"];
+            var examsubjectid = (int)obj["examsubject"];
+            var ticket = await context.AdmissionTicketCS.FindAsync(ticketid);
+            var student = await context.Students.FindAsync(ticket.StudentId);
+            var examSubject = await context.ExamSubjects.FindAsync(examsubjectid);
+
+
+            if (ticket.PostPaperTime != null)
+            {
+                return Ok(new { success = false, message = "已经交卷，不用重复提交" });
+            }
+
+            //var examresult = testContext.ExamResult.Where(c => c.StudentId == student.Id && c.ExamSubjectId == examsubjectid);
+            //if (examresult.Any())
+            //{
+            //    return Ok(new { success = false, message = "您已经考过本科目了，请联系管理员" });
+            //}
+
+            ExamResult examresultadd = new ExamResult(ticket.Num, ticket.Id, ticket.StudentId, ticket.ExamSubjectId, score, DateTime.Now, false);
+            await testContext.ExamResult.AddAsync(examresultadd);
+            await testContext.SaveChangesAsync();
+
+            ticket.PostPaper();
+            context.AdmissionTicketCS.Update(ticket);
+            await context.SaveChangesAsync();
+
+            return Ok(new { success = true, data = new { score, examsubjectid, ctr = 0 }, message = "交卷成功" });
         }
     }
 }

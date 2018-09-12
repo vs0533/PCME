@@ -91,6 +91,8 @@ namespace PCME.Infrastructure
 
         public DbSet<PrintedData> PrintedData { get; set; }
         public DbSet<CertificateCategory> CertificateCategory { get; set; }
+
+        public DbSet<AdmissionTicketCS> AdmissionTicketCS { get; set; }
  
 
         //private readonly IMediator _mediator;
@@ -137,6 +139,7 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new ExaminationRoomAccountEntityTypeConfiguration());
             builder.ApplyConfiguration(new CertificateCategoryEntityTypeConfiguration());
             builder.ApplyConfiguration(new PrintedDataEntityTypeConfiguration());
+            builder.ApplyConfiguration(new AdmissionTicketCSEntityTypeConfiguration());
 
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))

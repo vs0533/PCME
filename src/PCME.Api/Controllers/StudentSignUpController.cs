@@ -4,6 +4,7 @@ using PCME.Api.Application.ParameBinder;
 using PCME.Api.Extensions;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
+using PCME.Domain.AggregatesModel.ExamSubjectAggregates;
 using PCME.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace PCME.Api.Controllers
             this.context = context;
         }
         /// <summary>
-        /// 未生成准考证的报名
+        /// 报名列表
         /// </summary>
         /// <param name="start"></param>
         /// <param name="limit"></param>
@@ -47,7 +48,55 @@ namespace PCME.Api.Controllers
                          where 
                          //signup.TicketIsCreate == false && 
                          passexamsubject.Contains(signup.ExamSubjectId) == false &&
-                         signup.StudentId == studentId
+                         signup.StudentId == studentId &&
+                         examsubject.OpenTypeId == OpenType.Professional.Id
+                         select new { signup, trainingcenter, examsubject };
+
+            signUp = signUp
+                .FilterAnd(filter.ToObject<Filter>())
+                .FilterOr(query.ToObject<Filter>());
+
+            var item = signUp.ToList(); //signUp.Skip(start).Take(limit);
+            var result = item.Select(c => new Dictionary<string, object>
+            {
+                { "id",c.signup.Id},
+                { "examsubject.Id",c.examsubject.Id},
+                { "examsubject.Name",c.examsubject.Name},
+                { "trainingcenter.Id",c.trainingcenter.Id},
+                { "trainingcenter.Name",c.trainingcenter.Name},
+                { "signup.CreateTime",c.signup.CreateTime}
+            });
+
+            var total = signUp.Count();
+            return Ok(new { total, data = result });
+        }
+
+        /// <summary>
+        /// 未生成准考证的报名 非集中考试
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="limit"></param>
+        /// <param name="filter"></param>
+        /// <param name="query"></param>
+        /// <param name="navigates"></param>
+        /// <returns></returns>
+        [Route("readcs")]
+        [HttpPost]
+        [Authorize(Roles = "Student")]
+        public IActionResult StoreReadCS(int start, int limit, string filter, string query, string navigates)
+        {
+            var studentId = int.Parse(User.FindFirstValue("AccountId"));
+            var passexamsubject = context.CreditExams.Where(c => c.StudentId == studentId).Select(c => c.SubjectId).ToList();
+            var signUp = from signup in context.SignUp
+                         join trainingcenter in context.TrainingCenter on signup.TrainingCenterId equals trainingcenter.Id into left1
+                         from trainingcenter in left1.DefaultIfEmpty()
+                         join examsubject in context.ExamSubjects on signup.ExamSubjectId equals examsubject.Id// into left2
+                         //from examsubject in left2.DefaultIfEmpty()
+                         where
+                         //signup.TicketIsCreate == false && 
+                         passexamsubject.Contains(signup.ExamSubjectId) == false &&
+                         signup.StudentId == studentId &&
+                         examsubject.OpenTypeId == OpenType.CivilServant.Id
                          select new { signup, trainingcenter, examsubject };
 
             signUp = signUp
