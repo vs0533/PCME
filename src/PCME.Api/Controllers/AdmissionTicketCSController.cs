@@ -85,10 +85,23 @@ namespace PCME.Api.Controllers
             }
             
             var examsubject = context.ExamSubjects.Find(command.ExamSubjectId);
-            var isexists = context.AdmissionTicketCS.Where(c => c.StudentId == studentId && c.ExamSubjectId == command.ExamSubjectId).FirstOrDefault();
-            if (isexists != null)
+            var admissionticketcs = context.AdmissionTicketCS.Where(c => c.StudentId == studentId && c.ExamSubjectId == command.ExamSubjectId).FirstOrDefault();
+
+            if (admissionticketcs != null && admissionticketcs.PostPaperTime == null)
             {
-                return Ok(new { success = false, message = "存在相同科目的准考证号，生成失败" });
+                return Ok(new { success = false, message = "该科目存在一个未使用的准考证，请不要重复生成准考证" });
+            }
+            if (admissionticketcs != null)
+            {
+                var homework = testcontext.HomeWorkResult.Where(c => c.StudentId == studentId && c.CategoryCode == examsubject.Code).ToList();
+                var examresult = testcontext.ExamResult.Where(c => c.ExamSubjectId == admissionticketcs.ExamSubjectId && c.StudentId == studentId).FirstOrDefault();
+                var homeworkscore = homework.Any() != true ? 0 : homework.Sum(c => c.Score);
+                var examscore = examresult == null ? 0 : examresult.Score;
+                var score = homeworkscore + examscore;
+                if (examscore > 0 && score >= 60)
+                {
+                    return Ok(new { success = false, message = "准考证已经合格，一个工作日后计入学分。" });
+                }
             }
             var count = context.AdmissionTicketCS.Count();
             count = count + 1;
