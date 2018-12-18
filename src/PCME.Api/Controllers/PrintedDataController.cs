@@ -50,6 +50,15 @@ namespace PCME.Api.Controllers
                 }
 
             }
+            if (type == 3)
+            {
+                var jarray = JArray.FromObject(jObject["creditexam3"]);
+                if (jarray.Count() < 3)
+                {
+                    return Ok(new { success = false, message = "聘任合格科目未达到5门，生成失败。" });
+                }
+
+            }
             var isexists = dbContext.PrintedData.Where(c => c.StudentId == studentid && c.CertificateCategoryId == type);
             bool insert = true;
             int count = isexists.Count();

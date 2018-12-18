@@ -1,8 +1,6 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
 using PCME.Exam.Api.Application.ParameBinder;
@@ -12,11 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using PCME.Domain.AggregatesModel.InvigilateAggregates;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace PCME.Exam.Api.Controllers
 {

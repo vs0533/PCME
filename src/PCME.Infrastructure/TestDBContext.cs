@@ -41,7 +41,7 @@ namespace PCME.Infrastructure
             public TestDBContext CreateDbContext(string[] args)
             {
                 var optionsBuilder = new DbContextOptionsBuilder<TestDBContext>()
-                    .UseSqlServer(@"Server=.;database=PCME_TEST;uid=sa;pwd=Abc@28122661");
+                    .UseSqlServer(@"Server=.;database=PCME_TEST;uid=sa;pwd=sa@28122661");
 
                 return new TestDBContext(optionsBuilder.Options);
                 //return new ApplicationDbContext(optionsBuilder.Options,new NoMediator());

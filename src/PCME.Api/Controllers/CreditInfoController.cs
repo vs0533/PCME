@@ -27,7 +27,7 @@ namespace PCME.Api.Controllers
         public async Task<IActionResult> PassInfo()
         {
             var studentId = int.Parse(User.FindFirstValue("AccountId"));
-            var student = await context.Students.Include(s=>s.WorkUnit).Where(c=>c.Id == studentId).FirstOrDefaultAsync();
+            var student = await context.Students.Include(s => s.WorkUnit).Where(c => c.Id == studentId).FirstOrDefaultAsync();
             var professionalInfo = await context.ProfessionalInfos.Where(c => c.StudentId == studentId).Include(s => s.ProfessionalTitle).FirstOrDefaultAsync();
 
             var creditexam = await context.CreditExams.Where(c =>
@@ -51,11 +51,20 @@ namespace PCME.Api.Controllers
                                     ).SumAsync(c => c.Credit);
 
             var creditexam14_18 = (from creditexam_ in context.CreditExams
-                                  join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
-                                  where creditexam_.StudentId == student.Id && examsubjects.OpenTypeId == OpenType.Professional.Id && creditexam_.CreateTime >= new DateTime(2013, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
-                                  select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
+                                   join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
+                                   where creditexam_.StudentId == student.Id && examsubjects.OpenTypeId == OpenType.Professional.Id && creditexam_.CreateTime >= new DateTime(2013, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
+                                   select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
+
+            var creditexam16_18 = (from creditexam_ in context.CreditExams
+                                   join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
+                                   where creditexam_.StudentId == student.Id && examsubjects.OpenTypeId == OpenType.Professional.Id && creditexam_.CreateTime >= new DateTime(2015, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
+                                   select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
+
             var creditexam14_18_result = await creditexam14_18.Take(8).ToListAsync();
+            var creditexam16_18_result = await creditexam16_18.Take(8).ToListAsync();
+
             var count = creditexam14_18.Count();
+            var count16_18 = creditexam16_18.Count();
             DateTime now = DateTime.Now;
             DateTime calculateDate = professionalInfo.CalculateDate;
             var jfzq = ((now.Year - calculateDate.Year) * 12 + now.Month - calculateDate.Month - 1) / 6 / 2.0;
@@ -85,7 +94,13 @@ namespace PCME.Api.Controllers
                     {"examsubjectname",c.Name },
                     {"credit",c.Credit}
                 }) },
-                {"count",count}
+                {"count",count},
+                {"creditexam3",creditexam16_18_result.Select(c=>new Dictionary<string,object>{
+                    {"admissionticketnum",c.AdmissionTicketNum },
+                    {"examsubjectname",c.Name },
+                    {"credit",c.Credit}
+                }) },
+                {"count3",count16_18}
             };
             return Ok(new { success = true, data = result });
         }
@@ -122,8 +137,19 @@ namespace PCME.Api.Controllers
                                    join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
                                    where creditexam_.StudentId == student.Id && creditexam_.CreateTime >= new DateTime(2013, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
                                    select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
+
+            var creditexam16_18 = (from creditexam_ in context.CreditExams
+                                   join examsubjects in context.ExamSubjects on creditexam_.SubjectId equals examsubjects.Id
+                                   where creditexam_.StudentId == student.Id && examsubjects.OpenTypeId == OpenType.Professional.Id && creditexam_.CreateTime >= new DateTime(2015, 12, 31) && creditexam_.CreateTime <= new DateTime(2019, 1, 1)
+                                   select new { creditexam_.AdmissionTicketNum, examsubjects.Name, creditexam_.Credit });
+
+
             var creditexam14_18_result = await creditexam14_18.Take(8).ToListAsync();
+            var creditexam16_18_result = await creditexam16_18.Take(8).ToListAsync();
+
             var count = creditexam14_18.Count();
+            var count16_18 = creditexam16_18.Count();
+
             DateTime now = DateTime.Now;
             DateTime calculateDate = professionalInfo.CalculateDate;
             var jfzq = ((now.Year - calculateDate.Year) * 12 + now.Month - calculateDate.Month - 1) / 6 / 2.0;
@@ -153,17 +179,23 @@ namespace PCME.Api.Controllers
                     {"examsubjectname",c.Name },
                     {"credit",c.Credit}
                 }) },
-                {"count",count}
+                {"count",count},
+                {"creditexam16-18",creditexam16_18_result.Select(c=>new Dictionary<string,object>{
+                    {"admissionticketnum",c.AdmissionTicketNum },
+                    {"examsubjectname",c.Name },
+                    {"credit",c.Credit}
+                }) },
+                {"count16-18",count16_18}
             };
             return Ok(new { success = true, data = result });
         }
-        [HttpPost]
-        [Route("read1")]
-        [Authorize(Roles = "Student")]
-        public async Task<IActionResult> Read1()
-        {
-            var studentId = int.Parse(User.FindFirstValue("AccountId"));
-            return Ok();
-        }
+        //[HttpPost]
+        //[Route("read1")]
+        //[Authorize(Roles = "Student")]
+        //public async Task<IActionResult> Read1()
+        //{
+        //    var studentId = int.Parse(User.FindFirstValue("AccountId"));
+        //    return Ok();
+        //}
     }
 }

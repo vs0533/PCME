@@ -10,7 +10,9 @@ namespace PCME.Domain.AggregatesModel.CertificateAggregates
     {
         public static CertificateCategory Cert1 = new CertificateCategory(1, "继续教育合格证书");
         public static CertificateCategory Cert2 = new CertificateCategory(2, "参加职称评审合格证书");
-        public static IEnumerable<CertificateCategory> List() => new[] { Cert1, Cert2 };
+        public static CertificateCategory Cert3 = new CertificateCategory(3, "参加职称聘任合格证书");
+
+        public static IEnumerable<CertificateCategory> List() => new[] { Cert1, Cert2,Cert3 };
         public CertificateCategory()
         {
 

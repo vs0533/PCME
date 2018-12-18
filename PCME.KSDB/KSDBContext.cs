@@ -19,8 +19,8 @@ namespace PCME.KSDB
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server =.;database=KSDB;uid=sa;pwd=Abc@28122661");
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server =.;database=KSDB;uid=sa;pwd=sa@28122661");
             }
         }
 
