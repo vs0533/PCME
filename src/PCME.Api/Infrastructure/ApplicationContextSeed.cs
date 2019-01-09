@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using PCME.Domain.AggregatesModel.ApplicationForm;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.CertificateAggregates;
 using PCME.Domain.AggregatesModel.ExaminationRoomPlanAggregates;
@@ -156,7 +157,16 @@ namespace PCME.Api.Infrastructure
             {
                 using (context)
                 {
+
                     context.Database.Migrate();
+                    if (!context.ApplyForSetting.Any())
+                    {
+                        ApplyForSetting applyforSetting = new ApplyForSetting(
+                               "145,147", DateTime.Now, DateTime.Now.AddDays(30), "2019年优秀考核人员申请表"
+                            );
+                        context.ApplyForSetting.Add(applyforSetting);
+                        context.SaveChanges();
+                    }
                     #region 枚举字典表初始化数据
                     if (!context.WorkUnitNature.Any())
                     {
@@ -959,6 +969,8 @@ namespace PCME.Api.Infrastructure
                         await testcontext.SaveChangesAsync();
                     }
                     #endregion
+
+
                 }
             });
 

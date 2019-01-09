@@ -14,11 +14,6 @@ namespace PCME.Domain.AggregatesModel.ApplicationForm
             get;
             private set;
         }
-        public ExamSubject ExamSubject
-        {
-            get;
-            private set;
-        }
         public DateTime StartTime
         {
             get;
