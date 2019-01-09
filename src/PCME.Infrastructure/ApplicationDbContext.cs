@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using PCME.Domain.AggregatesModel.AdmissionTicketAggregates;
 using PCME.Domain.AggregatesModel.AdmissionTicketLogAggregates;
+using PCME.Domain.AggregatesModel.ApplicationForm;
 using PCME.Domain.AggregatesModel.AuditStatusAggregates;
 using PCME.Domain.AggregatesModel.BookAggregates;
 using PCME.Domain.AggregatesModel.CertificateAggregates;
@@ -93,7 +94,10 @@ namespace PCME.Infrastructure
         public DbSet<CertificateCategory> CertificateCategory { get; set; }
 
         public DbSet<AdmissionTicketCS> AdmissionTicketCS { get; set; }
- 
+        public DbSet<ApplyTable> ApplyTable { get; set; }
+        public DbSet<ApplyForSetting> ApplyForSetting { get; set; }
+        public DbSet<StudentItem> StudentItem { get; set; }
+
 
         //private readonly IMediator _mediator;
 
@@ -141,6 +145,8 @@ namespace PCME.Infrastructure
             builder.ApplyConfiguration(new PrintedDataEntityTypeConfiguration());
             builder.ApplyConfiguration(new AdmissionTicketCSEntityTypeConfiguration());
 
+            builder.ApplyConfiguration(new StudentItemEntityTypeConfigration());
+
         }
         //public async Task<bool> SaveEntitiesAsync(CancellationToken cancellationToken = default(CancellationToken))
         //{ 
@@ -152,7 +158,7 @@ namespace PCME.Infrastructure
         {
             public ApplicationDbContext CreateDbContext(string[] args) {
                 var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
-					.UseSqlServer(@"Server=.;database=PCME;uid=sa;pwd=sa@28122661");
+					.UseSqlServer(@"Server=.;database=PCME;uid=sa;pwd=pwd@1234");
 
                 return new ApplicationDbContext(optionsBuilder.Options);
                 //return new ApplicationDbContext(optionsBuilder.Options,new NoMediator());
