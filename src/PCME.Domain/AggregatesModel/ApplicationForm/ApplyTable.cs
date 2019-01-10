@@ -37,23 +37,31 @@ namespace PCME.Domain.AggregatesModel.ApplicationForm
             _studentItems = new List<StudentItem>();
         }
 
-        public ApplyTable(int workUnitId, DateTime createTime, string num)
+        public int ApplyForSettingId { get; set; }
+        public ApplyForSetting ApplyForSetting
+        {
+            get;
+            private set;
+        }
+
+        public ApplyTable(int workUnitId, DateTime createTime, string num,int applyForSettingId)
         {
             _studentItems = new List<StudentItem>();
             WorkUnitId = workUnitId;
             CreateTime = createTime;
             Num = num;
+            ApplyForSettingId = applyForSettingId;
         }
 
-        public void AddStudentItem(int studentId, int applyTableId)
+        public void AddStudentItem(int studentId)
         {
-            var isExists = _studentItems.FirstOrDefault(c => c.StudentId == studentId && c.ApplyTableId == applyTableId);
+            var isExists = _studentItems.FirstOrDefault(c => c.StudentId == studentId);
             if (isExists != null)
             {
                 throw new Exception("该人员已经存在申请表表内");
             }
             else {
-                StudentItem item = new StudentItem(studentId, applyTableId);
+                StudentItem item = new StudentItem(studentId);
                 _studentItems.Add(item);
             }
         }

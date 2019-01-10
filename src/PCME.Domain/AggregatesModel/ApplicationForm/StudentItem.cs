@@ -32,5 +32,9 @@ namespace PCME.Domain.AggregatesModel.ApplicationForm
             StudentId = studentId;
             ApplyTableId = applyTableId;
         }
+        public StudentItem(int studentId)
+        {
+            StudentId = studentId;
+        }
     }
 }
