@@ -50,7 +50,7 @@ namespace PCME.Api.Controllers
         public async Task<IActionResult> Read(int start, int limit, string filter, string query, string navigates)
         {
 
-            var search = context.ApplyForSetting.AsQueryable();
+            var search = context.ApplyForSetting.Where(c=>DateTime.Now >= c.StartTime && DateTime.Now <= c.EndTime);
             var examsubjectItem = await context.ExamSubjects.ToListAsync();
 
             search = search.FilterAnd(filter.ToObject<Filter>())
@@ -150,20 +150,20 @@ namespace PCME.Api.Controllers
             //var search = signUpCollectionRepository.Query(c => c.Id != 0, include: c => c.Include(s => s.ExamSubject).Include(s => s.Student));
             //search = search.Where(c => c.SignUpForUnitId == signupforunitid);
 
-            var search = context.ApplyTable.Include(i => i.StudentItems).FirstOrDefault(c => c.Id == applyTableId);
+            var search = context.StudentItem.Include(i => i.Student).Where(c => c.ApplyTableId == applyTableId);
             if (search == null)
             {
                 return Ok(new { total=0, data = "" });
             }
             //var item = search.Skip(start).Take(limit);
-            var result = search.StudentItems.ToList().Select(c => new Dictionary<string, object>
+            var result = search.ToList().Select(c => new Dictionary<string, object>
                 {
                     { "id",c.Id},
                     { "studentidcard",c.Student?.IDCard},
                     { "studentname",c.Student?.Name},
                     { "studentid",c.Student?.Id}
                 });
-            var total = search.StudentItems.Count();
+            var total = search.Count();
             return Ok(new { total, data = result });
         }
 
@@ -217,7 +217,7 @@ namespace PCME.Api.Controllers
             foreach (var item in jsonObjects)
             {
                 int studentid = (int)item["studentid"];
-                var studentItemIsExists = context.StudentItem.Where(c => c.StudentId == studentid).FirstOrDefault();
+                var studentItemIsExists = context.StudentItem.Include(s=>s.ApplyTable).Include(s=>s.Student).Where(c => c.StudentId == studentid && c.ApplyTable.ApplyForSettingId == applyforsettingid).FirstOrDefault();
                 if (studentItemIsExists != null)
                 {
                     badRequest.Add(
@@ -265,6 +265,122 @@ namespace PCME.Api.Controllers
             context.SaveChanges();
 
             return Ok(new { message = "添加成功", success = true, data = applyTable.Id });
+        }
+
+        /// <summary>
+        /// 读取当前单位的申请表
+        /// </summary>
+        /// <returns>The sign up for unit.</returns>
+        /// <param name="start">Start.</param>
+        /// <param name="limit">Limit.</param>
+        /// <param name="filter">Filter.</param>
+        /// <param name="query">Query.</param>
+        /// <param name="navigates">Navigates.</param>
+        [HttpPost]
+        [Route("readapplytable")]
+        [Authorize(Roles = "Unit")]
+        public async Task<IActionResult> ReadApplyTable(int start, int limit, string filter, string query, string navigates)
+        {
+            var loginWorkUnitAccountId = int.Parse(User.FindFirstValue("AccountId"));
+            var workUnitAccount = await context.WorkUnitAccounts
+                .Include(s => s.WorkUnit).Where(c => c.Id == loginWorkUnitAccountId).FirstOrDefaultAsync();
+
+            var search = context.ApplyTable
+                .Include(s => s.WorkUnit)
+                .Include(s => s.StudentItems)
+                .Include(s=>s.ApplyForSetting)
+                .Where(c => c.WorkUnitId == workUnitAccount.WorkUnitId);
+
+            var filterObject = filter.ToObject<Filter>().FirstOrDefault();
+            if (filterObject != null)
+            {
+                string value = filterObject.Value;
+                search = search.Where(c => c.Num.Contains(value));
+            }
+
+            var items = search.Skip(start).Take(limit);
+            //var test = items.ToList();
+            var result = items.ToList().Select(c => new Dictionary<string, object>
+                {
+                    {"id",c.Id},
+                    {"workunit.name",c.WorkUnit.Name },
+                    {"workunit.id",c.WorkUnitId},
+                    {"applyforsetting.title",c.ApplyForSetting.Title},
+                    {"applyforsetting.id",c.ApplyForSetting.Id },
+                    {"examSbuejctIdItems",c.ApplyForSetting.ExamSubjectIdString },
+                    {"ispay",c.IsPay},
+                    {"islock",c.IsLock},
+                    {"num",c.Num },
+                    {"studentcount",c.StudentItems.Count() },
+                    {"createtime",c.CreateTime }
+                });
+            var total = search.Count();
+            return Ok(new { total, data = result });
+        }
+
+        /// <summary>
+        /// 删除申请表并和申请表人员
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("delete")]
+        [Authorize(Roles = "Unit")]
+        public IActionResult Delete([FromBody]Object data)
+        {
+            JArray jsonObjects = new JArray();
+            var typeStr = data.GetType().FullName;
+
+            if (typeStr == "Newtonsoft.Json.Linq.JArray")
+            {
+                var jarray = JArray.FromObject(data);
+                jsonObjects = jarray;
+            }
+            else
+            {
+                var jobject = JObject.FromObject(data);
+                jsonObjects.Add(data);
+            }
+            List<object> del = new List<object>();
+            foreach (var item in jsonObjects)
+            {
+                del.Add((int)item["id"]);
+            }
+            var delarray = del.ToArray();
+            IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
+
+            var delObje = context.ApplyTable.Where(c => s.Contains(c.Id)).FirstOrDefault();// signUpForUnitRepository.Query(c => s.Contains(c.Id)).FirstOrDefault();
+
+            if (delObje.IsPay)
+            {
+                return BadRequest(new { message = "删除失败，已经扫描成功的把报名表不允许删除", success = false });
+            }
+
+            var delcollections = context.StudentItem.Where(c => c.ApplyTableId == delObje.Id).ToList(); // signUpCollectionRepository.Query(c => c.SignUpForUnitId == delObje.Id).ToList();
+            context.StudentItem.RemoveRange(delcollections);
+            context.ApplyTable.Remove(delObje);
+            unitOfWork.SaveChanges();
+            return Ok(new { message = "删除成功", success = true });
+        }
+
+        /// <summary>
+        /// 单位锁定申请按钮
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("saveorupdateapplytable")]
+        [Authorize(Roles = "Unit")]
+        public IActionResult SaveOrUpdateApplyTable([FromBody]JToken data)
+        {
+            //int s = int.TryParse(data.islock);
+            int key = (int)data["id"];
+            bool islock = (bool)data["islock"];
+            var applyTable = context.ApplyTable.Find(key);
+            applyTable.ChangeIsLock(islock);
+            context.ApplyTable.Update(applyTable);
+            context.SaveChanges();
+            return Ok(new { message = "锁定成功", success = true });
         }
     }
 }

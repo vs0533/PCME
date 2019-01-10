@@ -41,6 +41,49 @@ namespace PCME.Api.Controllers
             examRoomPlanTicketRepository = unitOfWork.GetRepository<ExamRoomPlanTicket>();
             this.context = context;
         }
+
+        [HttpPost]
+        [Route("apply")]
+        [Authorize(Roles = "Unit")]
+        public async Task<IActionResult> ApplyTableView(int applyTableId)
+        {
+            var search = context.ApplyTable.Include(s=>s.WorkUnit).Include(s=>s.ApplyForSetting).Where(c => c.Id == applyTableId);
+            var items = await search.FirstOrDefaultAsync();
+
+            ///取得科目开设信息
+            //var examsubjectOpenInfo = context.ExamSubjectOpenInfo.FirstOrDefault(c => c.TrainingCenterId == items.TrainingCenterId);
+
+
+            var search_child = context.StudentItem.Include(s => s.Student).Where(c => c.ApplyTableId == items.Id).OrderBy(c => c.Student.Name);
+
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",items.Id},
+                { "code",items.Num},
+                { "workunitname",items.WorkUnit.Name},
+                {"title",items.ApplyForSetting.Title},
+                { "islock",items.IsLock},
+                { "ispay",items.IsPay},
+                { "studentitemcount",search_child.Count()},
+                { "studentitem",search_child.Select(c=>new {
+                    id = c.Id,
+                    idcard = c.Student.IDCard,
+                    studentname = c.Student.Name,
+                    applyTableId = c.ApplyTableId
+                })}
+            };
+            try
+            {
+                return Ok(new { total = search_child.Count(), data = result });
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+
         /// <summary>
         /// 单位显示报名表
         /// </summary>
