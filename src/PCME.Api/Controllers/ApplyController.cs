@@ -109,7 +109,6 @@ namespace PCME.Api.Controllers
 
             var queryExamCredit = from q1 in search
                                   let examsubjectIdItems = context.CreditExams.Where(w => w.StudentId == q1.Id).Select(s=>s.SubjectId)
-                                  
                                   select new { q1,examsubjectIdItems };
 
 
@@ -206,10 +205,10 @@ namespace PCME.Api.Controllers
             {
                 return BadRequest(new { message = "单位申请表错误", success = false });
             }
-            //if (signUpForUnit.IsPay)
-            //{
-            //    return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = signupforunitid });
-            //}
+            if (signUpForUnit.IsPay)
+            {
+                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = signupforunitid });
+            }
 
 
             List<dynamic> badRequest = new List<dynamic>();
