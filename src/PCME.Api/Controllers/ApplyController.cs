@@ -205,9 +205,9 @@ namespace PCME.Api.Controllers
             {
                 return BadRequest(new { message = "单位申请表错误", success = false });
             }
-            if (signUpForUnit.IsPay)
+            if (applyTable.IsPay)
             {
-                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = signupforunitid });
+                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = applyTableid });
             }
 
 
