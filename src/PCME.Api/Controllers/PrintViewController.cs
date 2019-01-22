@@ -286,6 +286,40 @@ namespace PCME.Api.Controllers
             return Ok(new { total = 1, data = result });
         }
 
+        [HttpPost]
+        [Route("readapplydetailsbyqr")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReadApplyAndStudentItemByQR(string code)
+        {
+            //var loginTrainingCenterId = int.Parse(User.FindFirstValue("WorkUnitId"));
+
+
+
+            var apply = await context.ApplyTable.Include(s => s.WorkUnit).Include(s=>s.ApplyForSetting).Where(c => c.Num == code).FirstOrDefaultAsync();
+
+
+
+            var studentitem = context.StudentItem.Include(s => s.Student).Where(c => c.ApplyTableId == apply.Id);
+
+            var result = new Dictionary<string, object>
+            {
+                { "id",apply.Id},
+                { "code",apply.Num},
+                { "workunitname",apply.WorkUnit.Name},
+                { "islock",apply.IsLock},
+                { "ispay",apply.IsPay},
+                { "title",apply.ApplyForSetting.Title},
+                { "studentitemcount",studentitem.Count()},
+                { "studentitem",studentitem.Select(c=>new {
+                    id = c.Id,
+                    idcard = c.Student.IDCard,
+                    studentname = c.Student.Name,
+                    applytableid = c.ApplyTableId
+                })}
+            };
+            return Ok(new { total = 1, data = result });
+        }
+
         /// <summary>
         /// 培训点扫描报名(个人)
         /// </summary>
@@ -351,6 +385,20 @@ namespace PCME.Api.Controllers
             signUpForUnit.ChangeIsLock(islock);
             signUpForUnitRepository.Update(signUpForUnit);
             unitOfWork.SaveChanges();
+            return Ok(new { message = "解锁定成功", success = true });
+        }
+        [HttpPost]
+        [Route("saveorupdateapply")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult SaveOrUpdateApply([FromBody]JToken data)
+        {
+            //int s = int.TryParse(data.islock);
+            int key = (int)data["id"];
+            bool islock = (bool)data["islock"];
+            var apply = context.ApplyTable.Find(key);
+            apply.ChangeIsLock(islock);
+            context.ApplyTable.Update(apply);
+            context.SaveChanges();
             return Ok(new { message = "解锁定成功", success = true });
         }
         /// <summary>
@@ -457,6 +505,20 @@ namespace PCME.Api.Controllers
             return Ok("报名成功");
         }
 
+        [HttpPost]
+        [Route("applyqrok")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ApplyQROK(int applyid)
+        {
+            var apply = await context.ApplyTable.Where(c => c.Id == applyid)
+                .FirstOrDefaultAsync();
+
+            apply.PayToSuccess();
+            context.ApplyTable.Update(apply);
+            context.SaveChanges();
+
+            return Ok("扫描操作成功");
+        }
         /// <summary>
         /// 正式报名(个人)
         /// </summary>

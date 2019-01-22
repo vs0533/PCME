@@ -352,7 +352,7 @@ namespace PCME.Api.Controllers
 
             if (delObje.IsPay)
             {
-                return BadRequest(new { message = "删除失败，已经扫描成功的把报名表不允许删除", success = false });
+                return BadRequest(new { message = "删除失败，已经扫描成功的申请表不允许删除", success = false });
             }
 
             var delcollections = context.StudentItem.Where(c => c.ApplyTableId == delObje.Id).ToList(); // signUpCollectionRepository.Query(c => c.SignUpForUnitId == delObje.Id).ToList();
@@ -380,6 +380,49 @@ namespace PCME.Api.Controllers
             context.ApplyTable.Update(applyTable);
             context.SaveChanges();
             return Ok(new { message = "锁定成功", success = true });
+        }
+
+        /// <summary>
+        /// 删除报名表详情
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("remove")]
+        [Authorize(Roles = "Unit")]
+        public IActionResult Remove([FromBody]Object data)
+        {
+            JArray jsonObjects = new JArray();
+            var typeStr = data.GetType().FullName;
+
+            if (typeStr == "Newtonsoft.Json.Linq.JArray")
+            {
+                var jarray = JArray.FromObject(data);
+                jsonObjects = jarray;
+            }
+            else
+            {
+                var jobject = JObject.FromObject(data);
+                jsonObjects.Add(data);
+            }
+            List<object> del = new List<object>();
+            foreach (var item in jsonObjects)
+            {
+                del.Add((int)item["id"]);
+            }
+            var delarray = del.ToArray();
+            IEnumerable<int> s = jsonObjects.Select(c => (int)c["id"]);
+            var delobject = context.StudentItem.Where(c => delarray.Contains(c.Id)).ToList();
+
+            var signUpForUnit = context.ApplyTable.Find(delobject.FirstOrDefault().ApplyTableId);
+            if (signUpForUnit.IsPay)
+            {
+                return BadRequest(new { message = "已经扫描成功的报名表不允许编辑", success = false, data = delobject.FirstOrDefault().ApplyTableId });
+            }
+
+            context.StudentItem.RemoveRange(delobject);
+            context.SaveChanges();
+            return Ok(new { message = "删除成功", success = true, data = delobject.FirstOrDefault().ApplyTableId });
         }
     }
 }

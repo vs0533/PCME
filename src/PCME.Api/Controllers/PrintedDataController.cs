@@ -55,7 +55,7 @@ namespace PCME.Api.Controllers
                 var jarray = JArray.FromObject(jObject["creditexam3"]);
                 if (jarray.Count() < 3)
                 {
-                    return Ok(new { success = false, message = "聘任合格科目未达到5门，生成失败。" });
+                    return Ok(new { success = false, message = "聘任合格科目未达到3门，生成失败。" });
                 }
 
             }
